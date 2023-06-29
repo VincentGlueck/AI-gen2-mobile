@@ -1,6 +1,13 @@
 package org.ww.ai.data;
 
-public interface WhatToRenderIF {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+import org.ww.ai.parcel.SharePreferencesIF;
+
+public interface WhatToRenderIF extends Parcelable, SharePreferencesIF {
 	String getDescription();
 	String getPreset();
 	boolean isRandom();
@@ -16,4 +23,15 @@ public interface WhatToRenderIF {
 
 	void setPreset(String preset);
 
+	void setNumOfArtists(int num);
+
+	void setDescription(String description);
+
+	void setPhraseCount(int count);
+
+	@Override
+	int describeContents();
+
+	@Override
+	void writeToParcel(@NonNull Parcel dest, int flags);
 }

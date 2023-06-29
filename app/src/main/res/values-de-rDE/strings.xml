@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI-gen2-mobile</string>
+    <string name="title_activity_main">AI Gen 2</string>
+    <string name="first_fragment_label">Was soll es werden</string>
+    <string name="second_fragment_label">Resultate</string>
+    <string name="next">Weiter</string>
+    <string name="previous">Zurück</string>
+    <string name="lorem_ipsum">
+       Beschreibe das Bild in natürlicher Sprache (engl.!)\n\n
+        \'A bear passing through a spooky forrest\'\n
+        \'Donald trump alike dog sitting at a bar\'\n\n
+        …
+        anything you want!
+    </string>
+    <string name="lbl_layout">Preset</string>
+    <string name="lbl_no_layout">Ohne</string>
+    <string name="lbl_artist_type">Künstler</string>
+    <string name="chk_random_artist_type">Zufällig</string>
+    <string name="lbl_max_artists">Max. Künstler</string>
+    <string name="lbl_no_artists">Ohne</string>
+    <string name="spinner_none">(ohne)</string>
+</resources>
