@@ -1,5 +1,6 @@
 package org.ww.ai;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -7,8 +8,9 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
-import androidx.core.view.WindowCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -17,7 +19,6 @@ import androidx.navigation.ui.NavigationUI;
 import org.ww.ai.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
@@ -42,6 +43,15 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        installKeyBoardAutoHide();
+
+    }
+
+    private void installKeyBoardAutoHide() {
+        EditText editText = (EditText) findViewById(R.id.editTextTextMultiLine);
+        View.OnFocusChangeListener ofcListener = new MyFocusChangeListener();
+        editText.setOnFocusChangeListener(ofcListener);
     }
 
     @Override
@@ -50,4 +60,15 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
+    private class MyFocusChangeListener implements View.OnFocusChangeListener {
+        public void onFocusChange(View v, boolean hasFocus) {
+            if(v.getId() == R.id.editTextTextMultiLine && !hasFocus) {
+                InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+            }
+        }
+    }
+
 }

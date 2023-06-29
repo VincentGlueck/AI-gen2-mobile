@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<ai-generator>
+	<settings>
+		<setting name="version" type="system">
+			<value>
+				0.0.3
+			</value>
+		</setting>
+		<setting name="portrait" type="preset">
+			<attribute name="details" option="mix">
+				<value>
+					intricate details
+				</value>
+				<value>
+					bokeh
+				</value>
+				<value>
+					beautifully shot
+				</value>
+				<value>
+					hyper-realistic
+				</value>
+				<value>
+					ultra realistic
+				</value>
+				<value>
+					sharp focus
+				</value>
+			</attribute>
+			
+		</setting>
+		<setting name="landscape" type="preset">
+			<attribute name="format" option="mix">
+				<value>
+					widescreen
+				</value>
+				<value>
+					high detail
+				</value>
+				<value>
+					natural
+				</value>
+			</attribute>
+		</setting>
+		
+		<setting name="camera" type="optional">
+			<attribute name="type" option="unique">
+				<value>
+					Canon
+				</value>
+				<value>
+					Nikon
+				</value>
+				<value>
+					Leica
+				</value>
+			</attribute>
+			
+		</setting>
+		
+		<setting name="resolution" type="optional" depends="camera">
+			<attribute name="res" option="unique">
+				<value>
+					64 megapixels
+				</value>
+				<value>
+					8K
+				</value>
+				<value>
+					4K
+				</value>
+			</attribute>
+			<attribute name="specifics" option="mix" >
+				<value>
+					sharp focus
+				</value>
+				<value>
+					blurred
+				</value>
+				<value>
+					blunt
+				</value>
+			</attribute>
+		</setting>
+		<setting name="artisttype" type="system">
+			<value>
+				ai
+			</value>
+			<value>
+				everyday
+			</value>
+			<value>
+				hollywood
+			</value>
+			<value>
+				historic
+			</value>
+			<value>
+				modern
+			</value>
+			<value>
+				classic
+			</value>
+			<value>
+				famous
+			</value>
+			<value>
+				portrait
+			</value>
+		</setting>
+		<setting name="artists" type="optional" >
+			<attribute name="artist" option="mix">
+				<value artisttype="ai">
+					Greg Rutkowski
+				</value>
+				<value artisttype="ai">
+					Lee Jeffries
+				</value>
+				<value artisttype="ai">
+					Alessio Albi
+				</value>
+				<value artisttype="ai">
+					Adrian Kuipers
+				</value>
+				<value artisttype="ai">
+					Martin Schoeller
+				</value>
+				<value artisttype="ai">
+					Mark Mann
+				</value>
+				<value artisttype="portrait">
+					Annie Leibovitz
+				</value>
+				<value artisttype="portrait">
+					Cindy Sherman
+				</value>
+				<value artisttype="portrait">
+					Andreas Gursky
+				</value>
+				<value artisttype="portrait">
+					Jeff Wall
+				</value>
+				<value artisttype="portrait">
+					Peter Lindbergh
+				</value>
+				<value artisttype="portrait">
+					Steve McCurry
+				</value>
+				<value artisttype="famous">
+					Andy Warhol
+				</value>
+				<value artisttype="famous">
+					David LaChapelle
+				</value>
+				<value artisttype="historic">
+					Alfred Eisenstaedt
+				</value>
+				<value artisttype="historic">
+					Will McBride
+				</value>
+				<value artisttype="historic">
+					Nan Goldin
+				</value>
+				<value artisttype="everyday">
+					Martin Parr 
+				</value>
+				<value artisttype="everyday">
+					Yousuf Karsh
+				</value>
+				<value artisttype="portrait">
+					Edward Steichen
+				</value>
+				<value artisttype="portrait">
+					Cecil Beaton
+				</value>
+				<value artisttype="portrait">
+					Erwin Blumenfeld
+				</value>
+			</attribute>
+		</setting>
+		<setting name="random" type="optional" >
+			<attribute name="random" option="mix">
+				<value>
+					high contrast
+				</value>
+				<value>
+					dark gray
+				</value>
+				<value>
+					light gray
+				</value>
+				<value>
+					light purple
+				</value>
+				<value>
+					realistic
+				</value>
+				<value>
+					hyper realistic
+				</value>
+				<value>
+					light mint
+				</value>
+				<value>
+					mystic
+				</value>
+			</attribute>
+		</setting>
+	</settings>
+</ai-generator>
+
+
