@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/single_result_layout"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:padding="4dp">
 
     <EditText
         android:id="@+id/textview_result"
         android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/result_undefined" />
+        android:text="@string/result_undefined"
+        android:maxLines="8" />
 
+    <ImageView
+        android:id="@+id/btn_show_stats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="end|bottom"
+        android:background="@drawable/info_sml" />
 
-</RelativeLayout>
+</FrameLayout>

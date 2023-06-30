@@ -15,9 +15,19 @@
     </string>
     <string name="lbl_layout">Preset</string>
     <string name="lbl_no_layout">Ohne</string>
-    <string name="lbl_artist_type">Künstler</string>
+    <string name="lbl_artist_type">Künstlertyp</string>
     <string name="chk_random_artist_type">Zufällig</string>
     <string name="lbl_max_artists">Max. Künstler</string>
     <string name="lbl_no_artists">Ohne</string>
     <string name="spinner_none">(ohne)</string>
+    <string name="lbl_num_artists">Anz., Künstler</string>
+    <string name="lbl_result_header">Hier einige Vorschläge für dich</string>
+    <string name="instant_copy_to_clipboard">Bei Click in Zwischenablage</string>
+    <string name="reload">Neu laden</string>
+    <string name="dialogOk">OK</string>
+    <string name="result_undefined">undefiniert</string>
+    <string name="titleError">Fehler</string>
+    <string name="dialogWhoCares">OK</string>
+    <string name="pleaseWait">Bitte warten...</string>
+    <string name="render_result_dialog_title">Render-Details</string>
 </resources>

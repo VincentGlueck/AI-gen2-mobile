@@ -21,9 +21,46 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <CheckBox
+            android:id="@+id/instant_copy_to_clipboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/button_second"
+            android:layout_alignParentEnd="true"
+            android:text="@string/instant_copy_to_clipboard" />
+
+        <LinearLayout
+            android:id="@+id/lin_result_header"
+            android:layout_below="@id/button_second"
+            android:padding="8dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/lbl_result_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.85"
+                android:text="@string/lbl_result_header"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:src="@drawable/reset"
+                android:contentDescription="@string/reload" />
+
+        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/lin_result"
-            android:layout_below="@id/button_second"
+            android:layout_below="@id/lin_result_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">

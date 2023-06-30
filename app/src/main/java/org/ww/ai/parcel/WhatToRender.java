@@ -21,6 +21,17 @@ public class WhatToRender implements WhatToRenderIF {
             return new WhatToRender[size];
         }
     };
+    private static final String PREF_DESCRIPTION = "description";
+    private static final String PREF_PRESET = "preset";
+    private static final String PREF_RANDOM = "random";
+    private static final String PREF_USE_CAMERA = "useCamera";
+    private static final String PRE_NUM_OF_ARTIST = "numOfArtists";
+    private static final String PREF_PHRASE_COUNT = "phraseCount";
+    private static final String PREF_RANDOM_COUNT = "randomCount";
+    private static final String PREF_ARTIST_TYPE_NAME = "artistTypeName";
+    private static final String PREF_USE_NO_ARTIST = "useNoArtists";
+    private static final String PREF_USE_RESOLUTION = "useResolution";
+    private static final String PREF_INSTANT_COPY_TO_CLIP_BOARD = "instantCopyToClipBoard";
 
     public WhatToRender() {
     }
@@ -33,6 +44,8 @@ public class WhatToRender implements WhatToRenderIF {
         random = str != null && Boolean.parseBoolean(str);
         useCamera = str != null && Boolean.parseBoolean(str);
         numOfArtists = in.readInt();
+        str = in.readString();
+        useNoArtists = str != null && Boolean.parseBoolean(str);
         phraseCount = in.readInt();
         randomCount = in.readInt();
         artistTypeName = in.readString();
@@ -43,9 +56,14 @@ public class WhatToRender implements WhatToRenderIF {
     private boolean random;
     private boolean useCamera;
     private int numOfArtists;
+
+    private boolean useResolution;
+    private boolean useNoArtists;
     private int phraseCount;
     private int randomCount = 3;
     private String artistTypeName;
+
+    private boolean instantCopyToClipBoard;
     private AdditionalSettingsIF additionalSettingsIF;
     @Override
     public String getDescription() {
@@ -105,16 +123,39 @@ public class WhatToRender implements WhatToRenderIF {
         this.preset = preset;
     }
 
+    @Override
     public void setRandom(boolean random) {
         this.random = random;
     }
 
+    @Override
     public void setUseCamera(boolean useCamera) {
         this.useCamera = useCamera;
     }
 
+    @Override
     public void setNumOfArtists(int numOfArtists) {
         this.numOfArtists = numOfArtists;
+    }
+
+    @Override
+    public boolean isUseNoArtists() {
+        return useNoArtists;
+    }
+
+    @Override
+    public void setUseNoArtists(boolean useNoArtists) {
+        this.useNoArtists = useNoArtists;
+    }
+
+    @Override
+    public boolean isInstantCopyToClipBoard() {
+        return instantCopyToClipBoard;
+    }
+
+    @Override
+    public void setInstantCopyToClipBoard(boolean instantCopyToClipBoard) {
+        this.instantCopyToClipBoard = instantCopyToClipBoard;
     }
 
     @Override
@@ -132,6 +173,8 @@ public class WhatToRender implements WhatToRenderIF {
         dest.writeInt(phraseCount);
         dest.writeInt(randomCount);
         dest.writeString(artistTypeName);
+        dest.writeString(Boolean.toString(useNoArtists));
+        dest.writeString(Boolean.toString(useResolution));
     }
 
     public void setPhraseCount(int phraseCount) {
@@ -140,6 +183,14 @@ public class WhatToRender implements WhatToRenderIF {
 
     public void setRandomCount(int randomCount) {
         this.randomCount = randomCount;
+    }
+
+    public boolean isUseResolution() {
+        return useResolution;
+    }
+    @Override
+    public void setUseResolution(boolean useResolution) {
+        this.useResolution = useResolution;
     }
 
     public void setArtistTypeName(String artistTypeName) {
@@ -154,14 +205,18 @@ public class WhatToRender implements WhatToRenderIF {
     public void writeToSharedPreferences(SharedPreferences preferences) {
         SharedPreferences.Editor editor = preferences.edit();
         try {
-            editor.putString("description", getDescription());
-            editor.putString("preset", getPreset());
-            editor.putBoolean("random", isRandom());
-            editor.putBoolean("useCamera", isUseCamera());
-            editor.putInt("numOfArtists", getNumOfArtists());
-            editor.putInt("phraseCount", getPhraseCount());
-            editor.putInt("randomCount", getRandomCount());
-            editor.putString("artistTypeName", getArtistTypeName());
+            editor.putString(PREF_DESCRIPTION, getDescription());
+            editor.putString(PREF_PRESET, getPreset());
+            editor.putBoolean(PREF_RANDOM, isRandom());
+            editor.putBoolean(PREF_USE_CAMERA, isUseCamera());
+            editor.putInt(PRE_NUM_OF_ARTIST, getNumOfArtists());
+            editor.putInt(PREF_PHRASE_COUNT, getPhraseCount());
+            editor.putInt(PREF_RANDOM_COUNT, getRandomCount());
+            editor.putString(PREF_ARTIST_TYPE_NAME, getArtistTypeName());
+            editor.putBoolean(PREF_USE_NO_ARTIST, isUseNoArtists());
+            editor.putBoolean(PREF_USE_RESOLUTION, isUseResolution());
+            editor.putBoolean(PREF_INSTANT_COPY_TO_CLIP_BOARD, isInstantCopyToClipBoard());
+
         } finally {
             editor.apply();
         }
@@ -169,14 +224,17 @@ public class WhatToRender implements WhatToRenderIF {
 
     @Override
     public void getFromPreferences(SharedPreferences preferences) {
-        setDescription(preferences.getString("description", ""));
-        setPreset(preferences.getString("preset", ""));
-        setRandom(preferences.getBoolean("random", false));
-        setUseCamera(preferences.getBoolean("useCamera", false));
-        setNumOfArtists(preferences.getInt("numOfArtists", 3));
-        setPhraseCount(preferences.getInt("phraseCount", 1));
-        setRandomCount(preferences.getInt("randomCount", 1));
-        setArtistTypeName(preferences.getString("artistTypeName", ""));
+        setDescription(preferences.getString(PREF_DESCRIPTION, ""));
+        setPreset(preferences.getString(PREF_PRESET, ""));
+        setRandom(preferences.getBoolean(PREF_RANDOM, false));
+        setUseCamera(preferences.getBoolean(PREF_USE_CAMERA, false));
+        setNumOfArtists(preferences.getInt(PRE_NUM_OF_ARTIST, 3));
+        setPhraseCount(preferences.getInt(PREF_PHRASE_COUNT, 1));
+        setRandomCount(preferences.getInt(PREF_RANDOM_COUNT, 1));
+        setArtistTypeName(preferences.getString(PREF_ARTIST_TYPE_NAME, ""));
+        setUseNoArtists(preferences.getBoolean(PREF_USE_NO_ARTIST, false));
+        setUseResolution(preferences.getBoolean(PREF_USE_RESOLUTION, true));
+        setInstantCopyToClipBoard(preferences.getBoolean(PREF_INSTANT_COPY_TO_CLIP_BOARD, false));
     }
 
     @NonNull

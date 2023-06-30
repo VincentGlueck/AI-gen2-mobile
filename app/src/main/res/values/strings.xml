@@ -15,10 +15,20 @@
     </string>
     <string name="lbl_layout">Layout</string>
     <string name="lbl_no_layout">No layout</string>
-    <string name="lbl_artist_type">Artist</string>
+    <string name="lbl_artist_type">Artist type</string>
     <string name="chk_random_artist_type">Random</string>
     <string name="lbl_max_artists">Max. artists</string>
     <string name="lbl_no_artists">None</string>
     <string name="spinner_none">(none)</string>
-    <string name="result_undefined" translatable="false">undefined</string>
+    <string name="result_undefined">undefined</string>
+    <string name="lbl_num_artists">Num of artists</string>
+    <string name="lbl_result_header">Here are some possible sentences</string>
+    <string name="instant_copy_to_clipboard">Instant copy2clipboard</string>
+    <string name="reload">Reload</string>
+    <string name="dialogOk">OK</string>
+    <string name="titleError">Error</string>
+    <string name="dialogWhoCares">Dismiss</string>
+    <string name="pleaseWait">Please wait...</string>
+    <string name="render_result_dialog_title">Render details</string>
+
 </resources>

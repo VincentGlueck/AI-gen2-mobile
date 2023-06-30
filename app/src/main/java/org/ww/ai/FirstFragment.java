@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -63,13 +62,8 @@ public class FirstFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
 
-        binding.btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
-            }
-        });
+        binding.btnNext.setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
+                .navigate(R.id.action_FirstFragment_to_SecondFragment));
 
         if(whatToRender == null) {
             whatToRender = new WhatToRender();
@@ -79,9 +73,9 @@ public class FirstFragment extends Fragment {
         addValuesToArtistTypeSpinner(view);
         addValuesToLayoutSpinner(view);
         addCheckBoxListeners(view);
+        addValuesToNumOfArtistsSpinner(view);
 
     }
-
 
     @Override
     public void onResume() {
@@ -94,13 +88,13 @@ public class FirstFragment extends Fragment {
         CheckBox checkBoxNoLayout = view.findViewById(R.id.chk_no_layout);
         checkBoxNoLayout.setChecked(whatToRender.getPreset().isEmpty());
         CheckBox checkBoxNoArtist = view.findViewById(R.id.chk_no_artists);
-        // TODO this is currently missing in WhatToRenderIF
-        checkBoxNoArtist.setChecked(false);
+        checkBoxNoArtist.setChecked(whatToRender.isUseNoArtists());
         CheckBox checkBoxRandomArtist =  view.findViewById(R.id.chk_random_artist);
         checkBoxRandomArtist.setChecked(whatToRender.getArtistTypeName().isEmpty());
 
         selectSpinner(view.findViewById(R.id.spin_layout), whatToRender.getPreset());
         selectSpinner(view.findViewById(R.id.spin_artist_type), whatToRender.getArtistTypeName());
+        selectSpinner(view.findViewById(R.id.spin_num_artists), String.valueOf(whatToRender.getNumOfArtists()));
 
     }
 
@@ -165,7 +159,7 @@ public class FirstFragment extends Fragment {
         List<String> presets = new ArrayList<>();
         settingsCollection.getPresets().forEach(p -> presets.add(p.getName()));
         presets.add(0, view.getContext().getResources().getString(R.string.spinner_none));
-        Spinner spinner = (Spinner) view.findViewById(R.id.spin_layout);
+        Spinner spinner = view.findViewById(R.id.spin_layout);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(view.getContext(),
                 android.R.layout.simple_spinner_item, presets);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -180,9 +174,29 @@ public class FirstFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
             }
-
         });
     }
+
+    private void addValuesToNumOfArtistsSpinner(@NonNull View view) {
+        final String[] selection = new String[]{"1", "2", "3"};
+        Spinner spinner = view.findViewById(R.id.spin_num_artists);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(view.getContext(),
+                android.R.layout.simple_spinner_item, selection);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String str = spinner.getSelectedItem().toString();
+                whatToRender.setNumOfArtists(Integer.parseInt(str));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+    }
+
 
     private void addDescriptionTextListener(View view) {
         EditText editText = view.findViewById(R.id.editTextTextMultiLine);

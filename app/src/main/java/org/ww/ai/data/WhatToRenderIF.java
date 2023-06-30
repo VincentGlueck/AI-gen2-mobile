@@ -12,6 +12,10 @@ public interface WhatToRenderIF extends Parcelable, SharePreferencesIF {
 	String getPreset();
 	boolean isRandom();
 	boolean isUseCamera();
+
+	boolean isUseNoArtists();
+
+	boolean isInstantCopyToClipBoard();
 	int getNumOfArtists();
 	int getPhraseCount();
 	int getRandomCount();
@@ -28,6 +32,17 @@ public interface WhatToRenderIF extends Parcelable, SharePreferencesIF {
 	void setDescription(String description);
 
 	void setPhraseCount(int count);
+
+	void setInstantCopyToClipBoard(boolean onOff);
+
+	void setUseNoArtists(boolean useNoArtists);
+
+	void setUseCamera(boolean useCamera);
+
+	void setRandom(boolean random);
+
+	void setRandomCount(int randomCount);
+	void setUseResolution(boolean useResolution);
 
 	@Override
 	int describeContents();

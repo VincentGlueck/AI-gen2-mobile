@@ -1,18 +1,21 @@
 package org.ww.ai.phrase;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.ww.ai.R;
 import org.ww.ai.data.AddtionalAttributes;
 import org.ww.ai.data.AttributeValue;
+import org.ww.ai.data.RenderResult;
 import org.ww.ai.data.Setting;
 import org.ww.ai.data.SettingAttribute;
 import org.ww.ai.data.SettingAttributeType;
@@ -24,38 +27,35 @@ import org.ww.ai.phrase.PraseGeneratorErrorHandlerIF.Severity;
 public class PhraseGenerator {
 
 	// TODO: this might be be a param, but for now...
-	private static final int NORMAL_NUM_OF_ARTISTS = 4;
+	private static final int MAX_NUM_OF_ARTISTS = 3;
 	private final WhatToRenderIF whatToRender;
 	private final SettingsCollection settingsCollection;
 	private final PraseGeneratorErrorHandlerIF errorHandler;
 
-	public PhraseGenerator(WhatToRenderIF whatToRender, SettingsCollection settingsCollection, PraseGeneratorErrorHandlerIF errorHandler) {
+	public PhraseGenerator(WhatToRenderIF whatToRender, SettingsCollection settingsCollection,
+						   PraseGeneratorErrorHandlerIF errorHandler) {
 		this.whatToRender = whatToRender;
 		this.settingsCollection = settingsCollection;
 		this.errorHandler = errorHandler;
 	}
-	
-	public String getAITextAsString() {
-		return String.join("\\n", getAITextAsList());
-	}
-	
 
-	public List<String> getAITextAsList() {
+	public List<RenderResult> getAITextsAsRenderResultList() {
 		if(whatToRender == null || settingsCollection == null) {
 			throw new RuntimeException("simply don't know what your are planning to do, illegal call with null values...");
 		}
-		System.out.println(whatToRender);
 		int count = whatToRender.getPhraseCount();
-		final List<String> result = new ArrayList<>();
+		final List<RenderResult> result = new ArrayList<>();
 		for(int n=0; n<count; n++) {
-			final List<AttributeValue> list = getGenerateWordSettings();
+			RenderResult renderResult = new RenderResult();
+			final List<AttributeValue> list = getGenerateWordSettings(renderResult);
 			String str = TextUtils.join(", ", list.stream().map(AttributeValue::getValue).collect(Collectors.toList()));
-			result.add(whatToRender.getDescription().trim() + ", " + str);
+			renderResult.setSentence(whatToRender.getDescription().trim() + ", " + str);
+			result.add(renderResult);
 		}
 		return result;
 	}
 
-	private List<AttributeValue> getGenerateWordSettings() {
+	private List<AttributeValue> getGenerateWordSettings(RenderResult renderResult) {
 		boolean presetFound = false;
 		boolean presetWanted = whatToRender.getPreset() != null && !whatToRender.getPreset().isEmpty();
 		final List<AttributeValue> result = new ArrayList<>();
@@ -65,6 +65,8 @@ public class PhraseGenerator {
 					continue;
 				}
 				List<AttributeValue> presetWords = getRandomWords(setting);
+				renderResult.setPresetWords(presetWords.size());
+				renderResult.setPreset(setting.getName());
 				result.addAll(presetWords);
 				presetFound = true;
 			} 
@@ -74,16 +76,24 @@ public class PhraseGenerator {
 			}
 			if(AddtionalAttributes.ARTISTS == attr) {
 				int numOfArtists = whatToRender.getNumOfArtists();
-				if (numOfArtists > NORMAL_NUM_OF_ARTISTS) {
-					numOfArtists = NORMAL_NUM_OF_ARTISTS;
+				if (numOfArtists > MAX_NUM_OF_ARTISTS) {
+					numOfArtists = MAX_NUM_OF_ARTISTS;
 				}
-				result.addAll(getArtistsWords(setting, numOfArtists, whatToRender.getArtistTypeName()));
+				List<AttributeValue> list = getArtistsWords(setting, numOfArtists, whatToRender.getArtistTypeName());
+				result.addAll(list);
+				renderResult.setNumOfArtists(list.size());
 			} else if (AddtionalAttributes.CAMERA == attr && whatToRender.isUseCamera()) {
-				 result.add(getCamera(setting));
+				 AttributeValue camera = getCamera(setting);
+				 result.add(camera);
+				 renderResult.setCameraType(camera.getValue());
 			} else if (AddtionalAttributes.RESOLUTION == attr && whatToRender.isUseCamera()) {
-				result.addAll(getResolution(setting));
+				List<AttributeValue> resolution = getResolution(setting);
+				renderResult.setResolution(resolution.stream().map(AttributeValue::getValue).collect(Collectors.joining(", ")));
+				result.addAll(resolution);
 			} else if (AddtionalAttributes.RANDOM == attr) {
-				result.addAll(getRandomWords(setting));
+				List<AttributeValue> randomWords = getRandomWords(setting);
+				renderResult.setNumOfRandoms(randomWords.size());
+				result.addAll(randomWords);
 			}
 		}
 		if(!presetFound && presetWanted) {
@@ -107,7 +117,7 @@ public class PhraseGenerator {
 		List<AttributeValue> result = Collections.emptyList();
 		List<SettingAttribute> filteredList = new ArrayList<>();
 		if(artistTypeName != null && !artistTypeName.isEmpty()) {
-			List<String> filter = Stream.of(artistTypeName.split(",")).map(a -> a.trim()).collect(Collectors.toList());
+			List<String> filter = Stream.of(artistTypeName.split(",")).map(String::trim).collect(Collectors.toList());
 			for(SettingAttribute attr : attributes) {
 				for(AttributeValue attributeValue : attr.getValues()) {
 					String artistType = attributeValue.getExtraData().getOrDefault("artisttype", "");
@@ -120,16 +130,17 @@ public class PhraseGenerator {
 				}
 			}
 			if(filteredList.isEmpty()) {
-				System.out.println("Unable to find any artist matching artisttype '" + artistTypeName + "'");
+				Log.d("GENERATOR", "Unable to find any artist matching artisttype '" + artistTypeName + "'");
 			} else {
 				attributes.clear();
 				attributes.addAll(filteredList);
 			}
 		}
-		for(SettingAttribute attr : attributes) {
-			result = reduceToMaxEntriesRandom(attr.getValues(), numOfArtists);
-		}
-		return result;
+		List<AttributeValue> list = attributes.stream().flatMap(a -> a.getValues().stream()).collect(Collectors.toList());
+
+		return reduceToMaxEntriesRandom(list, numOfArtists);
+
+
 	}
 	
 	private AttributeValue getCamera(Setting setting) {
@@ -178,12 +189,12 @@ public class PhraseGenerator {
 	
 	private List<AttributeValue> reduceToMaxEntriesRandom(List<AttributeValue> original, int... maxEntries) {
 		List<AttributeValue> result = new ArrayList<>(original);
-		Random random = new Random();
 		Collections.shuffle(result);
-		int count = maxEntries.length > 1 ? maxEntries[0] : random.nextInt(original.size());
-		do {
+		int count = maxEntries.length > 1 ? maxEntries[0] :
+				ThreadLocalRandom.current().nextInt(1, original.size());
+		while (result.size() > count) {
 			result.remove(0);
-		} while (result.size() > count);
+		}
 		return result;
 	}
 	

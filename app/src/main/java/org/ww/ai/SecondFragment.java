@@ -1,22 +1,27 @@
 package org.ww.ai;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import org.ww.ai.data.RenderResult;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.FragmentSecondBinding;
@@ -25,6 +30,7 @@ import org.ww.ai.parser.Parser;
 import org.ww.ai.phrase.PhraseGenerator;
 import org.ww.ai.phrase.PhraseGeneratorException;
 import org.ww.ai.phrase.PraseGeneratorErrorHandlerIF;
+import org.ww.ai.ui.DialogUtil;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -106,18 +112,43 @@ public class SecondFragment extends Fragment implements PraseGeneratorErrorHandl
 
     private void renderResultText() {
         LinearLayout linearLayout = view.findViewById(R.id.lin_result);
+        CheckBox checkBox = view.findViewById(R.id.instant_copy_to_clipboard);
+        checkBox.setOnCheckedChangeListener((v, checked) -> {
+            whatToRender.setInstantCopyToClipBoard(checked);
+        });
         // TODO remove after it works ;-)
-        whatToRender.setPhraseCount(4);
+        whatToRender.setPhraseCount(5);
         PhraseGenerator phraseGenerator = new PhraseGenerator(whatToRender, settingsCollection, this);
 
-        List<String> textList = phraseGenerator.getAITextAsList();
-        for(String text : textList) {
-            RelativeLayout relativeLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.single_result, null);
-            final EditText editText = relativeLayout.findViewById(R.id.textview_result);
-            editText.setText(text);
+        List<RenderResult> textList = phraseGenerator.getAITextsAsRenderResultList();
+        for(RenderResult renderResult : textList) {
+            FrameLayout frameLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.single_result, null);
+            final EditText editText = frameLayout.findViewById(R.id.textview_result);
+            editText.setText(renderResult.getSentence());
             editText.setSelectAllOnFocus(true);
-            linearLayout.addView(relativeLayout);
+            editText.setOnClickListener(l -> {
+                if(whatToRender.isInstantCopyToClipBoard()) {
+                    copyToClipBoard(editText.getText());
+                }
+            });
+            ImageView imageView = frameLayout.findViewById(R.id.btn_show_stats);
+            imageView.setOnClickListener(l -> {
+                DialogUtil.DIALOG_UTIL.showMessage(getContext(), R.string.render_result_dialog_title,
+                        renderResult.toReadableForm(), R.drawable.info);
+            });
+            linearLayout.addView(frameLayout);
         }
+    }
+
+    private void copyToClipBoard(Editable text) {
+        if(getContext() != null && getContext().getSystemService(Context.CLIPBOARD_SERVICE) != null) {
+            ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("ai gen-2 text", text.toString());
+            clipboard.setPrimaryClip(clip);
+        } else {
+            Toast.makeText(containerContext, "Error copying to clipboard", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
