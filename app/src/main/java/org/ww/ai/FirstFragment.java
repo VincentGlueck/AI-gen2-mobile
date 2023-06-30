@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,12 +121,20 @@ public class FirstFragment extends Fragment {
         selectSpinner(view.findViewById(R.id.spin_camera), String.valueOf(whatToRender.getCamera()));
         selectSpinner(view.findViewById(R.id.spin_resolution), String.valueOf(whatToRender.getResolution()));
 
+        Log.d("VALUE1", "" + whatToRender.getRandomCount());
+        Log.d("VALUE2", "" + whatToRender.getPhraseCount());
 
-        Slider sliderRandomWords = view.findViewById(R.id.slider_random_words);
-        sliderRandomWords.setValue((float) whatToRender.getRandomCount());
+        try {
+            Slider sliderRandomWords = view.findViewById(R.id.slider_random_words);
+            sliderRandomWords.setValue((float) whatToRender.getRandomCount());
 
-        Slider sliderSentencesCount = view.findViewById(R.id.slider_sentences_count);
-        sliderSentencesCount.setValue(whatToRender.getPhraseCount());
+
+            Slider sliderSentencesCount = view.findViewById(R.id.slider_sentences_count);
+            sliderSentencesCount.setValue(whatToRender.getPhraseCount());
+        } catch (Exception e) {
+            Log.d("SLIDER_ERR", e.getMessage());
+        }
+
     }
 
     private void selectSpinner(Spinner spinner, String value) {

@@ -60,7 +60,6 @@ public class SecondFragment extends Fragment implements PraseGeneratorErrorHandl
         assert container != null;
         this.containerContext = container.getContext();
 
-
         binding = FragmentSecondBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -90,6 +89,10 @@ public class SecondFragment extends Fragment implements PraseGeneratorErrorHandl
         if(whatToRender == null) {
             whatToRender = new WhatToRender();
         }
+        ImageView refreshImageView = view.findViewById(R.id.refresh_results);
+        refreshImageView.setOnClickListener(l -> {
+            reRenderResults();
+        });
     }
 
     @Override
@@ -143,6 +146,12 @@ public class SecondFragment extends Fragment implements PraseGeneratorErrorHandl
             });
             linearLayout.addView(frameLayout);
         }
+    }
+
+    private void reRenderResults() {
+        LinearLayout linearLayout = view.findViewById(R.id.lin_result);
+        linearLayout.removeAllViews();
+        renderResultText();
     }
 
     private void copyToClipBoard(Editable text) {

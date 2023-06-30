@@ -259,7 +259,7 @@ public class WhatToRender implements WhatToRenderIF {
         setRandomCamera(preferences.getBoolean(PREF_USE_CAMERA, false));
         setNumOfArtists(preferences.getInt(PRE_NUM_OF_ARTIST, 3));
         setPhraseCount(preferences.getInt(PREF_PHRASE_COUNT, 1));
-        setRandomCount(preferences.getInt(PREF_RANDOM_COUNT, 1));
+        setRandomCount(preferences.getInt(PREF_RANDOM_COUNT, 50));
         setArtistTypeName(preferences.getString(PREF_ARTIST_TYPE_NAME, ""));
         setUseNoArtists(preferences.getBoolean(PREF_USE_NO_ARTIST, false));
         setInstantCopyToClipBoard(preferences.getBoolean(PREF_INSTANT_COPY_TO_CLIP_BOARD, false));
