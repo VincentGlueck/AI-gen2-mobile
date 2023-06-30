@@ -26,22 +26,39 @@
             android:layout_alignParentTop="true"
             android:text="@string/next" />
 
-        <EditText
-            android:id="@+id/editTextTextMultiLine"
-            android:layout_marginTop="8dp"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="start|top"
             android:layout_below="@id/btn_next"
-            android:layout_alignParentBottom="true"
-            android:inputType="textMultiLine"
-            android:minLines="8"
-            android:maxLines="8"
-            android:hint="@string/lorem_ipsum"
-            android:autofillHints=""
-            android:imeOptions="actionGo"
-            />
+            android:layout_marginTop="8dp"
+            android:padding="4dp">
+
+            <EditText
+                android:id="@+id/editTextTextMultiLine"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                android:minLines="8"
+                android:maxLines="8"
+                android:hint="@string/lorem_ipsum"
+                android:autofillHints=""
+                android:imeOptions="actionGo" />
+
+            <ImageView
+                android:id="@+id/btn_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="end|bottom"
+                android:background="@drawable/delete" />
+
+        </FrameLayout>
+
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -151,6 +168,134 @@
 
 
         </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rel_camera"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/lbl_camera"
+                android:text="@string/lbl_camera"
+                android:textSize="16sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"/>
+
+            <Spinner
+                android:id="@+id/spin_camera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@id/lbl_camera"/>
+
+            <CheckBox
+                android:id="@+id/chk_random_camera"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/spin_camera"
+                android:text="@string/chk_random_camera"
+                android:layout_alignParentEnd="true" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rel_resolution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/lbl_resolution"
+                android:text="@string/lbl_resolution"
+                android:textSize="16sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"/>
+
+            <Spinner
+                android:id="@+id/spin_resolution"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@id/lbl_resolution"/>
+
+            <CheckBox
+                android:id="@+id/chk_random_resolution"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/spin_resolution"
+                android:text="@string/chk_random_resolution"
+                android:layout_alignParentEnd="true" />
+
+        </RelativeLayout>
+
+        <View style="@style/Divider"/>
+
+        <LinearLayout
+            android:id="@+id/rel_random_words"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/lbl_random_words"
+                android:text="@string/lbl_random_words"
+                android:textSize="16sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_random_words"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                app:labelBehavior="gone"
+                android:valueFrom="0"
+                android:valueTo="100"
+                android:gravity="center_horizontal|end"
+                android:value="30"
+                android:stepSize="5" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rel_word_count"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/lbl_word_count"
+                android:text="@string/lbl_sentences_count"
+                android:textSize="16sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_sentences_count"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:valueFrom="1"
+                android:valueTo="25"
+                android:gravity="center_horizontal|end"
+                android:stepSize="1" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

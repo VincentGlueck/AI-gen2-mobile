@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -93,8 +92,6 @@ public class SecondFragment extends Fragment implements PraseGeneratorErrorHandl
         }
     }
 
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -107,7 +104,16 @@ public class SecondFragment extends Fragment implements PraseGeneratorErrorHandl
         SharedPreferences preferences = containerContext.getSharedPreferences(WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
         whatToRender = new WhatToRender();
         whatToRender.getFromPreferences(preferences);
+        CheckBox checkInstantCopy = view.findViewById(R.id.instant_copy_to_clipboard);
+        checkInstantCopy.setChecked(whatToRender.isInstantCopyToClipBoard());
         renderResultText();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences preferences = containerContext.getSharedPreferences(WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
+        whatToRender.writeToSharedPreferences(preferences);
     }
 
     private void renderResultText() {
@@ -116,18 +122,17 @@ public class SecondFragment extends Fragment implements PraseGeneratorErrorHandl
         checkBox.setOnCheckedChangeListener((v, checked) -> {
             whatToRender.setInstantCopyToClipBoard(checked);
         });
-        // TODO remove after it works ;-)
-        whatToRender.setPhraseCount(5);
         PhraseGenerator phraseGenerator = new PhraseGenerator(whatToRender, settingsCollection, this);
 
         List<RenderResult> textList = phraseGenerator.getAITextsAsRenderResultList();
-        for(RenderResult renderResult : textList) {
+        for (RenderResult renderResult : textList) {
             FrameLayout frameLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.single_result, null);
             final EditText editText = frameLayout.findViewById(R.id.textview_result);
             editText.setText(renderResult.getSentence());
             editText.setSelectAllOnFocus(true);
-            editText.setOnClickListener(l -> {
-                if(whatToRender.isInstantCopyToClipBoard()) {
+
+            editText.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus && whatToRender.isInstantCopyToClipBoard()) {
                     copyToClipBoard(editText.getText());
                 }
             });
@@ -145,6 +150,7 @@ public class SecondFragment extends Fragment implements PraseGeneratorErrorHandl
             ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("ai gen-2 text", text.toString());
             clipboard.setPrimaryClip(clip);
+            Toast.makeText(getContext(), "Text copied", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(containerContext, "Error copying to clipboard", Toast.LENGTH_SHORT).show();
         }

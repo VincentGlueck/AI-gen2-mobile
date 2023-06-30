@@ -28,7 +28,13 @@
     <string name="dialogOk">OK</string>
     <string name="titleError">Error</string>
     <string name="dialogWhoCares">Dismiss</string>
-    <string name="pleaseWait">Please wait...</string>
+    <string name="pleaseWait">Please wait…</string>
     <string name="render_result_dialog_title">Render details</string>
+    <string name="lbl_camera">Camera</string>
+    <string name="chk_random_camera">Random</string>
+    <string name="lbl_random_words">Random words (few … many)</string>
+    <string name="lbl_sentences_count">Number of sentences you\'d like to have</string>
+    <string name="lbl_resolution">Resolution</string>
+    <string name="chk_random_resolution">Random</string>
 
 </resources>

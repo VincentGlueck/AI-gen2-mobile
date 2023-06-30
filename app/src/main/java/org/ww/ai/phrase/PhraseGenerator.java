@@ -12,7 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.ww.ai.R;
 import org.ww.ai.data.AddtionalAttributes;
 import org.ww.ai.data.AttributeValue;
 import org.ww.ai.data.RenderResult;
@@ -82,24 +81,65 @@ public class PhraseGenerator {
 				List<AttributeValue> list = getArtistsWords(setting, numOfArtists, whatToRender.getArtistTypeName());
 				result.addAll(list);
 				renderResult.setNumOfArtists(list.size());
-			} else if (AddtionalAttributes.CAMERA == attr && whatToRender.isUseCamera()) {
-				 AttributeValue camera = getCamera(setting);
+			} else if (AddtionalAttributes.CAMERA == attr) {
+				 AttributeValue camera = getAttributeValueCamera(setting);
 				 result.add(camera);
 				 renderResult.setCameraType(camera.getValue());
-			} else if (AddtionalAttributes.RESOLUTION == attr && whatToRender.isUseCamera()) {
-				List<AttributeValue> resolution = getResolution(setting);
-				renderResult.setResolution(resolution.stream().map(AttributeValue::getValue).collect(Collectors.joining(", ")));
-				result.addAll(resolution);
+			} else if (AddtionalAttributes.RESOLUTION == attr && (whatToRender.isRandomCamera()
+					|| (whatToRender.getCamera() != null && !whatToRender.getCamera().isEmpty()))) {
+				List<AttributeValue> resolutions = getResolution(setting);
+				AttributeValue resolution = getResolutionAttribute(resolutions);
+				renderResult.setResolution(resolution.getValue());
+				result.add(resolution);
 			} else if (AddtionalAttributes.RANDOM == attr) {
-				List<AttributeValue> randomWords = getRandomWords(setting);
-				renderResult.setNumOfRandoms(randomWords.size());
-				result.addAll(randomWords);
+				result.addAll(getRandomAttributes(renderResult, setting));
 			}
 		}
 		if(!presetFound && presetWanted) {
 			System.out.println(">>> WARN: preset '" + whatToRender.getPreset() + "' is unknown.");
 		}
 		return result;
+	}
+
+	private AttributeValue getResolutionAttribute(List<AttributeValue> resolutions) {
+		AttributeValue resolution;
+		if(whatToRender.isRandom()) {
+			Collections.shuffle(resolutions);
+			resolution = resolutions.get(0);
+		} else {
+			resolution = new AttributeValue(whatToRender.getResolution());
+		}
+		return resolution;
+	}
+
+	private AttributeValue getAttributeValueCamera(Setting setting) {
+		AttributeValue camera;
+		if (!whatToRender.isRandomCamera()) {
+			camera = new AttributeValue(whatToRender.getCamera() + " lens");
+		} else {
+			camera = getSingleRandomValue(setting.getAttributes().stream()
+					.flatMap(a -> a.getValues().stream()).collect(Collectors.toList()));
+		}
+		return camera;
+	}
+
+	@NonNull
+	private List<AttributeValue> getRandomAttributes(RenderResult renderResult, Setting setting) {
+		List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(a -> a.getValues().stream()).collect(Collectors.toList());
+		int limitTo = getLimitToForRandoms(attributeValues.size(), whatToRender.getRandomCount());
+		while (attributeValues.size() > limitTo) {
+			attributeValues.remove(0);
+		}
+		renderResult.setNumOfRandoms(attributeValues.size());
+		return attributeValues;
+	}
+
+	private int getLimitToForRandoms(int size, int randomPercent) {
+		if(randomPercent == 0) {
+			return 0;
+		}
+		int limitTo = randomPercent * size / 100;
+		return limitTo > 0 ? limitTo : 1;
 	}
 
 	private AddtionalAttributes getAttributeFromSetting(Setting setting) {
@@ -132,18 +172,6 @@ public class PhraseGenerator {
 		}
 		return reduceToMaxEntriesRandom(attributeValues, numOfArtists);
 	}
-	
-	private AttributeValue getCamera(Setting setting) {
-		List<SettingAttribute> attributes = setting.getAttributes();
-		List<AttributeValue> result = new ArrayList<>();
-		for(SettingAttribute attr : attributes) {
-			result.addAll(attr.getValues());
-			List<AttributeValue> values = attr.getValues();
-			result.addAll(values);
-		}
-		Collections.shuffle(result);
-		return result.isEmpty() ? AttributeValue.of("") : (AttributeValue.of(result.get(0).getValue() + " lens")) ;
-	}
 
 	private List<AttributeValue> getResolution(Setting setting) {
 		List<AttributeValue> uniques = new ArrayList<>();
@@ -168,19 +196,20 @@ public class PhraseGenerator {
 		return result.get(0);
 	}
 
-	private List<AttributeValue> getRandomWords(Setting setting) {
+	private List<AttributeValue> getRandomWords(Setting setting, int... limitTo) {
 		List<AttributeValue> values = new ArrayList<>();
 		List<SettingAttribute> attributes = setting.getAttributes();
 		for(SettingAttribute attr : attributes) {
 			values.addAll(attr.getValues());
 		}
-		return values.size() > 0 ? reduceToMaxEntriesRandom(values) : Collections.emptyList();
+		return values.size() > 0 ? (limitTo.length > 0 ? reduceToMaxEntriesRandom(values, limitTo[0])
+				: reduceToMaxEntriesRandom(values)) : Collections.emptyList();
 	}
 	
 	private List<AttributeValue> reduceToMaxEntriesRandom(List<AttributeValue> original, int... maxEntries) {
 		List<AttributeValue> result = new ArrayList<>(original);
 		Collections.shuffle(result);
-		int count = maxEntries.length > 1 ? maxEntries[0] :
+		int count = maxEntries.length == 1 ? maxEntries[0] :
 				ThreadLocalRandom.current().nextInt(1, original.size());
 		while (result.size() > count) {
 			result.remove(0);

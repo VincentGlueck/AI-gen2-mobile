@@ -28,6 +28,12 @@
     <string name="result_undefined">undefiniert</string>
     <string name="titleError">Fehler</string>
     <string name="dialogWhoCares">OK</string>
-    <string name="pleaseWait">Bitte warten...</string>
+    <string name="pleaseWait">Bitte warten…</string>
     <string name="render_result_dialog_title">Render-Details</string>
+    <string name="lbl_camera">Kamera</string>
+    <string name="chk_random_camera">Zufällig</string>
+    <string name="lbl_random_words">Zufällige Wörter (von wenige … viele)</string>
+    <string name="lbl_sentences_count">Wie viele Sätze sollen es denn sein?</string>
+    <string name="lbl_resolution">Auflösung</string>
+    <string name="chk_random_resolution">Zufällig</string>
 </resources>

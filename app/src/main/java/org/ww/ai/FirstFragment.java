@@ -12,14 +12,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.slider.Slider;
+
+import org.ww.ai.data.AttributeValue;
+import org.ww.ai.data.Setting;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.FragmentFirstBinding;
@@ -30,12 +37,13 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 public class FirstFragment extends Fragment {
     public static final String GENERATOR_RULES = "generator.xml";
-    private static final int DEFAULT_ARTIST_COUNT = 3;
+    private static final int DEFAULT_ARTIST_COUNT = 2;
     private FragmentFirstBinding binding;
 
     private SettingsCollection settingsCollection;
@@ -70,12 +78,22 @@ public class FirstFragment extends Fragment {
         }
 
         addDescriptionTextListener(view);
+        addCheckBoxListeners(view);
         addValuesToArtistTypeSpinner(view);
         addValuesToLayoutSpinner(view);
-        addCheckBoxListeners(view);
         addValuesToNumOfArtistsSpinner(view);
-
+        addValuesToCameraSpinner(view);
+        addValuesToResolutionSpinner(view);
+        ImageView imageView = view.findViewById(R.id.btn_clear);
+        imageView.setOnClickListener(click -> {
+            EditText editText = view.findViewById(R.id.editTextTextMultiLine);
+            editText.setText("");
+        });
+        initRandomWordsSlider(view);
+        initSentencesCountSlider(view);
     }
+
+
 
     @Override
     public void onResume() {
@@ -91,11 +109,23 @@ public class FirstFragment extends Fragment {
         checkBoxNoArtist.setChecked(whatToRender.isUseNoArtists());
         CheckBox checkBoxRandomArtist =  view.findViewById(R.id.chk_random_artist);
         checkBoxRandomArtist.setChecked(whatToRender.getArtistTypeName().isEmpty());
+        CheckBox checkRandomCamera = view.findViewById(R.id.chk_random_camera);
+        checkRandomCamera.setChecked(whatToRender.isRandomCamera());
+        CheckBox checkRandomResolution = view.findViewById(R.id.chk_random_resolution);
+        checkRandomResolution.setChecked(whatToRender.isRandomResolution());
 
         selectSpinner(view.findViewById(R.id.spin_layout), whatToRender.getPreset());
         selectSpinner(view.findViewById(R.id.spin_artist_type), whatToRender.getArtistTypeName());
         selectSpinner(view.findViewById(R.id.spin_num_artists), String.valueOf(whatToRender.getNumOfArtists()));
+        selectSpinner(view.findViewById(R.id.spin_camera), String.valueOf(whatToRender.getCamera()));
+        selectSpinner(view.findViewById(R.id.spin_resolution), String.valueOf(whatToRender.getResolution()));
 
+
+        Slider sliderRandomWords = view.findViewById(R.id.slider_random_words);
+        sliderRandomWords.setValue((float) whatToRender.getRandomCount());
+
+        Slider sliderSentencesCount = view.findViewById(R.id.slider_sentences_count);
+        sliderSentencesCount.setValue(whatToRender.getPhraseCount());
     }
 
     private void selectSpinner(Spinner spinner, String value) {
@@ -159,15 +189,15 @@ public class FirstFragment extends Fragment {
         List<String> presets = new ArrayList<>();
         settingsCollection.getPresets().forEach(p -> presets.add(p.getName()));
         presets.add(0, view.getContext().getResources().getString(R.string.spinner_none));
-        Spinner spinner = view.findViewById(R.id.spin_layout);
+        Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(view.getContext(),
                 android.R.layout.simple_spinner_item, presets);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        layoutSpinner.setAdapter(adapter);
+        layoutSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                String str = spinner.getSelectedItem().toString();
+                String str = layoutSpinner.getSelectedItem().toString();
                 whatToRender.setPreset(str.startsWith("(") ? "" : str);
             }
 
@@ -197,6 +227,62 @@ public class FirstFragment extends Fragment {
         });
     }
 
+    private void addValuesToCameraSpinner(@NonNull View view) {
+        Spinner cameraSpinner = view.findViewById(R.id.spin_camera);
+        List<String> cameras = new ArrayList<>();
+        cameras.add(view.getContext().getResources().getString(R.string.spinner_none));
+        Setting setting = settingsCollection.getSetting("camera");
+        if(setting == null) {
+            cameraSpinner.setEnabled(false);
+        } else {
+            List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(s -> s.getValues().stream()).collect(Collectors.toList());
+            cameras.addAll(attributeValues.stream().map(AttributeValue::getValue).collect(Collectors.toList()));
+        }
+        ArrayAdapter<String> cameraAdapter = new ArrayAdapter<>(view.getContext(),
+                android.R.layout.simple_spinner_item, cameras);
+        cameraAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cameraSpinner.setAdapter(cameraAdapter);
+        cameraSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String str = cameraSpinner.getSelectedItem().toString();
+                whatToRender.setCamera(str.startsWith("(") ? "" : str);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+    }
+
+    private void addValuesToResolutionSpinner(@NonNull View view) {
+        Spinner resolutionSpinner = view.findViewById(R.id.spin_resolution);
+        List<String> resolutions = new ArrayList<>();
+        resolutions.add(view.getContext().getResources().getString(R.string.spinner_none));
+        Setting setting = settingsCollection.getSetting("resolution");
+        if(setting == null) {
+            resolutionSpinner.setEnabled(false);
+        } else {
+            List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(s -> s.getValues().stream()).collect(Collectors.toList());
+            resolutions.addAll(attributeValues.stream().map(AttributeValue::getValue).collect(Collectors.toList()));
+        }
+        ArrayAdapter<String> resolutionAdapter = new ArrayAdapter<>(view.getContext(),
+                android.R.layout.simple_spinner_item, resolutions);
+        resolutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        resolutionSpinner.setAdapter(resolutionAdapter);
+        resolutionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String str = resolutionSpinner.getSelectedItem().toString();
+                whatToRender.setResolution(str.startsWith("(") ? "" : str);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+
+    }
 
     private void addDescriptionTextListener(View view) {
         EditText editText = view.findViewById(R.id.editTextTextMultiLine);
@@ -224,27 +310,51 @@ public class FirstFragment extends Fragment {
 
     private void addCheckBoxListeners(@NonNull View view) {
         CheckBox checkBoxNoLayout = view.findViewById(R.id.chk_no_layout);
-        Spinner layoutSpinner = (Spinner) view.findViewById(R.id.spin_layout);
-        addDisableCheckBoxListener(checkBoxNoLayout, layoutSpinner);
+        Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
+        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) -> {
+            whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem());
+
+        });
         CheckBox checkBoxNoArtist = view.findViewById(R.id.chk_no_artists);
-        CheckBox checkBoxRandomArtist =  view.findViewById(R.id.chk_random_artist);
-        Spinner artistSpinner = (Spinner) view.findViewById(R.id.spin_artist_type);
-        addDisableCheckBoxListener(checkBoxRandomArtist, artistSpinner);
+        Spinner numOfArtist = view.findViewById(R.id.spin_num_artists);
         checkBoxNoArtist.setOnCheckedChangeListener((v, checked) -> {
-            whatToRender.setNumOfArtists(checked ? 0 : DEFAULT_ARTIST_COUNT);
+            whatToRender.setNumOfArtists(checked ? 0 : 1);
+            numOfArtist.setEnabled(!checked);
+        });
+        Spinner cameraSpinner = view.findViewById(R.id.spin_camera);
+        CheckBox checkRandomCamera = view.findViewById(R.id.chk_random_camera);
+        checkRandomCamera.setOnCheckedChangeListener((v, checked) -> {
+            whatToRender.setCamera("");
+            cameraSpinner.setEnabled(!checked);
+        });
+        Spinner artistTypeSpinner = view.findViewById(R.id.spin_artist_type);
+        CheckBox checkRandomArtistType = view.findViewById(R.id.chk_random_artist);
+        checkRandomArtistType.setOnCheckedChangeListener((v, checked) -> {
+            whatToRender.setArtistTypeName("");
+            artistTypeSpinner.setEnabled(!checked);
+        });
+        Spinner resolutionSpinner = view.findViewById(R.id.spin_resolution);
+        CheckBox checkRandomResolution = view.findViewById(R.id.chk_random_resolution);
+        checkRandomResolution.setOnCheckedChangeListener((v, checked) -> {
+           whatToRender.setRandomResolution(checked);
+           resolutionSpinner.setEnabled(!checked);
         });
     }
 
-    private void addDisableCheckBoxListener(CheckBox checkBoxLayout, Spinner layoutSpinner) {
-        checkBoxLayout.setOnCheckedChangeListener((v, checked) -> {
-            if(checked) {
-                layoutSpinner.setSelection(0);
-                layoutSpinner.setEnabled(false);
-            } else {
-                layoutSpinner.setEnabled(true);
-            }
+    private void initRandomWordsSlider(View view) {
+        Slider slider = view.findViewById(R.id.slider_random_words);
+        slider.addOnChangeListener((sl, v, fromUser) -> {
+            whatToRender.setRandomCount((int) v);
         });
     }
+
+    private void initSentencesCountSlider(View view) {
+        Slider slider = view.findViewById(R.id.slider_sentences_count);
+        slider.addOnChangeListener((sl, v, fromUser) -> {
+            whatToRender.setPhraseCount((int) v);
+        });
+    }
+
 
 
     @Override
