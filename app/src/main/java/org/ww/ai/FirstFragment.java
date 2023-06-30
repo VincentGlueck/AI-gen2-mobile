@@ -121,19 +121,18 @@ public class FirstFragment extends Fragment {
         selectSpinner(view.findViewById(R.id.spin_camera), String.valueOf(whatToRender.getCamera()));
         selectSpinner(view.findViewById(R.id.spin_resolution), String.valueOf(whatToRender.getResolution()));
 
-        Log.d("VALUE1", "" + whatToRender.getRandomCount());
-        Log.d("VALUE2", "" + whatToRender.getPhraseCount());
-
-        try {
-            Slider sliderRandomWords = view.findViewById(R.id.slider_random_words);
-            sliderRandomWords.setValue((float) whatToRender.getRandomCount());
-
-
-            Slider sliderSentencesCount = view.findViewById(R.id.slider_sentences_count);
-            sliderSentencesCount.setValue(whatToRender.getPhraseCount());
-        } catch (Exception e) {
-            Log.d("SLIDER_ERR", e.getMessage());
+        if(whatToRender.getRandomCount() < 5) {
+            whatToRender.setRandomCount(50);
         }
+        Slider sliderRandomWords = view.findViewById(R.id.slider_random_words);
+        sliderRandomWords.setValue((float) whatToRender.getRandomCount());
+
+        if(whatToRender.getPhraseCount() < 2) {
+            whatToRender.setPhraseCount(2);
+        }
+
+        Slider sliderSentencesCount = view.findViewById(R.id.slider_sentences_count);
+        sliderSentencesCount.setValue(whatToRender.getPhraseCount());
 
     }
 
@@ -333,7 +332,7 @@ public class FirstFragment extends Fragment {
         Spinner cameraSpinner = view.findViewById(R.id.spin_camera);
         CheckBox checkRandomCamera = view.findViewById(R.id.chk_random_camera);
         checkRandomCamera.setOnCheckedChangeListener((v, checked) -> {
-            whatToRender.setCamera("");
+            whatToRender.setRandomCamera(checked);
             cameraSpinner.setEnabled(!checked);
         });
         Spinner artistTypeSpinner = view.findViewById(R.id.spin_artist_type);

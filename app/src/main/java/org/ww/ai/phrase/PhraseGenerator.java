@@ -83,14 +83,22 @@ public class PhraseGenerator {
 				renderResult.setNumOfArtists(list.size());
 			} else if (AddtionalAttributes.CAMERA == attr) {
 				 AttributeValue camera = getAttributeValueCamera(setting);
+				 if(!camera.getValue().isEmpty()) {
+					 camera.setValue(camera.getValue() + " lens");
+				 }
 				 result.add(camera);
 				 renderResult.setCameraType(camera.getValue());
-			} else if (AddtionalAttributes.RESOLUTION == attr && (whatToRender.isRandomCamera()
-					|| (whatToRender.getCamera() != null && !whatToRender.getCamera().isEmpty()))) {
-				List<AttributeValue> resolutions = getResolution(setting);
-				AttributeValue resolution = getResolutionAttribute(resolutions);
-				renderResult.setResolution(resolution.getValue());
-				result.add(resolution);
+			} else if (AddtionalAttributes.RESOLUTION == attr) {
+				if(whatToRender.isRandomCamera()) {
+					List<AttributeValue> resolutions = getResolution(setting);
+					Collections.shuffle(resolutions);
+					result.add(resolutions.get(0));
+					renderResult.setResolution(resolutions.get(0).getValue());
+				} else if (whatToRender.getCamera() != null && !whatToRender.getCamera().isEmpty()) {
+					AttributeValue resolution = new AttributeValue(whatToRender.getResolution());
+					result.add(resolution);
+					renderResult.setResolution(resolution.getValue());
+				}
 			} else if (AddtionalAttributes.RANDOM == attr) {
 				result.addAll(getRandomAttributes(renderResult, setting));
 			}
@@ -115,7 +123,7 @@ public class PhraseGenerator {
 	private AttributeValue getAttributeValueCamera(Setting setting) {
 		AttributeValue camera;
 		if (!whatToRender.isRandomCamera()) {
-			camera = new AttributeValue(whatToRender.getCamera() + " lens");
+			camera = new AttributeValue(whatToRender.getCamera());
 		} else {
 			camera = getSingleRandomValue(setting.getAttributes().stream()
 					.flatMap(a -> a.getValues().stream()).collect(Collectors.toList()));

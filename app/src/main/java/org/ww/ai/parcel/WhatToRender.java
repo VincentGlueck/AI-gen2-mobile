@@ -24,7 +24,6 @@ public class WhatToRender implements WhatToRenderIF {
     private static final String PREF_DESCRIPTION = "description";
     private static final String PREF_PRESET = "preset";
     private static final String PREF_RANDOM = "random";
-    private static final String PREF_USE_CAMERA = "randomCamera";
     private static final String PRE_NUM_OF_ARTIST = "numOfArtists";
     private static final String PREF_PHRASE_COUNT = "phraseCount";
     private static final String PREF_RANDOM_COUNT = "randomCount";
@@ -235,7 +234,6 @@ public class WhatToRender implements WhatToRenderIF {
             editor.putString(PREF_DESCRIPTION, getDescription());
             editor.putString(PREF_PRESET, getPreset());
             editor.putBoolean(PREF_RANDOM, isRandom());
-            editor.putBoolean(PREF_USE_CAMERA, isRandomCamera());
             editor.putInt(PRE_NUM_OF_ARTIST, getNumOfArtists());
             editor.putInt(PREF_PHRASE_COUNT, getPhraseCount());
             editor.putInt(PREF_RANDOM_COUNT, getRandomCount());
@@ -256,7 +254,6 @@ public class WhatToRender implements WhatToRenderIF {
         setDescription(preferences.getString(PREF_DESCRIPTION, ""));
         setPreset(preferences.getString(PREF_PRESET, ""));
         setRandom(preferences.getBoolean(PREF_RANDOM, false));
-        setRandomCamera(preferences.getBoolean(PREF_USE_CAMERA, false));
         setNumOfArtists(preferences.getInt(PRE_NUM_OF_ARTIST, 3));
         setPhraseCount(preferences.getInt(PREF_PHRASE_COUNT, 1));
         setRandomCount(preferences.getInt(PREF_RANDOM_COUNT, 50));
