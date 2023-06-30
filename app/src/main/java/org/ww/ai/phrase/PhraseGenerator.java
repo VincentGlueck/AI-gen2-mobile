@@ -113,34 +113,24 @@ public class PhraseGenerator {
 	}
 
 	private List<AttributeValue> getArtistsWords(Setting setting, int numOfArtists, String artistTypeName) {
-		List<SettingAttribute> attributes = setting.getAttributes();
-		List<AttributeValue> result = Collections.emptyList();
-		List<SettingAttribute> filteredList = new ArrayList<>();
+		List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(a -> a.getValues().stream()).collect(Collectors.toList());
+		List<AttributeValue> filteredList = new ArrayList<>();
 		if(artistTypeName != null && !artistTypeName.isEmpty()) {
 			List<String> filter = Stream.of(artistTypeName.split(",")).map(String::trim).collect(Collectors.toList());
-			for(SettingAttribute attr : attributes) {
-				for(AttributeValue attributeValue : attr.getValues()) {
-					String artistType = attributeValue.getExtraData().getOrDefault("artisttype", "");
-					if(filter.stream().anyMatch(f -> {
-						assert artistType != null;
-						return artistType.equalsIgnoreCase(f);
-					})) {
-						filteredList.add(attr);
-					}
+			for(AttributeValue attributeValue : attributeValues) {
+				String artistType = attributeValue.getExtraData().getOrDefault("artisttype", "");
+				if(filter.contains(artistType)) {
+					filteredList.add(attributeValue);
 				}
 			}
 			if(filteredList.isEmpty()) {
 				Log.d("GENERATOR", "Unable to find any artist matching artisttype '" + artistTypeName + "'");
 			} else {
-				attributes.clear();
-				attributes.addAll(filteredList);
+				attributeValues.clear();
+				attributeValues.addAll(filteredList);
 			}
 		}
-		List<AttributeValue> list = attributes.stream().flatMap(a -> a.getValues().stream()).collect(Collectors.toList());
-
-		return reduceToMaxEntriesRandom(list, numOfArtists);
-
-
+		return reduceToMaxEntriesRandom(attributeValues, numOfArtists);
 	}
 	
 	private AttributeValue getCamera(Setting setting) {
