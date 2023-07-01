@@ -111,6 +111,9 @@
 				historic
 			</value>
 			<value>
+				modern
+			</value>
+			<value>
 				classic
 			</value>
 			<value>
@@ -143,7 +146,7 @@
 				<value artisttype="portrait">
 					Annie Leibovitz
 				</value>
-				<value artisttype="portrait">
+				<value artisttype="portrait,historic">
 					Cindy Sherman
 				</value>
 				<value artisttype="portrait">
@@ -155,7 +158,7 @@
 				<value artisttype="portrait">
 					Peter Lindbergh
 				</value>
-				<value artisttype="portrait">
+				<value artisttype="portrait,everyday">
 					Steve McCurry
 				</value>
 				<value artisttype="famous">

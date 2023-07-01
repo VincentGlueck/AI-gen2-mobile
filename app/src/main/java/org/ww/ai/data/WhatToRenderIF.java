@@ -28,8 +28,6 @@ public interface WhatToRenderIF extends Parcelable, SharePreferencesIF {
 	int getRandomCount();
 	String getArtistTypeName();
 	void readCommand(String[] args) throws Exception;
-	AdditionalSettingsIF getAdditionalSettings();
-
 	void setArtistTypeName(String artistTypeName);
 
 	void setPreset(String preset);

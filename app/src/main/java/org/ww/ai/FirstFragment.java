@@ -5,25 +5,23 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
 
 import org.ww.ai.data.AttributeValue;
@@ -45,6 +43,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class FirstFragment extends Fragment {
     public static final String GENERATOR_RULES = "generator.xml";
     private static final int DEFAULT_ARTIST_COUNT = 2;
+    private static final String KEY_ARTIST_TYPE = "artisttype";
     private FragmentFirstBinding binding;
 
     private SettingsCollection settingsCollection;
@@ -172,7 +171,7 @@ public class FirstFragment extends Fragment {
 
     private void addValuesToArtistTypeSpinner(@NonNull View view) {
         List<String> artistTypes = new ArrayList<>();
-        settingsCollection.getSetting("artisttype").getAttributes().forEach(a -> artistTypes.add(a.getName()));
+        settingsCollection.getSetting(KEY_ARTIST_TYPE).getAttributes().forEach(a -> artistTypes.add(a.getName()));
         artistTypes.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         final Spinner spinner = (Spinner) view.findViewById(R.id.spin_artist_type);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(view.getContext(),
@@ -184,6 +183,7 @@ public class FirstFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String str = spinner.getSelectedItem().toString();
                 whatToRender.setArtistTypeName(str.startsWith("(") ? "" : str);
+                showArtistsMatching(whatToRender.getArtistTypeName());
             }
 
             @Override
@@ -191,6 +191,22 @@ public class FirstFragment extends Fragment {
             }
 
         });
+    }
+
+    private void showArtistsMatching(String artistTypeName) {
+        TextView artistsView = view.findViewById(R.id.lbl_resulting_artists);
+        Setting setting = settingsCollection.getSetting("artists");
+        List<AttributeValue> list = new ArrayList<>();
+        if(setting != null) {
+            list = settingsCollection.getAttributesMatchingExtraData(KEY_ARTIST_TYPE, artistTypeName, setting);
+        }
+        if(!list.isEmpty()) {
+            String artistsStr = list.stream().map(AttributeValue::getValue).collect(Collectors.joining(", "));
+            artistsView.setText(artistsStr);
+            artistsView.setVisibility(View.VISIBLE);
+        } else {
+            artistsView.setVisibility(View.GONE);
+        }
     }
 
     private void addValuesToLayoutSpinner(@NonNull View view) {
@@ -301,7 +317,10 @@ public class FirstFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                whatToRender.setDescription(s.toString());
+                String str = s.toString();
+                whatToRender.setDescription(str);
+                Button btn = view.findViewById(R.id.btn_next);
+                btn.setEnabled(s.length() > 0);
             }
 
             @Override

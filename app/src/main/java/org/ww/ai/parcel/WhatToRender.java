@@ -7,7 +7,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import org.ww.ai.data.AdditionalSettingsIF;
 import org.ww.ai.data.WhatToRenderIF;
 
 public class WhatToRender implements WhatToRenderIF {
@@ -21,6 +20,7 @@ public class WhatToRender implements WhatToRenderIF {
             return new WhatToRender[size];
         }
     };
+
     private static final String PREF_DESCRIPTION = "description";
     private static final String PREF_PRESET = "preset";
     private static final String PREF_RANDOM = "random";
@@ -69,7 +69,6 @@ public class WhatToRender implements WhatToRenderIF {
     private String resolution;
 
     private boolean instantCopyToClipBoard;
-    private AdditionalSettingsIF additionalSettingsIF;
     @Override
     public String getDescription() {
         return description;
@@ -116,10 +115,6 @@ public class WhatToRender implements WhatToRenderIF {
     }
 
     @Override
-    public AdditionalSettingsIF getAdditionalSettings() {
-        return additionalSettingsIF;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -221,10 +216,6 @@ public class WhatToRender implements WhatToRenderIF {
 
     public void setArtistTypeName(String artistTypeName) {
         this.artistTypeName = artistTypeName;
-    }
-
-    public void setAdditionalSettingsIF(AdditionalSettingsIF additionalSettingsIF) {
-        this.additionalSettingsIF = additionalSettingsIF;
     }
 
     @Override

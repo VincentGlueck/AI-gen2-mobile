@@ -1,16 +1,24 @@
 package org.ww.ai.data;
 
+import static java.util.stream.Collectors.toSet;
+
 import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class SettingsCollection implements AdditionalSettingsIF, Serializable {
+public class SettingsCollection implements Serializable {
 
 	private final List<Setting> settings = new ArrayList<>();
 	private final Map<String, String> additionalSettings = new HashMap<>();
@@ -43,26 +51,27 @@ public class SettingsCollection implements AdditionalSettingsIF, Serializable {
 		return settings.stream().filter(setting -> SettingType.PRESET == setting.getType()).collect(Collectors.toList());
 	}
 
-	public List<Setting> getOthers() {
-		return settings.stream().filter(setting -> SettingType.PRESET != setting.getType()).collect(Collectors.toList());
+	public List<AttributeValue> getAttributesMatchingExtraData(String key, String extraDataStr, Setting setting) {
+		List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(a -> a.getValues().stream()).collect(Collectors.toList());
+		List<AttributeValue> filteredList = new ArrayList<>();
+		List<String> filter = Stream.of(extraDataStr.split(",")).map(String::trim).collect(Collectors.toList());
+		for(AttributeValue attributeValue : attributeValues) {
+			String artistType = attributeValue.getExtraData().getOrDefault(key, "");
+			assert artistType != null;
+			List<String> split = Arrays.asList(artistType.split(","));
+			if(split.stream().anyMatch(new HashSet<>(filter)::contains)) {
+				filteredList.add(attributeValue);
+			}
+			/*
+			if(filter.contains(artistType.split(","))) {
+
+			}
+			 */
+		}
+		return filteredList;
 	}
 
-	public String getAllPresetNames() {
-		final StringBuilder sb = new StringBuilder();
-		getPresets().forEach(p -> sb.append("\n").append(p.getName()));
-		return sb.toString();
-	}
-	
-	@Override
-	public Map<String, String> getAdditonalSettingsMap() {
-		return additionalSettings;
-	}
-
-	@Override
-	public void addAdditionalSetting(String key, String value) {
-		additionalSettings.put(key,  value);
-	}
-
+	@NonNull
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

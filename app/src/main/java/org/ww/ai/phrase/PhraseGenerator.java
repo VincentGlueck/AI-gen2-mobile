@@ -74,26 +74,12 @@ public class PhraseGenerator {
 				continue;
 			}
 			if(AddtionalAttributes.ARTISTS == attr) {
-				int numOfArtists = whatToRender.getNumOfArtists();
-				if (numOfArtists > MAX_NUM_OF_ARTISTS) {
-					numOfArtists = MAX_NUM_OF_ARTISTS;
-				}
-				List<AttributeValue> list = getArtistsWords(setting, numOfArtists, whatToRender.getArtistTypeName());
-				result.addAll(list);
-				renderResult.setNumOfArtists(list.size());
+				processArtists(renderResult, result, setting);
 			} else if (AddtionalAttributes.CAMERA == attr) {
-				 AttributeValue camera = getAttributeValueCamera(setting);
-				 if(!camera.getValue().isEmpty()) {
-					 camera.setValue(camera.getValue() + " lens");
-				 }
-				 result.add(camera);
-				 renderResult.setCameraType(camera.getValue());
+				processCamera(renderResult, result, setting);
 			} else if (AddtionalAttributes.RESOLUTION == attr) {
-				if(whatToRender.isRandomCamera()) {
-					List<AttributeValue> resolutions = getResolution(setting);
-					Collections.shuffle(resolutions);
-					result.add(resolutions.get(0));
-					renderResult.setResolution(resolutions.get(0).getValue());
+				if(whatToRender.isRandomResolution()) {
+					processRandomResolution(renderResult, result, setting);
 				} else if (whatToRender.getCamera() != null && !whatToRender.getCamera().isEmpty()) {
 					AttributeValue resolution = new AttributeValue(whatToRender.getResolution());
 					result.add(resolution);
@@ -109,15 +95,30 @@ public class PhraseGenerator {
 		return result;
 	}
 
-	private AttributeValue getResolutionAttribute(List<AttributeValue> resolutions) {
-		AttributeValue resolution;
-		if(whatToRender.isRandom()) {
-			Collections.shuffle(resolutions);
-			resolution = resolutions.get(0);
-		} else {
-			resolution = new AttributeValue(whatToRender.getResolution());
+	private void processRandomResolution(RenderResult renderResult, List<AttributeValue> result, Setting setting) {
+		List<AttributeValue> resolutions = getResolution(setting);
+		Collections.shuffle(resolutions);
+		result.add(resolutions.get(0));
+		renderResult.setResolution(resolutions.get(0).getValue());
+	}
+
+	private void processCamera(RenderResult renderResult, List<AttributeValue> result, Setting setting) {
+		AttributeValue camera = getAttributeValueCamera(setting);
+		if(!camera.getValue().isEmpty()) {
+			camera.setValue(camera.getValue() + " lens");
 		}
-		return resolution;
+		result.add(camera);
+		renderResult.setCameraType(camera.getValue());
+	}
+
+	private void processArtists(RenderResult renderResult, List<AttributeValue> result, Setting setting) {
+		int numOfArtists = whatToRender.getNumOfArtists();
+		if (numOfArtists > MAX_NUM_OF_ARTISTS) {
+			numOfArtists = MAX_NUM_OF_ARTISTS;
+		}
+		List<AttributeValue> list = getArtistsWords(setting, numOfArtists, whatToRender.getArtistTypeName());
+		result.addAll(list);
+		renderResult.setNumOfArtists(list.size());
 	}
 
 	private AttributeValue getAttributeValueCamera(Setting setting) {
@@ -162,15 +163,8 @@ public class PhraseGenerator {
 
 	private List<AttributeValue> getArtistsWords(Setting setting, int numOfArtists, String artistTypeName) {
 		List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(a -> a.getValues().stream()).collect(Collectors.toList());
-		List<AttributeValue> filteredList = new ArrayList<>();
 		if(artistTypeName != null && !artistTypeName.isEmpty()) {
-			List<String> filter = Stream.of(artistTypeName.split(",")).map(String::trim).collect(Collectors.toList());
-			for(AttributeValue attributeValue : attributeValues) {
-				String artistType = attributeValue.getExtraData().getOrDefault("artisttype", "");
-				if(filter.contains(artistType)) {
-					filteredList.add(attributeValue);
-				}
-			}
+			List<AttributeValue> filteredList = getArtistsForType(artistTypeName, attributeValues);
 			if(filteredList.isEmpty()) {
 				Log.d("GENERATOR", "Unable to find any artist matching artisttype '" + artistTypeName + "'");
 			} else {
@@ -179,6 +173,18 @@ public class PhraseGenerator {
 			}
 		}
 		return reduceToMaxEntriesRandom(attributeValues, numOfArtists);
+	}
+
+	private List<AttributeValue> getArtistsForType(String artistTypeName, List<AttributeValue> attributeValues) {
+		List<AttributeValue> filteredList = new ArrayList<>();
+		List<String> filter = Stream.of(artistTypeName.split(",")).map(String::trim).collect(Collectors.toList());
+		for(AttributeValue attributeValue : attributeValues) {
+			String artistType = attributeValue.getExtraData().getOrDefault("artisttype", "");
+			if(filter.contains(artistType)) {
+				filteredList.add(attributeValue);
+			}
+		}
+		return filteredList;
 	}
 
 	private List<AttributeValue> getResolution(Setting setting) {
@@ -216,11 +222,13 @@ public class PhraseGenerator {
 	
 	private List<AttributeValue> reduceToMaxEntriesRandom(List<AttributeValue> original, int... maxEntries) {
 		List<AttributeValue> result = new ArrayList<>(original);
-		Collections.shuffle(result);
-		int count = maxEntries.length == 1 ? maxEntries[0] :
-				ThreadLocalRandom.current().nextInt(1, original.size());
-		while (result.size() > count) {
-			result.remove(0);
+		if(original.size() > 0) {
+			Collections.shuffle(result);
+			int count = maxEntries.length == 1 ? maxEntries[0] :
+					ThreadLocalRandom.current().nextInt(1, original.size());
+			while (result.size() > count) {
+				result.remove(0);
+			}
 		}
 		return result;
 	}
