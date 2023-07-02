@@ -1,6 +1,7 @@
 package org.ww.ai.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -31,6 +32,8 @@ import java.io.InputStream;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    public final static String KEY_BITMAP = "bitmap";
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
@@ -73,9 +76,10 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = getIntent().getData();
                 in = getContentResolver().openInputStream(uri);
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
-                Toast.makeText(this, "bitmap: " + bitmap.getByteCount(), Toast.LENGTH_LONG).show();
                 bitmap = ImageUtil.IMAGE_UTIL.getScaledBitmap(bitmap, 1024);
-                Toast.makeText(this, "after scale: " + bitmap.getByteCount(), Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(this, ReceiveImage.class);
+                intent.putExtra(KEY_BITMAP, bitmap);
+                startActivity(intent);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
