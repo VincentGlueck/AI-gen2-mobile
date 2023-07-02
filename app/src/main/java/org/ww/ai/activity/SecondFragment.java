@@ -1,4 +1,4 @@
-package org.ww.ai;
+package org.ww.ai.activity;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -20,10 +20,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import org.ww.ai.R;
 import org.ww.ai.data.RenderResult;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;
-import org.ww.ai.databinding.FragmentSecondBinding;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.phrase.PhraseGenerator;

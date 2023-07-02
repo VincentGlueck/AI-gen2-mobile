@@ -1,4 +1,4 @@
-package org.ww.ai;
+package org.ww.ai.activity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -25,23 +25,22 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.slider.Slider;
 
+import org.ww.ai.R;
 import org.ww.ai.data.AttributeValue;
 import org.ww.ai.data.Setting;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;
-import org.ww.ai.databinding.FragmentFirstBinding;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.tools.ResourceLoader;
+import org.ww.ai.ui.ClipBoardUtil;
 import org.ww.ai.ui.DialogUtil;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -103,6 +102,12 @@ public class FirstFragment extends Fragment {
         ImageView btnShow = view.findViewById(R.id.btn_show);
         btnShow.setOnClickListener(l -> {
             showGeneratorXML();
+        });
+
+        ImageView btnClip = view.findViewById(R.id.btn_clip);
+        btnClip.setOnClickListener(l -> {
+            ClipBoardUtil clipBoardUtil = ClipBoardUtil.getInstance(containerContext);
+            Toast.makeText(containerContext, clipBoardUtil.testContent(), Toast.LENGTH_LONG).show();
         });
     }
 

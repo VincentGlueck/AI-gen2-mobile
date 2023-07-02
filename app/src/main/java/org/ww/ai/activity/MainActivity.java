@@ -1,6 +1,9 @@
-package org.ww.ai;
+package org.ww.ai.activity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,22 +12,23 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.lifecycle.LiveData;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import org.ww.ai.R;
 import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.ui.ImageUtil;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import io.reactivex.rxjava3.core.Single;
-import kotlinx.coroutines.flow.Flow;
 
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
@@ -43,22 +47,48 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        /*
-        binding.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAnchorView(R.id.fab)
-                .setAction("Action", null).show());
-        */
         installKeyBoardAutoHide();
 
         AppDatabase appDatabase = AppDatabase.getInstance(this);
         Log.d("DATABASE", "entries: " + appDatabase.renderResultDao());
         if(appDatabase.renderResultDao() != null) {
-            Flow<List<RenderResult>> listFlow = appDatabase.renderResultDao().getAll();
-            Log.d("FLOW", listFlow.toString());
+            LiveData<List<RenderResult>> liveData = appDatabase.renderResultDao().getAll();
+            liveData.observe(this, renderResults -> {
+                if(renderResults != null && !renderResults.isEmpty()) {
+                    renderResults.forEach(r -> {
+                        Log.d("RENDER_RESULT", r.toString());
+                    });
+                }
+            });
         }
 
+        checkIntent();
 
     }
+
+    private void checkIntent() {
+        if(getIntent().getData() != null){
+            InputStream in = null;
+            try {
+                Uri uri = getIntent().getData();
+                in = getContentResolver().openInputStream(uri);
+                Bitmap bitmap = BitmapFactory.decodeStream(in);
+                Toast.makeText(this, "bitmap: " + bitmap.getByteCount(), Toast.LENGTH_LONG).show();
+                bitmap = ImageUtil.IMAGE_UTIL.getScaledBitmap(bitmap, 1024);
+                Toast.makeText(this, "after scale: " + bitmap.getByteCount(), Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException ignore) {
+                    }
+                }
+            }
+        }
+    }
+
 
     private void installKeyBoardAutoHide() {
         EditText editText = (EditText) findViewById(R.id.editTextTextMultiLine);

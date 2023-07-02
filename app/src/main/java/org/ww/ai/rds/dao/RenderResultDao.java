@@ -1,5 +1,6 @@
 package org.ww.ai.rds.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -20,7 +21,7 @@ public interface RenderResultDao {
     public static final String TABLE = "renderresult";
 
     @Query("SELECT * from " + TABLE)
-    Flow<List<RenderResult>> getAll();
+    LiveData<List<RenderResult>> getAll();
 
     //@Query("SELECT uid, createdTime from " + TABLE + " ORDER BY createdTime DESC")
     //List<Integer> getAllUids();
