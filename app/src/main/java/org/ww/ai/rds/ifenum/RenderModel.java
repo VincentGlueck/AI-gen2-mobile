@@ -2,7 +2,9 @@ package org.ww.ai.rds.ifenum;
 
 import androidx.room.TypeConverter;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum RenderModel {
@@ -40,4 +42,7 @@ public enum RenderModel {
         return model.getName();
     }
 
+    public static List<String> getAvailableModels() {
+        return Stream.of(values()).map(rm -> rm.getName()).collect(Collectors.toList());
+    }
 }

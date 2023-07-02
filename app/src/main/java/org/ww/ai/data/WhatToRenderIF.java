@@ -51,6 +51,10 @@ public interface WhatToRenderIF extends Parcelable, SharePreferencesIF {
 
 	void setCamera(String camera);
 
+	void setQueryUsed(String queryUsed);
+
+	String getQueryUsed();
+
 	@Override
 	int describeContents();
 

@@ -36,5 +36,15 @@
     <string name="lbl_sentences_count">Number of sentences you\'d like to have</string>
     <string name="lbl_resolution">Resolution</string>
     <string name="chk_random_resolution">Random</string>
+    <string name="receive_result_header">Do you notice your creation?</string>
+    <string name="lbl_what_was_rendered">Your query</string>
+    <string name="lbl_what_was_rendered_date">Date</string>
+    <string name="text_copied">Text copied</string>
+    <string name="lbl_what_was_rendered_engine">Rendered by</string>
+    <string name="lbl_what_was_rendered_credits">Overall costs</string>
+    <string name="image_received_description">Image you pasted</string>
+    <string name="lbl_what_was_rendered_query">Resulting in</string>
+    <string name="back">Cancel</string>
+    <string name="result_save">Save</string>
 
 </resources>

@@ -36,4 +36,14 @@
     <string name="lbl_sentences_count">Wie viele Sätze sollen es denn sein?</string>
     <string name="lbl_resolution">Auflösung</string>
     <string name="chk_random_resolution">Zufällig</string>
+    <string name="receive_result_header">War das dein Ergebnis?</string>
+    <string name="lbl_what_was_rendered">Dein Satz</string>
+    <string name="lbl_what_was_rendered_date">Datum</string>
+    <string name="text_copied">In Zwischenanlage kopiert</string>
+    <string name="lbl_what_was_rendered_engine">Gerendert mit</string>
+    <string name="lbl_what_was_rendered_credits">Kosten/Credits</string>
+    <string name="image_received_description">Bild, das du weitergeleitet hast</string>
+    <string name="lbl_what_was_rendered_query">Genutzt wurde</string>
+    <string name="back">Abbruch</string>
+    <string name="result_save">Speichern</string>
 </resources>

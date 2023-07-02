@@ -1,10 +1,15 @@
 package org.ww.ai.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +41,7 @@ import org.ww.ai.parser.Parser;
 import org.ww.ai.tools.ResourceLoader;
 import org.ww.ai.ui.ClipBoardUtil;
 import org.ww.ai.ui.DialogUtil;
+import org.ww.ai.ui.ImageUtil;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
@@ -169,6 +175,8 @@ public class FirstFragment extends Fragment {
 
     }
 
+
+
     private void selectSpinner(Spinner spinner, String value) {
         SpinnerAdapter adapter = spinner.getAdapter();
         for(int n=0; n<adapter.getCount(); n++) {
@@ -186,7 +194,6 @@ public class FirstFragment extends Fragment {
         SharedPreferences preferences = containerContext.getSharedPreferences(WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
         whatToRender.writeToSharedPreferences(preferences);
     }
-
 
     @Override
     public void onAttach(@NonNull Context context) {

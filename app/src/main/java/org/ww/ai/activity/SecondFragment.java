@@ -154,7 +154,13 @@ public class SecondFragment extends Fragment implements PhraseGeneratorErrorHand
             ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("ai gen-2 text", text.toString());
             clipboard.setPrimaryClip(clip);
-            Toast.makeText(getContext(), "Text copied", Toast.LENGTH_SHORT).show();
+            if(whatToRender != null) {
+                if(getActivity() != null) {
+                    whatToRender.setQueryUsed(text.toString());
+                    ((MainActivity) getActivity()).setLastQuery(whatToRender);
+                }
+            }
+            Toast.makeText(getContext(), R.string.text_copied, Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(containerContext, "Error copying to clipboard", Toast.LENGTH_SHORT).show();
         }

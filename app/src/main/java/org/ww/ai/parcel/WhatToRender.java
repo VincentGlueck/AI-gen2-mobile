@@ -34,6 +34,7 @@ public class WhatToRender implements WhatToRenderIF {
     private static final String PREF_RANDOM_CAMERA = "useRandomCamera";
     private static final String PREF_RANDOM_RESOLUTION = "useRandomResolution";
     private static final String PREF_RESOLUTION = "resolution";
+    private static final String PREF_QUERY_USED = "queryUsed";
 
     public WhatToRender() {
     }
@@ -65,8 +66,8 @@ public class WhatToRender implements WhatToRenderIF {
     private int randomCount;
     private String artistTypeName;
     private String camera;
-
     private String resolution;
+    private String queryUsed;
 
     private boolean instantCopyToClipBoard;
     @Override
@@ -179,6 +180,16 @@ public class WhatToRender implements WhatToRenderIF {
     }
 
     @Override
+    public void setQueryUsed(String queryUsed) {
+        this.queryUsed = queryUsed;
+    }
+
+    @Override
+    public String getQueryUsed() {
+        return queryUsed;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -235,6 +246,7 @@ public class WhatToRender implements WhatToRenderIF {
             editor.putBoolean(PREF_RANDOM_CAMERA, isRandomCamera());
             editor.putBoolean(PREF_RANDOM_RESOLUTION, isRandomResolution());
             editor.putString(PREF_RESOLUTION, getResolution());
+            editor.putString(PREF_QUERY_USED, getQueryUsed());
         } finally {
             editor.apply();
         }
@@ -255,6 +267,7 @@ public class WhatToRender implements WhatToRenderIF {
         setRandomCamera(preferences.getBoolean(PREF_RANDOM_CAMERA, false));
         setResolution(preferences.getString(PREF_RESOLUTION, ""));
         setRandomResolution(preferences.getBoolean(PREF_RANDOM_RESOLUTION, false));
+        setQueryUsed(preferences.getString(PREF_QUERY_USED, "undefined"));
     }
 
     @NonNull
@@ -267,13 +280,14 @@ public class WhatToRender implements WhatToRenderIF {
                 ", random=" + random +
                 ", randomCamera=" + randomCamera +
                 ", numOfArtists=" + numOfArtists +
-                ", useResolution=" + randomResolution +
+                ", randomResolution=" + randomResolution +
                 ", useNoArtists=" + useNoArtists +
                 ", phraseCount=" + phraseCount +
                 ", randomCount=" + randomCount +
                 ", artistTypeName='" + artistTypeName + '\'' +
                 ", camera='" + camera + '\'' +
-                ", instantCopyToClipBoard=" + instantCopyToClipBoard +
+                ", resolution='" + resolution + '\'' +
+                ", queryUsed='" + queryUsed + '\'' +
                 '}';
     }
 }

@@ -1,41 +1,41 @@
 package org.ww.ai.activity;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.lifecycle.LiveData;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import org.ww.ai.R;
+import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
-import org.ww.ai.rds.AppDatabase;
-import org.ww.ai.rds.entity.RenderResult;
-import org.ww.ai.ui.ImageUtil;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
+import org.ww.ai.ui.DialogUtil;
 
 public class MainActivity extends AppCompatActivity {
 
     public final static String KEY_BITMAP = "bitmap";
+    public static final String KEY_WHAT_TO_RENDER = "whatToRender";
     private AppBarConfiguration appBarConfiguration;
+
+    private WhatToRenderIF lastRender;
     private ActivityMainBinding binding;
+
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            uri -> Log.d("ON_RESULT", uri.toString()));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +50,7 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        installKeyBoardAutoHide();
-
+/*
         AppDatabase appDatabase = AppDatabase.getInstance(this);
         Log.d("DATABASE", "entries: " + appDatabase.renderResultDao());
         if(appDatabase.renderResultDao() != null) {
@@ -64,40 +63,29 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+        */
 
-        checkIntent();
+        checkIntentPurpose();
 
     }
 
-    private void checkIntent() {
-        if(getIntent().getData() != null){
-            InputStream in = null;
-            try {
-                Uri uri = getIntent().getData();
-                in = getContentResolver().openInputStream(uri);
-                Bitmap bitmap = BitmapFactory.decodeStream(in);
-                bitmap = ImageUtil.IMAGE_UTIL.getScaledBitmap(bitmap, 1024);
-                Intent intent = new Intent(this, ReceiveImage.class);
-                intent.putExtra(KEY_BITMAP, bitmap);
-                startActivity(intent);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if(in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException ignore) {
-                    }
+    private void checkIntentPurpose() {
+        ClipData clipData = getIntent().getClipData();
+        if(clipData != null) {
+            if(clipData.getItemCount() > 0) {
+                ClipData.Item item = clipData.getItemAt(0);
+                if(item.getUri() != null) {
+                    startReceiveImageActivity(item.getUri());
                 }
             }
         }
     }
 
-
-    private void installKeyBoardAutoHide() {
-        EditText editText = (EditText) findViewById(R.id.editTextTextMultiLine);
-        View.OnFocusChangeListener ofcListener = new MyFocusChangeListener();
-        editText.setOnFocusChangeListener(ofcListener);
+    private void startReceiveImageActivity(Uri uri) {
+        Intent intent = new Intent(this, ReceiveImage.class);
+        intent.putExtra(KEY_BITMAP, uri);
+        intent.putExtra(KEY_WHAT_TO_RENDER, lastRender);
+        startActivity(intent);
     }
 
     @Override
@@ -107,14 +95,9 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    private class MyFocusChangeListener implements View.OnFocusChangeListener {
-        public void onFocusChange(View v, boolean hasFocus) {
-            if(v.getId() == R.id.editTextTextMultiLine && !hasFocus) {
-                InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-
-            }
-        }
+    public void setLastQuery(WhatToRenderIF whatToRenderIF) {
+        lastRender = whatToRenderIF;
     }
+
 
 }
