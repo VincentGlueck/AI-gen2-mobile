@@ -52,7 +52,7 @@ public class SecondFragment extends Fragment implements PhraseGeneratorErrorHand
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
+            @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
 
@@ -91,9 +91,7 @@ public class SecondFragment extends Fragment implements PhraseGeneratorErrorHand
             whatToRender = new WhatToRender();
         }
         ImageView refreshImageView = view.findViewById(R.id.refresh_results);
-        refreshImageView.setOnClickListener(l -> {
-            reRenderResults();
-        });
+        refreshImageView.setOnClickListener(l -> reRenderResults());
     }
 
     @Override
@@ -123,14 +121,12 @@ public class SecondFragment extends Fragment implements PhraseGeneratorErrorHand
     private void renderResultText() {
         LinearLayout linearLayout = view.findViewById(R.id.lin_result);
         CheckBox checkBox = view.findViewById(R.id.instant_copy_to_clipboard);
-        checkBox.setOnCheckedChangeListener((v, checked) -> {
-            whatToRender.setInstantCopyToClipBoard(checked);
-        });
+        checkBox.setOnCheckedChangeListener((v, checked) -> whatToRender.setInstantCopyToClipBoard(checked));
         PhraseGenerator phraseGenerator = new PhraseGenerator(whatToRender, settingsCollection, this);
 
         List<RenderResult> textList = phraseGenerator.getAITextsAsRenderResultList();
         for (RenderResult renderResult : textList) {
-            FrameLayout frameLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.single_result, null);
+            FrameLayout frameLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.single_result, linearLayout, false);
             final EditText editText = frameLayout.findViewById(R.id.textview_result);
             editText.setText(renderResult.getSentence());
             editText.setSelectAllOnFocus(true);
@@ -141,10 +137,8 @@ public class SecondFragment extends Fragment implements PhraseGeneratorErrorHand
                 }
             });
             ImageView imageView = frameLayout.findViewById(R.id.btn_show_stats);
-            imageView.setOnClickListener(l -> {
-                DialogUtil.DIALOG_UTIL.showMessage(getContext(), R.string.render_result_dialog_title,
-                        renderResult.toReadableForm(), R.drawable.info);
-            });
+            imageView.setOnClickListener(l -> DialogUtil.DIALOG_UTIL.showMessage(getContext(), R.string.render_result_dialog_title,
+                    renderResult.toReadableForm(), R.drawable.info));
             linearLayout.addView(frameLayout);
         }
     }
