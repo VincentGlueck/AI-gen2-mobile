@@ -28,7 +28,7 @@ import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.phrase.PhraseGenerator;
 import org.ww.ai.phrase.PhraseGeneratorException;
-import org.ww.ai.phrase.PraseGeneratorErrorHandlerIF;
+import org.ww.ai.phrase.PhraseGeneratorErrorHandlerIF;
 import org.ww.ai.ui.DialogUtil;
 import org.xml.sax.SAXException;
 
@@ -37,7 +37,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-public class SecondFragment extends Fragment implements PraseGeneratorErrorHandlerIF {
+public class SecondFragment extends Fragment implements PhraseGeneratorErrorHandlerIF {
 
     private FragmentSecondBinding binding;
 

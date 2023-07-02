@@ -21,7 +21,7 @@ import org.ww.ai.data.SettingAttributeType;
 import org.ww.ai.data.SettingType;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;
-import org.ww.ai.phrase.PraseGeneratorErrorHandlerIF.Severity;
+import org.ww.ai.phrase.PhraseGeneratorErrorHandlerIF.Severity;
 
 public class PhraseGenerator {
 
@@ -29,10 +29,10 @@ public class PhraseGenerator {
 	private static final int MAX_NUM_OF_ARTISTS = 3;
 	private final WhatToRenderIF whatToRender;
 	private final SettingsCollection settingsCollection;
-	private final PraseGeneratorErrorHandlerIF errorHandler;
+	private final PhraseGeneratorErrorHandlerIF errorHandler;
 
 	public PhraseGenerator(WhatToRenderIF whatToRender, SettingsCollection settingsCollection,
-						   PraseGeneratorErrorHandlerIF errorHandler) {
+						   PhraseGeneratorErrorHandlerIF errorHandler) {
 		this.whatToRender = whatToRender;
 		this.settingsCollection = settingsCollection;
 		this.errorHandler = errorHandler;
@@ -88,9 +88,6 @@ public class PhraseGenerator {
 			} else if (AddtionalAttributes.RANDOM == attr) {
 				result.addAll(getRandomAttributes(renderResult, setting));
 			}
-		}
-		if(!presetFound && presetWanted) {
-			System.out.println(">>> WARN: preset '" + whatToRender.getPreset() + "' is unknown.");
 		}
 		return result;
 	}

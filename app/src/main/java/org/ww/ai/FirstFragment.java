@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -31,9 +32,16 @@ import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.FragmentFirstBinding;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
+import org.ww.ai.tools.ResourceLoader;
+import org.ww.ai.ui.DialogUtil;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,8 +99,28 @@ public class FirstFragment extends Fragment {
         });
         initRandomWordsSlider(view);
         initSentencesCountSlider(view);
+
+        ImageView btnShow = view.findViewById(R.id.btn_show);
+        btnShow.setOnClickListener(l -> {
+            showGeneratorXML();
+        });
     }
 
+    private void showGeneratorXML() {
+        try {
+            InputStream in = ResourceLoader.RESOURCE_LOADER.getResource(containerContext, GENERATOR_RULES);
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line).append("\n");
+                }
+            }
+            DialogUtil.DIALOG_UTIL.showLargeTextDialog(containerContext, R.string.title_activity_main, sb.toString());
+        } catch (IOException e) {
+            Toast.makeText(containerContext, "Error loading " + GENERATOR_RULES, Toast.LENGTH_LONG).show();
+        }
+    }
 
 
     @Override

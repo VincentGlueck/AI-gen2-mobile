@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.EditText;
 
 import org.ww.ai.R;
 
@@ -84,6 +85,20 @@ public enum DialogUtil {
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(titleResourceId)
                 .setView(htmlView)
+                .setPositiveButton(R.string.dialogOk, null);
+        if(iconResourceId.length > 0) {
+            builder.setIcon(iconResourceId[0]);
+        }
+        builder.show();
+    }
+
+    public void showLargeTextDialog(Context context, int titleResourceId, String largeText, int... iconResourceId) {
+        final View largeTextView = View.inflate(context, R.layout.large_text_dialog_view, null);
+        final EditText editText = largeTextView.findViewById(R.id.large_text);
+        editText.setText(largeText);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setTitle(titleResourceId)
+                .setView(largeTextView)
                 .setPositiveButton(R.string.dialogOk, null);
         if(iconResourceId.length > 0) {
             builder.setIcon(iconResourceId[0]);

@@ -3,10 +3,9 @@ package org.ww.ai;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -17,6 +16,15 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import org.ww.ai.databinding.ActivityMainBinding;
+import org.ww.ai.rds.AppDatabase;
+import org.ww.ai.rds.entity.RenderResult;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import io.reactivex.rxjava3.core.Single;
+import kotlinx.coroutines.flow.Flow;
 
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
@@ -41,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
                 .setAction("Action", null).show());
         */
         installKeyBoardAutoHide();
+
+        AppDatabase appDatabase = AppDatabase.getInstance(this);
+        Log.d("DATABASE", "entries: " + appDatabase.renderResultDao());
+        if(appDatabase.renderResultDao() != null) {
+            Flow<List<RenderResult>> listFlow = appDatabase.renderResultDao().getAll();
+            Log.d("FLOW", listFlow.toString());
+        }
+
 
     }
 

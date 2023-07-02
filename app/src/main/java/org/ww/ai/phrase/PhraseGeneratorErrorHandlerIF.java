@@ -1,6 +1,6 @@
 package org.ww.ai.phrase;
 
-public interface PraseGeneratorErrorHandlerIF {
+public interface PhraseGeneratorErrorHandlerIF {
 	
 	public enum Severity {
 		INFO,
