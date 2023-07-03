@@ -1,5 +1,6 @@
 package org.ww.ai.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -15,11 +16,12 @@ import org.ww.ai.R;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.RenderResultAdapter;
 
 import java.util.List;
 
-public class RenderResultsActivity extends AppCompatActivity {
+public class RenderResultsActivity extends AppCompatActivity implements RenderResultAdapter.OnItemClickListener {
 
     private RenderResultAdapter adapter;
 
@@ -30,7 +32,7 @@ public class RenderResultsActivity extends AppCompatActivity {
 
         RecyclerView renderResultView = findViewById(R.id.render_result_List);
 
-        adapter = new RenderResultAdapter();
+        adapter = new RenderResultAdapter(this);
         renderResultView.setAdapter(adapter);
         renderResultView.setLayoutManager(new LinearLayoutManager(this));
         getRenderResultsFromDatabase();
@@ -54,4 +56,9 @@ public class RenderResultsActivity extends AppCompatActivity {
         }, getApplication());
     }
 
+    @Override
+    public void onItemClick(RenderResultLightWeight item) {
+        Intent intent = new Intent(getApplication(), RenderResultDetailsActivity.class);
+        startActivity(intent);
+    }
 }
