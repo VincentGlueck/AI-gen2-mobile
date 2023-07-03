@@ -134,6 +134,7 @@ public class PhraseGenerator {
 		List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(a -> a.getValues().stream()).collect(Collectors.toList());
 		int limitTo = getLimitToForRandoms(attributeValues.size(), whatToRender.getRandomCount());
 		while (attributeValues.size() > limitTo) {
+			Collections.shuffle(attributeValues);
 			attributeValues.remove(0);
 		}
 		renderResult.setNumOfRandoms(attributeValues.size());
@@ -220,10 +221,10 @@ public class PhraseGenerator {
 	private List<AttributeValue> reduceToMaxEntriesRandom(List<AttributeValue> original, int... maxEntries) {
 		List<AttributeValue> result = new ArrayList<>(original);
 		if(original.size() > 0) {
-			Collections.shuffle(result);
 			int count = maxEntries.length == 1 ? maxEntries[0] :
 					ThreadLocalRandom.current().nextInt(1, original.size());
 			while (result.size() > count) {
+				Collections.shuffle(result);
 				result.remove(0);
 			}
 		}
