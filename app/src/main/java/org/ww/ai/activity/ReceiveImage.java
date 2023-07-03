@@ -74,7 +74,7 @@ public class ReceiveImage extends AppCompatActivity {
     private void saveResult() {
         RenderResult renderResult = new RenderResult();
         if(bitmap != null) {
-            Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(bitmap, 96);
+            Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(bitmap, 128);
             renderResult.thumbNail = IMAGE_UTIL.convertImageToBlob(thumbNail);
             renderResult.image = IMAGE_UTIL.convertImageToBlob(bitmap);
         }

@@ -53,5 +53,6 @@
     <string name="title_result_stored">Ergebnis gespeichert</string>
     <string name="msg_result_stored">Dein Ergebnis wurde in der Datenbank gespeichert.</string>
     <string name="btn_show_in_history">Zur Historie</string>
+    <string name="content_description_stats_info">Show stats</string>
 
 </resources>

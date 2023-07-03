@@ -53,5 +53,6 @@
     <string name="title_result_stored">Result stored</string>
     <string name="msg_result_stored">Your rendered result was stored into history\'s database.</string>
     <string name="btn_show_in_history">Show history</string>
+    <string name="content_description_stats_info">Show stats</string>
 
 </resources>

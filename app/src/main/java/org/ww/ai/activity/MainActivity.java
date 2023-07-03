@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    // There are no request codes
                     Intent data = result.getData();
                     showWhatToDoWithResultDialog(data);
                 }
