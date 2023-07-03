@@ -48,6 +48,10 @@
     <string name="result_save">Speichern</string>
     <string name="emptyListText">(noch keine Einträge)</string>
     <string name="btn_back">Zurück</string>
-    <string name="title_no_query">Achtung</string>
     <string name="message_no_query">Du hast leider nicht die App zuvor genutzt, um deinen Text für deinen AI-Renderer zu erstellen. Daher ist dieser unbekannt.</string>
+    <string name="title_no_query">Warnung</string>
+    <string name="title_result_stored">Ergebnis gespeichert</string>
+    <string name="msg_result_stored">Dein Ergebnis wurde in der Datenbank gespeichert.</string>
+    <string name="btn_show_in_history">Zur Historie</string>
+
 </resources>

@@ -7,10 +7,11 @@ import androidx.room.PrimaryKey;
 import org.ww.ai.rds.dao.RenderResultDao;
 import org.ww.ai.rds.ifenum.RenderModel;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 @Entity(tableName = RenderResultDao.TABLE)
-public class RenderResult {
+public class RenderResult implements Serializable {
 
     public RenderResult() {
     }

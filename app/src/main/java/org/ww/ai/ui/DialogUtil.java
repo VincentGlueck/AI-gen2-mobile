@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -35,7 +36,9 @@ public enum DialogUtil {
         builder.show();
     }
 
-    public void showPrompt(Context context, int titleResourceId, int messageResourceId,
+    public void showPrompt(Context context,
+                           int titleResourceId,
+                           int messageResourceId,
                            int resourcePositive,
                            final DialogInterface.OnClickListener positiveListener,
                            int resourceNegative,
@@ -52,6 +55,37 @@ public enum DialogUtil {
         builder.show();
     }
 
+
+    public void showPrompt(Context context, String title, String msg,
+                           int resourcePositive,
+                           final DialogInterface.OnClickListener positiveListener,
+                           int resourceNegative,
+                           final DialogInterface.OnClickListener negativeListener,
+                           int... iconResourceId) {
+
+        buildPrompt(context, title, msg, resourcePositive, positiveListener,
+                resourceNegative, negativeListener, iconResourceId).show();
+    }
+
+    public AlertDialog.Builder buildPrompt(Context context, String title, String msg,
+                                           int resourcePositive,
+                                           final DialogInterface.OnClickListener positiveListener,
+                                           int resourceNegative,
+                                           final DialogInterface.OnClickListener negativeListener,
+                                           int... iconResourceId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton(resourcePositive, positiveListener)
+                .setNegativeButton(resourceNegative, negativeListener);
+        if(iconResourceId.length > 0) {
+            builder.setIcon(iconResourceId[0]);
+        }
+        return builder;
+    }
+
+
     public void showErrorMessage(Context context, String errText, DialogInterface.OnClickListener... positiveListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(R.string.titleError)
@@ -64,20 +98,6 @@ public enum DialogUtil {
         }
         builder.show();
     }
-
-    public ProgressDialog showPleaseWaitIndicator(Context context) {
-        ProgressDialog dialog = new ProgressDialog(context);
-        dialog.setMessage(context.getResources().getString(R.string.pleaseWait));
-        dialog.show();
-        return dialog;
-    }
-
-    public void hidePleaseWaitIndicator(ProgressDialog dialog) {
-        if(dialog != null && dialog.isShowing()) {
-            dialog.dismiss();
-        }
-    }
-
     public void showHtmlDialog(Context context, int titleResourceId, String htmlUrl, int... iconResourceId) {
         final View htmlView = View.inflate(context, R.layout.html_dialog_view, null);
         final WebView html = htmlView.findViewById(R.id.html);

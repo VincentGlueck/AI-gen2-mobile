@@ -2,21 +2,14 @@ package org.ww.ai.activity;
 
 import android.app.Activity;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.navigation.NavController;
@@ -32,10 +25,8 @@ import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
-import org.ww.ai.rds.ifenum.RenderModel;
 import org.ww.ai.ui.DialogUtil;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        // deleteAllTestRecords(AppDatabase.getInstance(this));
+        deleteAllTestRecords(AppDatabase.getInstance(this));
 
         checkIntentPurpose();
 
@@ -131,11 +122,28 @@ public class MainActivity extends AppCompatActivity {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     // There are no request codes
                     Intent data = result.getData();
-                    if (data != null) {
-                        Log.d("RESULT", "got some data: " + data.toString());
-                    }
+                    showWhatToDoWithResultDialog(data);
                 }
             });
+
+    private void showWhatToDoWithResultDialog(Intent data) {
+        if (data != null && data.getSerializableExtra(RenderResult.class.getCanonicalName()) != null) {
+            DialogUtil.DIALOG_UTIL.showPrompt(
+                    this,
+                    getResources().getString(R.string.title_result_stored),
+                    getResources().getString(R.string.msg_result_stored),
+                    R.string.btn_show_in_history, (d, i1) -> {
+                        d.dismiss();
+                        Intent intent = new Intent(this, RenderResultsActivity.class);
+                        startActivity(intent);
+                    },
+                    R.string.btn_back, (d, i1) -> {
+                        d.dismiss();
+                    },
+                    R.drawable.info
+            );
+        }
+    }
 
 
 }

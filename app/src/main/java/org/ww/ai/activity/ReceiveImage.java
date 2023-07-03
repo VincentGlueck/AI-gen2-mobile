@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -105,7 +106,9 @@ public class ReceiveImage extends AppCompatActivity {
     }
 
     private void finishWithResult(RenderResult renderResult) {
-        setResult(Activity.RESULT_OK);
+        Intent intent = new Intent();
+        intent.putExtra(RenderResult.class.getCanonicalName(), renderResult);
+        setResult(Activity.RESULT_OK, intent);
         finish();
     }
 
