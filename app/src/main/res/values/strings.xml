@@ -44,9 +44,11 @@
     <string name="lbl_what_was_rendered_credits">Overall costs</string>
     <string name="image_received_description">Image you pasted</string>
     <string name="lbl_what_was_rendered_query">Resulting in</string>
-    <string name="back">Cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="result_save">Save</string>
     <string name="emptyListText">(Nothing to display)</string>
     <string name="btn_back">Back</string>
+    <string name="title_no_query">Warning</string>
+    <string name="message_no_query">I don\'t know what(!) you rendered before as you didn\'t use a text from results.</string>
 
 </resources>

@@ -44,8 +44,10 @@
     <string name="lbl_what_was_rendered_credits">Kosten/Credits</string>
     <string name="image_received_description">Bild, das du weitergeleitet hast</string>
     <string name="lbl_what_was_rendered_query">Genutzt wurde</string>
-    <string name="back">Abbruch</string>
+    <string name="cancel">Abbruch</string>
     <string name="result_save">Speichern</string>
     <string name="emptyListText">(noch keine Einträge)</string>
     <string name="btn_back">Zurück</string>
+    <string name="title_no_query">Achtung</string>
+    <string name="message_no_query">Du hast leider nicht die App zuvor genutzt, um deinen Text für deinen AI-Renderer zu erstellen. Daher ist dieser unbekannt.</string>
 </resources>

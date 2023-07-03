@@ -1,11 +1,14 @@
 package org.ww.ai.activity;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.navigation.NavController;
@@ -43,9 +47,6 @@ public class MainActivity extends AppCompatActivity {
     private WhatToRenderIF lastRender;
     private ActivityMainBinding binding;
 
-    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-            uri -> Log.d("ON_RESULT", uri.toString()));
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        deleteAllTestRecords(AppDatabase.getInstance(this));
+        // deleteAllTestRecords(AppDatabase.getInstance(this));
 
         checkIntentPurpose();
 
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ReceiveImage.class);
         intent.putExtra(KEY_BITMAP, uri);
         intent.putExtra(KEY_WHAT_TO_RENDER, lastRender);
-        startActivity(intent);
+        someActivityResultLauncher.launch(intent);
     }
 
     @Override
@@ -123,6 +124,18 @@ public class MainActivity extends AppCompatActivity {
     public void setLastQuery(WhatToRenderIF whatToRenderIF) {
         lastRender = whatToRenderIF;
     }
+
+    ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    // There are no request codes
+                    Intent data = result.getData();
+                    if (data != null) {
+                        Log.d("RESULT", "got some data: " + data.toString());
+                    }
+                }
+            });
 
 
 }
