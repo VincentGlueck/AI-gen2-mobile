@@ -55,7 +55,6 @@ public class PhraseGenerator {
 	}
 
 	private List<AttributeValue> getGenerateWordSettings(RenderResult renderResult) {
-		boolean presetFound = false;
 		boolean presetWanted = whatToRender.getPreset() != null && !whatToRender.getPreset().isEmpty();
 		final List<AttributeValue> result = new ArrayList<>();
 		for(Setting setting : settingsCollection.getAll()) {
@@ -67,8 +66,7 @@ public class PhraseGenerator {
 				renderResult.setPresetWords(presetWords.size());
 				renderResult.setPreset(setting.getName());
 				result.addAll(presetWords);
-				presetFound = true;
-			} 
+			}
 			AddtionalAttributes attr = getAttributeFromSetting(setting);
 			if(attr == null) {
 				continue;
