@@ -20,10 +20,19 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
+import org.ww.ai.rds.AppDatabase;
+import org.ww.ai.rds.AsyncDbFuture;
+import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.rds.ifenum.RenderModel;
 import org.ww.ai.ui.DialogUtil;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,24 +59,40 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-/*
-        AppDatabase appDatabase = AppDatabase.getInstance(this);
-        Log.d("DATABASE", "entries: " + appDatabase.renderResultDao());
-        if(appDatabase.renderResultDao() != null) {
-            LiveData<List<RenderResult>> liveData = appDatabase.renderResultDao().getAll();
-            liveData.observe(this, renderResults -> {
-                if(renderResults != null && !renderResults.isEmpty()) {
-                    renderResults.forEach(r -> {
-                        Log.d("RENDER_RESULT", r.toString());
-                    });
-                }
-            });
-        }
-        */
+        deleteAllTestRecords(AppDatabase.getInstance(this));
 
         checkIntentPurpose();
 
     }
+
+    private void deleteAllTestRecords(AppDatabase appDatabase) {
+        ListenableFuture<List<RenderResult>> listenableFuture = appDatabase.renderResultDao().getAll();
+        AsyncDbFuture<List<RenderResult>> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(listenableFuture, renderResults -> {
+            if(!renderResults.isEmpty()) {
+                ListenableFuture<Integer> integerListenableFuture = appDatabase.renderResultDao().deleteRenderResults(renderResults);
+                AsyncDbFuture<Integer> integerAsyncDbFuture = new AsyncDbFuture<>();
+                integerAsyncDbFuture.processFuture(integerListenableFuture, result -> {
+                    Toast.makeText(this, "deleted: " + result.toString(), Toast.LENGTH_LONG).show();
+                }, this);
+            }
+        }, this);
+    }
+
+    /*
+    private void createTestRecord(AppDatabase appDatabase) {
+        RenderResult renderResult = new RenderResult();
+        renderResult.queryString = "Dummy";
+        renderResult.createdTime = System.currentTimeMillis();
+        renderResult.renderEngine = RenderModel.SDXL_0_9;
+        ListenableFuture<Void> listenableFuture = appDatabase
+                .renderResultDao().insertRenderResult(renderResult);
+        AsyncDbFuture<Void> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(listenableFuture, callback -> {
+            Log.d("UPDATE", "updated...");
+        }, this);
+    }
+     */
 
     private void checkIntentPurpose() {
         ClipData clipData = getIntent().getClipData();

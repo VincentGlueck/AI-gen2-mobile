@@ -113,9 +113,13 @@ public class FirstFragment extends Fragment {
 
         ImageView btnClip = view.findViewById(R.id.btn_clip);
         btnClip.setOnClickListener(l -> {
-            ClipBoardUtil clipBoardUtil = ClipBoardUtil.getInstance(containerContext);
-            Toast.makeText(containerContext, clipBoardUtil.testContent(), Toast.LENGTH_LONG).show();
+            openRenderResultsHistoryActivity();
         });
+    }
+
+    private void openRenderResultsHistoryActivity() {
+        Intent intent = new Intent(getActivity(), RenderResultsActivity.class);
+        startActivity(intent);
     }
 
     private void showGeneratorXML() {
@@ -133,7 +137,6 @@ public class FirstFragment extends Fragment {
             Toast.makeText(containerContext, "Error loading " + GENERATOR_RULES, Toast.LENGTH_LONG).show();
         }
     }
-
 
     @Override
     public void onResume() {
@@ -174,8 +177,6 @@ public class FirstFragment extends Fragment {
         sliderSentencesCount.setValue(whatToRender.getPhraseCount());
 
     }
-
-
 
     private void selectSpinner(Spinner spinner, String value) {
         SpinnerAdapter adapter = spinner.getAdapter();

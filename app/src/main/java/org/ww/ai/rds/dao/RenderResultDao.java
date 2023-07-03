@@ -4,16 +4,15 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
+
+import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.rds.entity.RenderResult;
 
 import java.util.List;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
-import kotlinx.coroutines.flow.Flow;
-
 
 @Dao
 public interface RenderResultDao {
@@ -21,7 +20,7 @@ public interface RenderResultDao {
     public static final String TABLE = "renderresult";
 
     @Query("SELECT * from " + TABLE)
-    LiveData<List<RenderResult>> getAll();
+    ListenableFuture<List<RenderResult>> getAll();
 
     //@Query("SELECT uid, createdTime from " + TABLE + " ORDER BY createdTime DESC")
     //List<Integer> getAllUids();
@@ -32,10 +31,13 @@ public interface RenderResultDao {
     //@Query("SELECT * from " + TABLE + " WHERE uid = :uid")
     //Flow<RenderResult> findById(String uid);
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
+
     @Insert
-    void insertAll(RenderResult... renderResults);
+    ListenableFuture<Void> insertRenderResult(RenderResult... renderResults);
 
     @Delete
-    void delete(RenderResult renderResult);
+    ListenableFuture<Integer> deleteRenderResults(List<RenderResult> renderResults);
 
 }

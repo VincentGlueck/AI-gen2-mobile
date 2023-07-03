@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "org.ww.ai"
-        minSdk 24
+        minSdk 28
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -25,8 +25,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_9
+        targetCompatibility JavaVersion.VERSION_1_9
     }
 
     buildFeatures {
@@ -50,8 +50,11 @@ dependencies {
 
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-rxjava3:$room_version"
+    implementation "androidx.room:room-guava:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+
+    implementation "com.google.guava:guava:31.0.1-android"
+    implementation "androidx.concurrent:concurrent-futures:1.1.0"
 
     /*
     implementation "androidx.room:room-paging:$room_version"

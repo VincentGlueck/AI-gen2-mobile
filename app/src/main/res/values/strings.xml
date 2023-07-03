@@ -46,5 +46,7 @@
     <string name="lbl_what_was_rendered_query">Resulting in</string>
     <string name="back">Cancel</string>
     <string name="result_save">Save</string>
+    <string name="emptyListText">(Nothing to display)</string>
+    <string name="btn_back">Back</string>
 
 </resources>

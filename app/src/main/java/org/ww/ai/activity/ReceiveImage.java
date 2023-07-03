@@ -9,9 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -30,14 +28,12 @@ import java.util.Date;
 
 public class ReceiveImage extends AppCompatActivity {
 
-    private Uri bitmapUri;
-
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_image);
-        bitmapUri = (Uri) getIntent().getExtras().get(MainActivity.KEY_BITMAP);
+        Uri bitmapUri = (Uri) getIntent().getExtras().get(MainActivity.KEY_BITMAP);
         TextView textView = findViewById(R.id.receive_title);
         textView.setText(R.string.receive_result_header);
 

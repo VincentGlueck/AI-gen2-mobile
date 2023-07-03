@@ -46,4 +46,6 @@
     <string name="lbl_what_was_rendered_query">Genutzt wurde</string>
     <string name="back">Abbruch</string>
     <string name="result_save">Speichern</string>
+    <string name="emptyListText">(noch keine Einträge)</string>
+    <string name="btn_back">Zurück</string>
 </resources>
