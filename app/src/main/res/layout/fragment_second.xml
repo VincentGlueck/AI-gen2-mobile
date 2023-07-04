@@ -9,29 +9,22 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:padding="4dp">
 
-        <Button
-            android:id="@+id/button_second"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/previous"
-            app:layout_constraintBottom_toTopOf="@id/lin_result"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <CheckBox
             android:id="@+id/instant_copy_to_clipboard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/button_second"
-            android:layout_alignParentEnd="true"
+            app:layout_constraintBottom_toTopOf="@id/lin_result"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:text="@string/instant_copy_to_clipboard" />
 
         <LinearLayout
             android:id="@+id/lin_result_header"
-            android:layout_below="@id/button_second"
+            android:layout_below="@id/instant_copy_to_clipboard"
             android:padding="8dp"
             android:orientation="horizontal"
             android:layout_width="match_parent"

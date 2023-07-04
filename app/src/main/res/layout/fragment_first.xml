@@ -322,7 +322,7 @@
 
         <ImageView
             android:padding="8dp"
-            android:id="@+id/btn_clip"
+            android:id="@+id/btn_render_results"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/gallery" />

@@ -83,8 +83,8 @@ public class SecondFragment extends Fragment implements PhraseGeneratorErrorHand
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonSecond.setOnClickListener(view1 -> NavHostFragment.findNavController(SecondFragment.this)
-                .navigate(R.id.action_SecondFragment_to_FirstFragment));
+//        binding.buttonSecond.setOnClickListener(view1 -> NavHostFragment.findNavController(SecondFragment.this)
+//                .navigate(R.id.action_SecondFragment_to_FirstFragment));
 
         this.view = view;
         if(whatToRender == null) {
