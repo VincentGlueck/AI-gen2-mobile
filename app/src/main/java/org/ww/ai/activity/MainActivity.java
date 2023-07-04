@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startReceiveImageActivity(Uri uri) {
-        Intent intent = new Intent(this, ReceiveImage.class);
+        Intent intent = new Intent(this, ReceiveImageActivity.class);
         intent.putExtra(KEY_BITMAP, uri);
         intent.putExtra(KEY_WHAT_TO_RENDER, lastRender);
         receiveActivityResultLauncher.launch(intent);
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         Snackbar snackbar = Snackbar.make(coordinatorLayout, getText(R.string.history_entry_create_snackbar), Snackbar.LENGTH_LONG);
         snackbar.setAction(getText(R.string.history_entry_show_snackbar), view -> {
             Toast.makeText(this, "data: " +
-                    data.getBundleExtra(RenderResult.class.getCanonicalName()),
+                    data.getSerializableExtra("test"),
                     Toast.LENGTH_LONG).show();
         });
         snackbar.setActionTextColor(Color.YELLOW);

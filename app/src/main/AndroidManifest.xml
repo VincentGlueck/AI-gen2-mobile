@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.ReceiveImage"
+        <activity android:name=".activity.ReceiveImageActivity"
             android:label="@string/title_activity_main"
             android:parentActivityName=".activity.MainActivity" />
 

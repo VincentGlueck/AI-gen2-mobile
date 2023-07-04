@@ -4,7 +4,6 @@ import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Parcelable;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,21 +31,18 @@ import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.ifenum.RenderModel;
 import org.ww.ai.ui.DialogUtil;
-import org.ww.ai.ui.ImageUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.List;
 
-public class ReceiveImage extends AppCompatActivity {
+public class ReceiveImageActivity extends AppCompatActivity {
 
     private Bitmap bitmap;
 
     private WhatToRenderIF whatToRender;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,9 +101,7 @@ public class ReceiveImage extends AppCompatActivity {
 
     private void finishWithResult(RenderResult renderResult) {
         Intent intent = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(RenderResult.class.getCanonicalName(), renderResult);
-        intent.putExtras(bundle);
+        intent.putExtra("test", renderResult);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
