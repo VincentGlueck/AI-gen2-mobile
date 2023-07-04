@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapter.ViewHolder> {
 
@@ -40,9 +41,10 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
             Log.d("ADD_RENDER_RESULTS", "Attempt to add null or empty list of RenderResults");
             return;
         }
-        renderResults.forEach(r -> {
-            localDataSet.add(new RenderResultLightWeight(r));
-        });
+        int oldLength = localDataSet.size();
+        localDataSet.addAll(renderResults.stream().map(
+                RenderResultLightWeight::fromRenderResult).collect(Collectors.toList()));
+        notifyItemRangeInserted(oldLength, localDataSet.size());
     }
 
     public void removeResult(int position) {

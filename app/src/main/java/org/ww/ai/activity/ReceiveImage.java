@@ -90,9 +90,7 @@ public class ReceiveImage extends AppCompatActivity {
         }
         String selectedItem = (String) engineSpinner.getSelectedItem();
         renderResult.renderEngine = RenderModel.fromName(selectedItem);
-        Toast.makeText(this, renderResult.toString(), Toast.LENGTH_LONG).show();
         renderResult.createdTime = System.currentTimeMillis();
-        Log.d("RENDERRESULT", renderResult.toString());
         storeToDatabase(renderResult);
     }
 

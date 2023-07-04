@@ -67,7 +67,7 @@ abstract public class SwipeToDeleteCallback extends ItemTouchHelper.Callback {
 
         if (isCancelled) {
             clearCanvas(c, itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, false);
             return;
         }
 
@@ -86,13 +86,10 @@ abstract public class SwipeToDeleteCallback extends ItemTouchHelper.Callback {
         deleteDrawable.draw(c);
 
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-
-
     }
 
     private void clearCanvas(Canvas c, Float left, Float top, Float right, Float bottom) {
         c.drawRect(left, top, right, bottom, mClearPaint);
-
     }
 
     @Override

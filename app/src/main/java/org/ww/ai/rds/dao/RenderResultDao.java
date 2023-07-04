@@ -29,6 +29,9 @@ public interface RenderResultDao {
     @Query("SELECT uid, createdTime, thumbnail, render_engine, query_string from " + TABLE + " ORDER BY createdTime DESC")
     ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights();
 
+    @Query("SELECT * from " + TABLE + " WHERE uid = :id")
+    ListenableFuture<RenderResult> getById(int id);
+
     //@Query("SELECT * from " + TABLE + " WHERE uid = :uid")
     //Flow<RenderResult> findById(String uid);
 

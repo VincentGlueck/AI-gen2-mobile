@@ -54,5 +54,7 @@
     <string name="msg_result_stored">Dein Ergebnis wurde in der Datenbank gespeichert.</string>
     <string name="btn_show_in_history">Zur Historie</string>
     <string name="content_description_stats_info">Show stats</string>
+    <string name="history_entry_deleted_snackbar">Der Eintrag wird gelöscht.</string>
+    <string name="undo_snackbar">Rückgängig</string>
 
 </resources>
