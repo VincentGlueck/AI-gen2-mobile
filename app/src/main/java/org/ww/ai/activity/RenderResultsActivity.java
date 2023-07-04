@@ -32,7 +32,7 @@ public class RenderResultsActivity extends AppCompatActivity implements RenderRe
 
         RecyclerView renderResultView = findViewById(R.id.render_result_List);
 
-        adapter = new RenderResultAdapter(this);
+        adapter = new RenderResultAdapter(this, this);
         renderResultView.setAdapter(adapter);
         renderResultView.setLayoutManager(new LinearLayoutManager(this));
         getRenderResultsFromDatabase();
@@ -45,13 +45,12 @@ public class RenderResultsActivity extends AppCompatActivity implements RenderRe
 
     private void getRenderResultsFromDatabase() {
         AppDatabase appDatabase = AppDatabase.getInstance(getApplication());
-        // createTestRecord(appDatabase);
         ListenableFuture<List<RenderResult>> listenableFuture = appDatabase.renderResultDao().getAll();
         AsyncDbFuture<List<RenderResult>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(listenableFuture, renderResults -> {
+            int oldSize = adapter.getItemCount();
             adapter.addRenderResults(renderResults);
-            // adapter.notifyItemRangeInserted(0, renderResults.size());
-            adapter.notifyDataSetChanged();
+            adapter.notifyItemRangeInserted(oldSize, adapter.getItemCount());
             Toast.makeText(this, "Items added: " + renderResults.size(), Toast.LENGTH_LONG).show();
         }, getApplication());
     }

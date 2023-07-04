@@ -2,26 +2,24 @@ package org.ww.ai.ui;
 
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
-import android.content.Intent;
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.ww.ai.R;
-import org.ww.ai.activity.RenderResultDetailsActivity;
-import org.ww.ai.activity.RenderResultsActivity;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapter.ViewHolder> {
@@ -29,9 +27,12 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     private final List<RenderResultLightWeight> localDataSet;
     private final OnItemClickListener listener;
 
-    public RenderResultAdapter(RenderResultAdapter.OnItemClickListener listener) {
+    private final DateFormat dateFormat;
+
+    public RenderResultAdapter(Context context, RenderResultAdapter.OnItemClickListener listener) {
         this.listener = listener;
         this.localDataSet = new ArrayList<>();
+        dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     }
 
     public void addRenderResults(List<RenderResult> renderResults) {
@@ -55,9 +56,10 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
 
     @Override
     public void onBindViewHolder(@NonNull RenderResultAdapter.ViewHolder viewHolder, int position) {
-        viewHolder.getTextView().setText(localDataSet.get(position).queryString);
-        viewHolder.getThumb().setImageBitmap(IMAGE_UTIL.convertBlobToImage(localDataSet.get(position).thumbNail));
         RenderResultLightWeight item = localDataSet.get(position);
+        viewHolder.getTextView().setText(item.queryString);
+        viewHolder.getThumb().setImageBitmap(IMAGE_UTIL.convertBlobToImage(item.thumbNail));
+        viewHolder.getTextViewDate().setText(dateFormat.format(new Date(item.createdTime)));
         viewHolder.bind(item, listener);
     }
 
@@ -72,12 +74,13 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         private final TextView textView;
         private final ImageView thumb;
 
+        private final TextView textViewDate;
+
         public ViewHolder(View view) {
             super(view);
             textView = view.findViewById(R.id.render_result_title);
             thumb = view.findViewById(R.id.history_render_result_thumb);
-            View row = view.findViewById(R.id.render_result_row);
-
+            textViewDate = view.findViewById(R.id.render_result_date);
         }
 
         public void bind(final RenderResultLightWeight item, final OnItemClickListener listener) {
@@ -92,6 +95,10 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
 
         public ImageView getThumb() {
             return thumb;
+        }
+
+        public TextView getTextViewDate() {
+            return textViewDate;
         }
     }
 
