@@ -34,7 +34,6 @@ public class RenderResultsActivity extends AppCompatActivity implements RenderRe
 
     private RenderResultAdapter adapter;
     private LinearLayout linearLayout;
-
     private RecyclerView renderResultView;
 
     @Override
@@ -102,6 +101,8 @@ public class RenderResultsActivity extends AppCompatActivity implements RenderRe
             ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
             AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
             asyncDbFutureDel.processFuture(delFuture, i -> {
+                Toast.makeText(RenderResultsActivity.this,
+                        getText(R.string.permanent_deleted_toast), Toast.LENGTH_LONG).show();
             }, this);
         }, this);
     }
@@ -118,6 +119,7 @@ public class RenderResultsActivity extends AppCompatActivity implements RenderRe
     @Override
     public void onItemClick(RenderResultLightWeight item) {
         Intent intent = new Intent(getApplication(), RenderResultDetailsActivity.class);
+        intent.putExtra("uid", item.uid);
         startActivity(intent);
     }
 

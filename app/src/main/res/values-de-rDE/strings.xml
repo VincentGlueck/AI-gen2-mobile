@@ -56,5 +56,6 @@
     <string name="content_description_stats_info">Show stats</string>
     <string name="history_entry_deleted_snackbar">Der Eintrag wird gelöscht.</string>
     <string name="undo_snackbar">Rückgängig</string>
+    <string name="permanent_deleted_toast">Der Eintrag wurde endgültig gelöscht.</string>
 
 </resources>
