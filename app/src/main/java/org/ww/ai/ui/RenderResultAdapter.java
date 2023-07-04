@@ -36,7 +36,6 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     }
 
     public void addRenderResults(List<RenderResult> renderResults) {
-
         if(renderResults == null || renderResults.isEmpty()) {
             Log.d("ADD_RENDER_RESULTS", "Attempt to add null or empty list of RenderResults");
             return;
@@ -44,6 +43,24 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         renderResults.forEach(r -> {
             localDataSet.add(new RenderResultLightWeight(r));
         });
+    }
+
+    public void removeResult(int position) {
+        if(position >= 0 && position < localDataSet.size()) {
+            localDataSet.remove(position);
+            notifyItemRemoved(position);
+        } else {
+            Log.e("REMOVE_RESULT", "with position " + position + ", but localDataSet.size() is " + localDataSet.size());
+        }
+    }
+
+    public void restoreResult(RenderResultLightWeight renderResult, int position) {
+        localDataSet.add(position, renderResult);
+        notifyItemInserted(position);
+    }
+
+    public RenderResultLightWeight itemAt(int position) {
+        return localDataSet.get(position);
     }
 
     @NonNull

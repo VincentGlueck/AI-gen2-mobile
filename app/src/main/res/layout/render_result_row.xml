@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
-        android:text="<title>"
+        android:text="*title*"
         android:textSize="20sp"
         tools:ignore="HardcodedText" />
 
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
         android:textColor="@color/lightGrayTransparent"
-        android:text="<date>"
+        android:text="*date*"
         android:textSize="16sp"
         tools:ignore="HardcodedText" />
 

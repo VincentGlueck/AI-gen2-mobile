@@ -1,6 +1,7 @@
 package org.ww.ai.activity;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -18,7 +19,10 @@ public class RenderResultDetailsActivity extends AppCompatActivity {
         if(uid > Integer.MIN_VALUE) {
             loadRenderResultHistory(uid);
         }
-
+        Button btnBack = findViewById(R.id.history_detail_back);
+        btnBack.setOnClickListener(click -> {
+            finish();
+        });
     }
 
     private void loadRenderResultHistory(int uid) {
