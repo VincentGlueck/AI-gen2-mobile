@@ -105,7 +105,9 @@ public class ReceiveImage extends AppCompatActivity {
 
     private void finishWithResult(RenderResult renderResult) {
         Intent intent = new Intent();
-        intent.putExtra(RenderResult.class.getCanonicalName(), renderResult);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(RenderResult.class.getCanonicalName(), renderResult);
+        intent.putExtras(bundle);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }

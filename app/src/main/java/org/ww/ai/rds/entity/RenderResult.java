@@ -1,5 +1,9 @@
 package org.ww.ai.rds.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -11,7 +15,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 @Entity(tableName = RenderResultDao.TABLE)
-public class RenderResult implements Serializable {
+public class RenderResult implements Serializable, Parcelable {
 
     public RenderResult() {
     }
@@ -52,5 +56,19 @@ public class RenderResult implements Serializable {
                 ", renderEngine=" + renderEngine +
                 ", credits=" + credits +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeInt(uid);
+        dest.writeLong(createdTime);
+        dest.writeString(queryString);
+        dest.writeString(queryUsed);
+        dest.writeByteArray(thumbNail);
     }
 }

@@ -35,14 +35,6 @@
             android:label="@string/title_activity_main"
             android:parentActivityName=".activity.MainActivity" />
 
-        <activity android:name=".activity.RenderResultsActivity"
-            android:label="@string/title_activity_main"
-            android:parentActivityName=".activity.MainActivity" />
-
-        <activity android:name=".activity.RenderResultDetailsActivity"
-            android:label="@string/title_activity_main"
-            android:parentActivityName=".activity.MainActivity" />
-
     </application>
 
 </manifest>

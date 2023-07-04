@@ -3,32 +3,27 @@ package org.ww.ai.activity;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.widget.Toast;
-
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
-import org.ww.ai.rds.AppDatabase;
-import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
-import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.ui.DialogUtil;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     private WhatToRenderIF lastRender;
     private ActivityMainBinding binding;
+
+    private CoordinatorLayout coordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +48,13 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        coordinatorLayout = findViewById(R.id.main_activity_scroll_bar);
 
         checkIntentPurpose();
 
     }
+
+
 
     private void checkIntentPurpose() {
         ClipData clipData = getIntent().getClipData();
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ReceiveImage.class);
         intent.putExtra(KEY_BITMAP, uri);
         intent.putExtra(KEY_WHAT_TO_RENDER, lastRender);
-        someActivityResultLauncher.launch(intent);
+        receiveActivityResultLauncher.launch(intent);
     }
 
     @Override
@@ -86,33 +86,24 @@ public class MainActivity extends AppCompatActivity {
         lastRender = whatToRenderIF;
     }
 
-    ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
+    ActivityResultLauncher<Intent> receiveActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     Intent data = result.getData();
-                    showWhatToDoWithResultDialog(data);
+                    showWantToSeeSnackBar(data);
                 }
             });
 
-    private void showWhatToDoWithResultDialog(Intent data) {
-        if (data != null && data.getSerializableExtra(RenderResult.class.getCanonicalName()) != null) {
-            DialogUtil.DIALOG_UTIL.showPrompt(
-                    this,
-                    getResources().getString(R.string.title_result_stored),
-                    getResources().getString(R.string.msg_result_stored),
-                    R.string.btn_show_in_history, (d, i1) -> {
-                        d.dismiss();
-                        Intent intent = new Intent(this, RenderResultsActivity.class);
-                        startActivity(intent);
-                    },
-                    R.string.btn_back, (d, i1) -> {
-                        d.dismiss();
-                    },
-                    R.drawable.info
-            );
-        }
+    private void showWantToSeeSnackBar(Intent data) {
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, getText(R.string.history_entry_create_snackbar), Snackbar.LENGTH_LONG);
+        snackbar.setAction(getText(R.string.history_entry_show_snackbar), view -> {
+            Toast.makeText(this, "data: " +
+                    data.getBundleExtra(RenderResult.class.getCanonicalName()),
+                    Toast.LENGTH_LONG).show();
+        });
+        snackbar.setActionTextColor(Color.YELLOW);
+        snackbar.show();
     }
-
 
 }

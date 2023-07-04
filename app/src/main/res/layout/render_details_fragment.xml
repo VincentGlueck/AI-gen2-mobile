@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.RenderResultsActivity">
+    android:padding="4dp"
+    tools:context=".activity.RenderDetailsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,7 +14,6 @@
 
         <TextView
             android:id="@+id/history_title"
-            android:paddingTop="2dp"
             android:paddingBottom="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -142,21 +142,6 @@
                 android:text="3"
                 android:layout_weight="0.75"
                 tools:ignore="HardcodedText" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp">
-
-            <Button
-                android:id="@+id/history_detail_back"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:text="@string/btn_back" />
 
         </LinearLayout>
 

@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -143,8 +144,9 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
 
     @Override
     public void onItemClick(RenderResultLightWeight item) {
-        Intent intent = new Intent(containerContext, RenderResultDetailsActivity.class);
-        intent.putExtra("uid", item.uid);
-        startActivity(intent);
+        NavController navController = NavHostFragment.findNavController(RenderResultsFragment.this);
+        Bundle bundle = new Bundle();
+        bundle.putInt("uid", item.uid);
+        navController.navigate(R.id.action_RenderResultsFragment_to_ShowRenderDetailsFragment, bundle);
     }
 }

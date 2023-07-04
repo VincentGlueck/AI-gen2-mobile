@@ -31,12 +31,23 @@
     <fragment
         android:id="@+id/RenderResultsFragment"
         android:name="org.ww.ai.activity.RenderResultsFragment"
-        android:label="Test"
+        android:label="@string/render_results_title"
         tools:layout="@layout/render_results_fragment">
         <action
             android:id="@+id/action_RenderResultsFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
-
+        <action
+            android:id="@+id/action_RenderResultsFragment_to_ShowRenderDetailsFragment"
+            app:destination="@id/ShowRenderDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ShowRenderDetailsFragment"
+        android:name="org.ww.ai.activity.RenderDetailsFragment"
+        android:label="@string/render_details_title"
+        tools:layout="@layout/render_details_fragment">
+        <action
+            android:id="@+id/action_ShowRenderDetailsFragment_to_RenderResultsFragment"
+            app:destination="@id/RenderResultsFragment" />
     </fragment>
 
 </navigation>

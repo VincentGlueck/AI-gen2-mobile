@@ -50,7 +50,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class FirstFragment extends Fragment {
     public static final String GENERATOR_RULES = "generator.xml";
-    private static final int DEFAULT_ARTIST_COUNT = 2;
     private static final String KEY_ARTIST_TYPE = "artisttype";
     private FragmentFirstBinding binding;
 
@@ -107,19 +106,6 @@ public class FirstFragment extends Fragment {
         btnShow.setOnClickListener(l -> {
             showGeneratorXML();
         });
-
-        /*
-        ImageView btnClip = view.findViewById(R.id.btn_render_results);
-        btnClip.setOnClickListener(l -> {
-            openRenderResultsHistoryActivity();
-        });
-
-         */
-    }
-
-    private void openRenderResultsHistoryActivity() {
-        Intent intent = new Intent(getActivity(), RenderResultsActivity.class);
-        startActivity(intent);
     }
 
     private void showGeneratorXML() {

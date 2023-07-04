@@ -57,5 +57,9 @@
     <string name="history_entry_deleted_snackbar">Der Eintrag wird gelöscht.</string>
     <string name="undo_snackbar">Rückgängig</string>
     <string name="permanent_deleted_toast">Der Eintrag wurde endgültig gelöscht.</string>
+    <string name="render_results_title">Deine bisherigen Kreationen</string>
+    <string name="render_details_title">Deine Kreation</string>
+    <string name="history_entry_show_snackbar">Anzeigen</string>
+    <string name="history_entry_create_snackbar">Resultat gespeichert.</string>
 
 </resources>
