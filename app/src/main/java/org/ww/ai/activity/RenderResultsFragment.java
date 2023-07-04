@@ -122,7 +122,7 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
             ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
             AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
             asyncDbFutureDel.processFuture(delFuture, i -> {
-                Toast.makeText(containerContext, getText(R.string.permanent_deleted_toast), Toast.LENGTH_LONG).show();
+//                Toast.makeText(containerContext, getText(R.string.permanent_deleted_toast), Toast.LENGTH_LONG).show();
             }, containerContext);
         }, containerContext);
     }

@@ -1,7 +1,6 @@
 package org.ww.ai.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -60,7 +59,7 @@ public class FirstFragment extends Fragment {
     private View view;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
@@ -103,9 +102,7 @@ public class FirstFragment extends Fragment {
         initSentencesCountSlider(view);
 
         ImageView btnShow = view.findViewById(R.id.btn_show);
-        btnShow.setOnClickListener(l -> {
-            showGeneratorXML();
-        });
+        btnShow.setOnClickListener(v -> showGeneratorXML());
     }
 
     private void showGeneratorXML() {
@@ -202,7 +199,7 @@ public class FirstFragment extends Fragment {
         settingsCollection.getSetting(KEY_ARTIST_TYPE).getAttributes().forEach(a -> artistTypes.add(a.getName()));
         artistTypes.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         final Spinner spinner = (Spinner) view.findViewById(R.id.spin_artist_type);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(view.getContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
                 android.R.layout.simple_spinner_item, artistTypes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -242,7 +239,7 @@ public class FirstFragment extends Fragment {
         settingsCollection.getPresets().forEach(p -> presets.add(p.getName()));
         presets.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(view.getContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
                 android.R.layout.simple_spinner_item, presets);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         layoutSpinner.setAdapter(adapter);
@@ -262,7 +259,7 @@ public class FirstFragment extends Fragment {
     private void addValuesToNumOfArtistsSpinner(@NonNull View view) {
         final String[] selection = new String[]{"1", "2", "3"};
         Spinner spinner = view.findViewById(R.id.spin_num_artists);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(view.getContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
                 android.R.layout.simple_spinner_item, selection);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -366,10 +363,7 @@ public class FirstFragment extends Fragment {
     private void addCheckBoxListeners(@NonNull View view) {
         CheckBox checkBoxNoLayout = view.findViewById(R.id.chk_no_layout);
         Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
-        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) -> {
-            whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem());
-
-        });
+        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) -> whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem()));
         CheckBox checkBoxNoArtist = view.findViewById(R.id.chk_no_artists);
         Spinner numOfArtist = view.findViewById(R.id.spin_num_artists);
         checkBoxNoArtist.setOnCheckedChangeListener((v, checked) -> {
@@ -398,19 +392,13 @@ public class FirstFragment extends Fragment {
 
     private void initRandomWordsSlider(View view) {
         Slider slider = view.findViewById(R.id.slider_random_words);
-        slider.addOnChangeListener((sl, v, fromUser) -> {
-            whatToRender.setRandomCount((int) v);
-        });
+        slider.addOnChangeListener((sl, v, fromUser) -> whatToRender.setRandomCount((int) v));
     }
 
     private void initSentencesCountSlider(View view) {
         Slider slider = view.findViewById(R.id.slider_sentences_count);
-        slider.addOnChangeListener((sl, v, fromUser) -> {
-            whatToRender.setPhraseCount((int) v);
-        });
+        slider.addOnChangeListener((sl, v, fromUser) -> whatToRender.setPhraseCount((int) v));
     }
-
-
 
     @Override
     public void onDestroyView() {

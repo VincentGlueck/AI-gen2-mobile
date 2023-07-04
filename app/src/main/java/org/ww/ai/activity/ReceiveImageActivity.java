@@ -101,7 +101,7 @@ public class ReceiveImageActivity extends AppCompatActivity {
 
     private void finishWithResult(RenderResult renderResult) {
         Intent intent = new Intent();
-        intent.putExtra("test", renderResult);
+        intent.putExtra(RenderResult.class.getCanonicalName(), renderResult);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
