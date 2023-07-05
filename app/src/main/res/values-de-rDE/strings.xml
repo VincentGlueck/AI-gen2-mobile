@@ -61,5 +61,6 @@
     <string name="render_details_title">Deine Kreation</string>
     <string name="history_entry_show_snackbar">Anzeigen</string>
     <string name="history_entry_created_snackbar">Resultat gespeichert.</string>
+    <string name="receive_image_title">Kreation einfügen</string>
 
 </resources>

@@ -62,5 +62,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="render_results_title">What you\'ve created so far</string>
     <string name="render_details_title">Your creation</string>
+    <string name="receive_image_title">Insert render result</string>
 
 </resources>
