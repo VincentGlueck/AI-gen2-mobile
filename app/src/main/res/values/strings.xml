@@ -59,7 +59,6 @@
     <string name="history_entry_show_snackbar">View creations</string>
     <string name="undo_snackbar">Undo</string>
     <string name="permanent_deleted_toast">History entry permanently deleted.</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="render_results_title">What you\'ve created so far</string>
     <string name="render_details_title">Your creation</string>
     <string name="receive_image_title">Insert render result</string>

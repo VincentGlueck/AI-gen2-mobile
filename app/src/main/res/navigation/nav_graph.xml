@@ -3,42 +3,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/MainFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="org.ww.ai.activity.FirstFragment"
+        android:id="@+id/MainFragment"
+        android:name="org.ww.ai.activity.MainFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        tools:layout="@layout/main_fragment">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_MainFragment_to_ShowSentencesFragment"
+            app:destination="@id/ShowSentencesFragment" />
         <action
-            android:id="@+id/action_FirstFragment_to_RenderResultsFragment"
+            android:id="@+id/action_MainFragment_to_RenderResultsFragment"
             app:destination="@id/RenderResultsFragment" />
         <action
-            android:id="@+id/action_FirstFragment_to_ReceiveImageFragment"
+            android:id="@+id/action_MainFragment_to_ReceiveImageFragment"
             app:destination="@id/ReceiveImageFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="org.ww.ai.activity.SecondFragment"
+        android:id="@+id/ShowSentencesFragment"
+        android:name="org.ww.ai.activity.ShowSentencesFragment"
         android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        tools:layout="@layout/show_sentences_fragment">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_ShowSentencesFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
     </fragment>
     <fragment
         android:id="@+id/RenderResultsFragment"
         android:name="org.ww.ai.activity.RenderResultsFragment"
         android:label="@string/render_results_title"
-        tools:layout="@layout/render_results_fragment">
+        tools:layout="@layout/show_sentences_fragment">
         <action
-            android:id="@+id/action_RenderResultsFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_RenderResultsFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
         <action
             android:id="@+id/action_RenderResultsFragment_to_ShowRenderDetailsFragment"
             app:destination="@id/ShowRenderDetailsFragment" />
@@ -58,8 +58,8 @@
         android:label="@string/receive_image_title"
         tools:layout="@layout/receive_image_fragment">
         <action
-            android:id="@+id/action_ReceiveImageFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_ReceiveImageFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
         <action
             android:id="@+id/action_ReceiveImageFragment_to_RenderResultsFragment"
             app:destination="@id/RenderResultsFragment" />

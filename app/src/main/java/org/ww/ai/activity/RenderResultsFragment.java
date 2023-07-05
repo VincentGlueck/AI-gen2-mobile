@@ -64,7 +64,7 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
 
         binding.renderResultList.setOnClickListener(view1 -> NavHostFragment
                 .findNavController(RenderResultsFragment.this)
-                .navigate(R.id.action_RenderResultsFragment_to_FirstFragment));
+                .navigate(R.id.action_RenderResultsFragment_to_MainFragment));
 
         renderResultView = view.findViewById(R.id.render_result_List);
         adapter = new RenderResultAdapter(getContext(), this);

@@ -30,7 +30,7 @@ import org.ww.ai.data.AttributeValue;
 import org.ww.ai.data.Setting;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;
-import org.ww.ai.databinding.FragmentFirstBinding;
+import org.ww.ai.databinding.MainFragmentBinding;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.tools.ResourceLoader;
@@ -47,10 +47,10 @@ import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-public class FirstFragment extends Fragment {
+public class MainFragment extends Fragment {
     public static final String GENERATOR_RULES = "generator.xml";
     private static final String KEY_ARTIST_TYPE = "artisttype";
-    private FragmentFirstBinding binding;
+    private MainFragmentBinding binding;
 
     private SettingsCollection settingsCollection;
 
@@ -67,7 +67,7 @@ public class FirstFragment extends Fragment {
         assert container != null;
         this.containerContext = container.getContext();
 
-        binding = FragmentFirstBinding.inflate(inflater, container, false);
+        binding = MainFragmentBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
     }
@@ -76,11 +76,11 @@ public class FirstFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
 
-        binding.btnNext.setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
-                .navigate(R.id.action_FirstFragment_to_SecondFragment));
+        binding.btnNext.setOnClickListener(view1 -> NavHostFragment.findNavController(MainFragment.this)
+                .navigate(R.id.action_MainFragment_to_ShowSentencesFragment));
 
-        binding.btnRenderResults.setOnClickListener(v -> NavHostFragment.findNavController(FirstFragment.this)
-                .navigate(R.id.action_FirstFragment_to_RenderResultsFragment));
+        binding.btnRenderResults.setOnClickListener(v -> NavHostFragment.findNavController(MainFragment.this)
+                .navigate(R.id.action_MainFragment_to_RenderResultsFragment));
 
         if(whatToRender == null) {
             whatToRender = new WhatToRender();

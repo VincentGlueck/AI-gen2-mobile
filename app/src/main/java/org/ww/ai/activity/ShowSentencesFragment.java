@@ -18,13 +18,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import org.ww.ai.R;
 import org.ww.ai.data.RenderResult;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;
-import org.ww.ai.databinding.FragmentSecondBinding;
+import org.ww.ai.databinding.ShowSentencesFragmentBinding;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.phrase.PhraseGenerator;
@@ -38,12 +37,13 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-public class SecondFragment extends Fragment implements PhraseGeneratorErrorHandlerIF {
+public class ShowSentencesFragment extends Fragment implements PhraseGeneratorErrorHandlerIF {
 
-    private FragmentSecondBinding binding;
+    private ShowSentencesFragmentBinding binding;
     private Context containerContext;
     private SettingsCollection settingsCollection;
     private WhatToRenderIF whatToRender;
+
     private View view;
 
     @Override
@@ -57,7 +57,7 @@ public class SecondFragment extends Fragment implements PhraseGeneratorErrorHand
         assert container != null;
         this.containerContext = container.getContext();
 
-        binding = FragmentSecondBinding.inflate(inflater, container, false);
+        binding = ShowSentencesFragmentBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -70,7 +70,7 @@ public class SecondFragment extends Fragment implements PhraseGeneratorErrorHand
     private void initEngine(Context context) {
         Parser parser = new Parser();
         try {
-            settingsCollection = parser.getSettings(context, FirstFragment.GENERATOR_RULES);
+            settingsCollection = parser.getSettings(context, MainFragment.GENERATOR_RULES);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new RuntimeException(e);
         }

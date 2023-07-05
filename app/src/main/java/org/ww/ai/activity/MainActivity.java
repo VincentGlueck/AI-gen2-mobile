@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     if(renderResult != null) {
                         bundle.putInt("uid", renderResult.uid);
                     }
-                    navController.navigate(R.id.action_FirstFragment_to_RenderResultsFragment, bundle);
+                    navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment, bundle);
                 }
             }
         });
