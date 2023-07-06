@@ -21,19 +21,18 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.google.mlkit.common.model.DownloadConditions;
 
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.rds.entity.RenderResult;
-import org.ww.ai.tools.SimpleTranslationUtil;
 import org.ww.ai.ui.ImageUtil;
 
 public class MainActivity extends AppCompatActivity {
 
     public final static String KEY_BITMAP = "bitmap";
     public static final String KEY_WHAT_TO_RENDER = "whatToRender";
+    private static final int SIZE_SNACK_THUMB_MAX = 96;
     private AppBarConfiguration appBarConfiguration;
     private WhatToRenderIF lastRender;
     private CoordinatorLayout coordinatorLayout;
@@ -79,23 +78,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
+        return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp();
     }
 
     public void setLastQuery(WhatToRenderIF whatToRenderIF) {
         lastRender = whatToRenderIF;
     }
 
-    ActivityResultLauncher<Intent> receiveActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    assert data != null;
-                    showWantToSeeSnackBar(data);
-                }
-            });
+    ActivityResultLauncher<Intent> receiveActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            Intent data = result.getData();
+            assert data != null;
+            showWantToSeeSnackBar(data);
+        }
+    });
 
 
     private void showWantToSeeSnackBar(Intent data) {
@@ -105,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         if (renderResult != null && renderResult.thumbNail != null) {
             bitmap = ImageUtil.IMAGE_UTIL.convertBlobToImage(renderResult.thumbNail);
             if (bitmap != null) {
-                bitmap = ImageUtil.IMAGE_UTIL.getScaledBitmap(bitmap, 96);
+                bitmap = ImageUtil.IMAGE_UTIL.getScaledBitmap(bitmap, SIZE_SNACK_THUMB_MAX);
             }
         }
         builder.append(getText(R.string.history_entry_created_snackbar)).append("    ");
@@ -130,6 +126,5 @@ public class MainActivity extends AppCompatActivity {
         });
         snackbar.show();
     }
-
 
 }
