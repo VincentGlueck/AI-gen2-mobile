@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void checkIntentPurpose() {
         ClipData clipData = getIntent().getClipData();
         if(clipData != null) {

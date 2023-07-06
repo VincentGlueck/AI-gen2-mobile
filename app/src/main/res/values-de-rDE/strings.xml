@@ -64,5 +64,6 @@
     <string name="receive_image_title">Kreation einfügen</string>
     <string name="lbl_render_results">Bisher</string>
     <string name="lbl_gallery_title">Galerie</string>
+    <string name="lbl_gallery_detail_title">Dein Bild</string>
 
 </resources>

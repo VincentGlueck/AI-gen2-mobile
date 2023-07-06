@@ -59,8 +59,7 @@ public class MainFragment extends Fragment {
     private View view;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
 
@@ -76,16 +75,13 @@ public class MainFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
 
-        binding.btnNext.setOnClickListener(view1 -> NavHostFragment.findNavController(MainFragment.this)
-                .navigate(R.id.action_MainFragment_to_ShowSentencesFragment));
+        binding.btnNext.setOnClickListener(view1 -> NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_MainFragment_to_ShowSentencesFragment));
 
-        binding.btnRenderResults.setOnClickListener(v -> NavHostFragment.findNavController(MainFragment.this)
-                .navigate(R.id.action_MainFragment_to_RenderResultsFragment));
+        binding.btnRenderResults.setOnClickListener(v -> NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_MainFragment_to_RenderResultsFragment));
 
-        binding.btnGallery.setOnClickListener(v -> NavHostFragment.findNavController(MainFragment.this)
-                .navigate(R.id.action_MainFragment_to_ResultsGalleryFragment));
+        binding.btnGallery.setOnClickListener(v -> NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_MainFragment_to_ResultsGalleryFragment));
 
-        if(whatToRender == null) {
+        if (whatToRender == null) {
             whatToRender = new WhatToRender();
         }
 
@@ -134,7 +130,7 @@ public class MainFragment extends Fragment {
         checkBoxNoLayout.setChecked(whatToRender.getPreset().isEmpty());
         CheckBox checkBoxNoArtist = view.findViewById(R.id.chk_no_artists);
         checkBoxNoArtist.setChecked(whatToRender.isUseNoArtists());
-        CheckBox checkBoxRandomArtist =  view.findViewById(R.id.chk_random_artist);
+        CheckBox checkBoxRandomArtist = view.findViewById(R.id.chk_random_artist);
         checkBoxRandomArtist.setChecked(whatToRender.getArtistTypeName().isEmpty());
         CheckBox checkRandomCamera = view.findViewById(R.id.chk_random_camera);
         checkRandomCamera.setChecked(whatToRender.isRandomCamera());
@@ -147,13 +143,13 @@ public class MainFragment extends Fragment {
         selectSpinner(view.findViewById(R.id.spin_camera), String.valueOf(whatToRender.getCamera()));
         selectSpinner(view.findViewById(R.id.spin_resolution), String.valueOf(whatToRender.getResolution()));
 
-        if(whatToRender.getRandomCount() < 5) {
+        if (whatToRender.getRandomCount() < 5) {
             whatToRender.setRandomCount(50);
         }
         Slider sliderRandomWords = view.findViewById(R.id.slider_random_words);
         sliderRandomWords.setValue((float) whatToRender.getRandomCount());
 
-        if(whatToRender.getPhraseCount() < 2) {
+        if (whatToRender.getPhraseCount() < 2) {
             whatToRender.setPhraseCount(2);
         }
 
@@ -164,9 +160,9 @@ public class MainFragment extends Fragment {
 
     private void selectSpinner(Spinner spinner, String value) {
         SpinnerAdapter adapter = spinner.getAdapter();
-        for(int n=0; n<adapter.getCount(); n++) {
+        for (int n = 0; n < adapter.getCount(); n++) {
             String str = (String) adapter.getItem(n);
-            if(value.equalsIgnoreCase(str)) {
+            if (value.equalsIgnoreCase(str)) {
                 spinner.setSelection(n);
                 return;
             }
@@ -200,8 +196,7 @@ public class MainFragment extends Fragment {
         settingsCollection.getSetting(KEY_ARTIST_TYPE).getAttributes().forEach(a -> artistTypes.add(a.getName()));
         artistTypes.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         final Spinner spinner = (Spinner) view.findViewById(R.id.spin_artist_type);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, artistTypes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, artistTypes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -223,10 +218,10 @@ public class MainFragment extends Fragment {
         TextView artistsView = view.findViewById(R.id.lbl_resulting_artists);
         Setting setting = settingsCollection.getSetting("artists");
         List<AttributeValue> list = new ArrayList<>();
-        if(setting != null) {
+        if (setting != null) {
             list = settingsCollection.getAttributesMatchingExtraData(KEY_ARTIST_TYPE, artistTypeName, setting);
         }
-        if(!list.isEmpty()) {
+        if (!list.isEmpty()) {
             String artistsStr = list.stream().map(AttributeValue::getValue).collect(Collectors.joining(", "));
             artistsView.setText(artistsStr);
             artistsView.setVisibility(View.VISIBLE);
@@ -240,8 +235,7 @@ public class MainFragment extends Fragment {
         settingsCollection.getPresets().forEach(p -> presets.add(p.getName()));
         presets.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, presets);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, presets);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         layoutSpinner.setAdapter(adapter);
         layoutSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -260,8 +254,7 @@ public class MainFragment extends Fragment {
     private void addValuesToNumOfArtistsSpinner(@NonNull View view) {
         final String[] selection = new String[]{"1", "2", "3"};
         Spinner spinner = view.findViewById(R.id.spin_num_artists);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, selection);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, selection);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -282,14 +275,13 @@ public class MainFragment extends Fragment {
         List<String> cameras = new ArrayList<>();
         cameras.add(view.getContext().getResources().getString(R.string.spinner_none));
         Setting setting = settingsCollection.getSetting("camera");
-        if(setting == null) {
+        if (setting == null) {
             cameraSpinner.setEnabled(false);
         } else {
             List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(s -> s.getValues().stream()).collect(Collectors.toList());
             cameras.addAll(attributeValues.stream().map(AttributeValue::getValue).collect(Collectors.toList()));
         }
-        ArrayAdapter<String> cameraAdapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, cameras);
+        ArrayAdapter<String> cameraAdapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, cameras);
         cameraAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cameraSpinner.setAdapter(cameraAdapter);
         cameraSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -310,14 +302,13 @@ public class MainFragment extends Fragment {
         List<String> resolutions = new ArrayList<>();
         resolutions.add(view.getContext().getResources().getString(R.string.spinner_none));
         Setting setting = settingsCollection.getSetting("resolution");
-        if(setting == null) {
+        if (setting == null) {
             resolutionSpinner.setEnabled(false);
         } else {
             List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(s -> s.getValues().stream()).collect(Collectors.toList());
             resolutions.addAll(attributeValues.stream().map(AttributeValue::getValue).collect(Collectors.toList()));
         }
-        ArrayAdapter<String> resolutionAdapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, resolutions);
+        ArrayAdapter<String> resolutionAdapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, resolutions);
         resolutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         resolutionSpinner.setAdapter(resolutionAdapter);
         resolutionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -386,8 +377,8 @@ public class MainFragment extends Fragment {
         Spinner resolutionSpinner = view.findViewById(R.id.spin_resolution);
         CheckBox checkRandomResolution = view.findViewById(R.id.chk_random_resolution);
         checkRandomResolution.setOnCheckedChangeListener((v, checked) -> {
-           whatToRender.setRandomResolution(checked);
-           resolutionSpinner.setEnabled(!checked);
+            whatToRender.setRandomResolution(checked);
+            resolutionSpinner.setEnabled(!checked);
         });
     }
 

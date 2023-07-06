@@ -4,21 +4,18 @@ import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -27,7 +24,6 @@ import org.ww.ai.databinding.ResultsGalleryFragmentBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.ui.ImageUtil;
 import org.ww.ai.ui.MetricsUtil;
 
 import java.util.List;
@@ -100,6 +96,9 @@ public class ResultsGalleryFragment extends Fragment {
 
             }
             count++;
+            imageView.setOnClickListener(v -> {
+                onImageClickListener(lightWeight.uid);
+            });
             rowLayout.addView(imageView, params);
             if(count >= THUMBS_PER_ROW) {
                 view.addView(rowLayout);
@@ -112,7 +111,15 @@ public class ResultsGalleryFragment extends Fragment {
         }
     }
 
-    private static LinearLayout createRow(ViewGroup parent) {
+
+    private void onImageClickListener(int uid) {
+        NavController navController = NavHostFragment.findNavController(ResultsGalleryFragment.this);
+        Bundle bundle = new Bundle();
+        bundle.putInt(RenderDetailsFragment.ARG_UID, uid);
+        navController.navigate(R.id.action_ResultsGalleryFragment_to_GalleryFullSizeFragment, bundle);
+    }
+
+    private LinearLayout createRow(ViewGroup parent) {
         return (LinearLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.single_gallery_row, parent, false);
     }

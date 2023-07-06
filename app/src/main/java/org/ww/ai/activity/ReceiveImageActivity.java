@@ -40,6 +40,7 @@ import java.util.Date;
 
 public class ReceiveImageActivity extends AppCompatActivity {
 
+    private static final int MAX_IMAGE_SIZE = 1600;
     private Bitmap bitmap;
 
     private WhatToRenderIF whatToRender;
@@ -144,7 +145,7 @@ public class ReceiveImageActivity extends AppCompatActivity {
         Bitmap bitmap = null;
         try (InputStream in = getContentResolver().openInputStream(uri)) {
             bitmap = BitmapFactory.decodeStream(in);
-            bitmap = IMAGE_UTIL.getScaledBitmap(bitmap, 1024);
+            bitmap = IMAGE_UTIL.getScaledBitmap(bitmap, MAX_IMAGE_SIZE);
         } catch (IOException e) {
             Toast.makeText(this, "ERR: unable to get image: " + uri.toString(), Toast.LENGTH_LONG).show();
         }

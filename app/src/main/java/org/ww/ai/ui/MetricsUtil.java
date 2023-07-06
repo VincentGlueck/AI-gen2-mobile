@@ -2,7 +2,6 @@ package org.ww.ai.ui;
 
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 public class MetricsUtil {
 

@@ -61,8 +61,17 @@
             android:id="@+id/action_ResultsGalleryFragment_to_MainFragment"
             app:destination="@id/MainFragment" />
         <action
-            android:id="@+id/action_ResultsGalleryFragment_to_ShowRenderDetailsFragment"
-            app:destination="@id/ShowRenderDetailsFragment" />
+            android:id="@+id/action_ResultsGalleryFragment_to_GalleryFullSizeFragment"
+            app:destination="@id/GalleryFullSizeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/GalleryFullSizeFragment"
+        android:name="org.ww.ai.activity.GalleryFullSizeFragment"
+        android:label="@string/lbl_gallery_title"
+        tools:layout="@layout/results_gallery_fragment">
+        <action
+            android:id="@+id/action_GalleryFullSizeFragment_to_ResultsGalleryFragment"
+            app:destination="@id/ResultsGalleryFragment" />
     </fragment>
 
 </navigation>
