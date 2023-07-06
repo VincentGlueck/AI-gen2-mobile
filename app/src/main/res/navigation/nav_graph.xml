@@ -17,9 +17,6 @@
         <action
             android:id="@+id/action_MainFragment_to_RenderResultsFragment"
             app:destination="@id/RenderResultsFragment" />
-        <action
-            android:id="@+id/action_MainFragment_to_ReceiveImageFragment"
-            app:destination="@id/ReceiveImageFragment" />
     </fragment>
     <fragment
         android:id="@+id/ShowSentencesFragment"
@@ -50,18 +47,6 @@
         tools:layout="@layout/render_details_fragment">
         <action
             android:id="@+id/action_ShowRenderDetailsFragment_to_RenderResultsFragment"
-            app:destination="@id/RenderResultsFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/ReceiveImageFragment"
-        android:name="org.ww.ai.activity.ReceiveImageFragment"
-        android:label="@string/receive_image_title"
-        tools:layout="@layout/receive_image_fragment">
-        <action
-            android:id="@+id/action_ReceiveImageFragment_to_MainFragment"
-            app:destination="@id/MainFragment" />
-        <action
-            android:id="@+id/action_ReceiveImageFragment_to_RenderResultsFragment"
             app:destination="@id/RenderResultsFragment" />
     </fragment>
 
