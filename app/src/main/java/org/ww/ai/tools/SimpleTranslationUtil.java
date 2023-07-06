@@ -16,7 +16,6 @@ public class SimpleTranslationUtil implements TranslationAvailableNotifierIF {
     private static final String sourceLanguage = TranslateLanguage.GERMAN;
 
     private static Translator translator;
-    private boolean available = false;
 
     public static SimpleTranslationUtil getInstance() {
         if (instance == null) {
@@ -27,21 +26,14 @@ public class SimpleTranslationUtil implements TranslationAvailableNotifierIF {
 
     private SimpleTranslationUtil() {
         if (translator == null) {
-            TranslatorOptions options = new TranslatorOptions.Builder().setSourceLanguage(sourceLanguage).setTargetLanguage(TranslateLanguage.ENGLISH).build();
+            TranslatorOptions options = new TranslatorOptions.Builder()
+                    .setSourceLanguage(sourceLanguage).setTargetLanguage(TranslateLanguage.ENGLISH).build();
             translator = Translation.getClient(options);
         }
     }
 
     public Translator getTranslator() {
         return translator;
-    }
-
-    public boolean isAvailable() {
-        return available;
-    }
-
-    public void setAvailable(boolean available) {
-        this.available = available;
     }
 
     @Override

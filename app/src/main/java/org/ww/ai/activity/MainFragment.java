@@ -442,7 +442,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         instance.getTranslator().downloadModelIfNeeded(conditions)
                 .addOnSuccessListener(unused -> {
                     CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
-                    instance.notifyTranslationAvailable(checkBoxTranslate, SimpleTranslationUtil.getInstance().getTranslator());
+                    instance.notifyTranslationAvailable(checkBoxTranslate,
+                            SimpleTranslationUtil.getInstance().getTranslator());
                 })
                 .addOnFailureListener(e -> Toast.makeText(containerContext,
                         getText(R.string.no_translation_ger_to_eng),
