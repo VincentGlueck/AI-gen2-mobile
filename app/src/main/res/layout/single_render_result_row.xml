@@ -40,6 +40,16 @@
         android:textSize="16sp"
         tools:ignore="HardcodedText" />
 
+    <TextView
+        android:id="@+id/render_result_uid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dp"
+        android:textColor="@color/teal_200"
+        android:text="*id*"
+        android:textSize="16sp"
+        tools:ignore="HardcodedText" />
+
     </LinearLayout>
 
 </LinearLayout>

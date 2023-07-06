@@ -2,6 +2,7 @@ package org.ww.ai.ui;
 
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -73,12 +75,14 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         return new ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull RenderResultAdapter.ViewHolder viewHolder, int position) {
         RenderResultLightWeight item = localDataSet.get(position);
         viewHolder.getTextView().setText(item.queryString);
         viewHolder.getThumb().setImageBitmap(IMAGE_UTIL.convertBlobToImage(item.thumbNail));
         viewHolder.getTextViewDate().setText(dateFormat.format(new Date(item.createdTime)));
+        viewHolder.uidTextView.setText("id: " + item.uid);
         viewHolder.bind(item, listener);
     }
 
@@ -93,6 +97,8 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         private final TextView textView;
         private final ImageView thumb;
 
+        protected final TextView uidTextView;
+
         private final TextView textViewDate;
 
         public ViewHolder(View view) {
@@ -100,6 +106,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
             textView = view.findViewById(R.id.render_result_title);
             thumb = view.findViewById(R.id.history_render_result_thumb);
             textViewDate = view.findViewById(R.id.render_result_date);
+            uidTextView = view.findViewById(R.id.render_result_uid);
         }
 
         public void bind(final RenderResultLightWeight item, final OnItemClickListener listener) {

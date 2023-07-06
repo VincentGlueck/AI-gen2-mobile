@@ -36,7 +36,7 @@ import java.util.Date;
  */
 public class RenderDetailsFragment extends Fragment {
 
-    private static final String ARG_UID = "uid";
+    public static final String ARG_UID = "uid";
     private int uid;
 
     public RenderDetailsFragment() {

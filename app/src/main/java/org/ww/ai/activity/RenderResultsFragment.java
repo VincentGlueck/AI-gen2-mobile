@@ -1,7 +1,6 @@
 package org.ww.ai.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,7 +31,11 @@ import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.RenderResultAdapter;
 import org.ww.ai.ui.SwipeToDeleteCallback;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RenderResultsFragment extends Fragment implements RenderResultAdapter.OnItemClickListener {
 
@@ -44,6 +47,9 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
     private LinearLayout linearLayout;
 
     private RecyclerView renderResultView;
+
+    private final Map<Integer, LightWeightDeleteHolder> renderResultLightWeights = new HashMap<>();
+
 
     @Nullable
     @Override
@@ -87,14 +93,19 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
 
                 final int position = viewHolder.getAdapterPosition();
-                final RenderResultLightWeight renderResultLightWeight = adapter.itemAt(position);
+                renderResultLightWeights.put(adapter.itemAt(position).uid,
+                        new LightWeightDeleteHolder(position, adapter.itemAt(position)));
                 adapter.removeResult(position);
 
                 Snackbar snackbar = Snackbar
                         .make(linearLayout, getText(R.string.history_entry_deleted_snackbar), Snackbar.LENGTH_LONG);
                 snackbar.setAction(getText(R.string.undo_snackbar), view -> {
-                    adapter.restoreResult(renderResultLightWeight, position);
-                    renderResultView.scrollToPosition(position);
+                    AtomicInteger lastPosition = new AtomicInteger();
+                    renderResultLightWeights.values().forEach(r -> {
+                        adapter.restoreResult(r.renderResultLightWeight, r.position);
+                        lastPosition.set(r.position);
+                    });
+                    renderResultView.scrollToPosition(lastPosition.get());
                 });
 
                 snackbar.setActionTextColor(Color.YELLOW);
@@ -105,29 +116,30 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
                     public void onDismissed(Snackbar transientBottomBar, int event) {
                         super.onDismissed(transientBottomBar, event);
                         if (event == 2) { // auto dismiss, nothing clicked
-                            permanentDelete(renderResultLightWeight);
+                            permanentDelete();
                         }
                     }
                 });
 
             }
         };
-
         ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
         itemTouchhelper.attachToRecyclerView(renderResultView);
     }
 
-    private void permanentDelete(RenderResultLightWeight renderResultLightWeight) {
+    private void permanentDelete() {
         AppDatabase db = AppDatabase.getInstance(containerContext);
-        ListenableFuture<RenderResult> future = db.renderResultDao().getById(renderResultLightWeight.uid);
-        AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
-        asyncDbFuture.processFuture(future, result -> {
-            ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
-            AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
-            asyncDbFutureDel.processFuture(delFuture, i -> {
-//                Toast.makeText(containerContext, getText(R.string.permanent_deleted_toast), Toast.LENGTH_LONG).show();
+        renderResultLightWeights.values().forEach(r -> {
+            ListenableFuture<RenderResult> future = db.renderResultDao().getById(r.renderResultLightWeight.uid);
+            AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
+            asyncDbFuture.processFuture(future, result -> {
+                ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
+                AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
+                asyncDbFutureDel.processFuture(delFuture, i -> {
+                }, containerContext);
             }, containerContext);
-        }, containerContext);
+        });
+        renderResultLightWeights.clear();
     }
 
     private void getRenderResultsFromDatabase() {
@@ -149,7 +161,17 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
     public void onItemClick(RenderResultLightWeight item) {
         NavController navController = NavHostFragment.findNavController(RenderResultsFragment.this);
         Bundle bundle = new Bundle();
-        bundle.putInt("uid", item.uid);
+        bundle.putInt(RenderDetailsFragment.ARG_UID, item.uid);
         navController.navigate(R.id.action_RenderResultsFragment_to_ShowRenderDetailsFragment, bundle);
+    }
+
+    private static class LightWeightDeleteHolder {
+        public int position;
+        public RenderResultLightWeight renderResultLightWeight;
+
+        public LightWeightDeleteHolder(int position, RenderResultLightWeight renderResultLightWeight) {
+            this.position = position;
+            this.renderResultLightWeight = renderResultLightWeight;
+        }
     }
 }
