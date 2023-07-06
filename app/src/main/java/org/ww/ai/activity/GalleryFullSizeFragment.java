@@ -4,15 +4,18 @@ import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -22,6 +25,8 @@ import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.ui.MetricsUtil;
+
+import java.util.List;
 
 public class GalleryFullSizeFragment extends Fragment {
 
@@ -57,7 +62,7 @@ public class GalleryFullSizeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(getActivity() != null && getActivity().getWindowManager() != null) {
+        if (getActivity() != null && getActivity().getWindowManager() != null) {
             screen = MetricsUtil.getScreen(getActivity().getWindowManager());
         }
 
@@ -72,15 +77,24 @@ public class GalleryFullSizeFragment extends Fragment {
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             if (result != null) {
-                if(screen != null) {
+                if (screen != null) {
                     imageView.setImageBitmap(IMAGE_UTIL.getScaledBitmap(IMAGE_UTIL.convertBlobToImage(result.image), screen.width));
                 } else {
                     imageView.setImageBitmap(IMAGE_UTIL.convertBlobToImage(result.image));
                 }
                 imageDescriptionTextView.setText(result.queryUsed.length() > 0
                         ? result.queryUsed : result.queryString);
+                setActionBarTitle(result.queryString);
             }
         }, containerContext);
+    }
+
+    private void setActionBarTitle(String string) {
+        if (getActivity() != null) {
+            // TODO: later
+        } else {
+            Log.d("SETACTIONBAR", "no title, or attempt to set " + string);
+        }
     }
 
     @Override
