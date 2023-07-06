@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.slider.Slider;
+import com.google.mlkit.common.model.DownloadConditions;
+import com.google.mlkit.nl.translate.Translator;
 
 import org.ww.ai.R;
 import org.ww.ai.data.AttributeValue;
@@ -34,6 +37,8 @@ import org.ww.ai.databinding.MainFragmentBinding;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.tools.ResourceLoader;
+import org.ww.ai.tools.SimpleTranslationUtil;
+import org.ww.ai.tools.TranslationAvailableNotifierIF;
 import org.ww.ai.ui.DialogUtil;
 import org.xml.sax.SAXException;
 
@@ -47,7 +52,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements TranslationAvailableNotifierIF  {
     public static final String GENERATOR_RULES = "generator.xml";
     private static final String KEY_ARTIST_TYPE = "artisttype";
     private MainFragmentBinding binding;
@@ -85,6 +90,8 @@ public class MainFragment extends Fragment {
             whatToRender = new WhatToRender();
         }
 
+        EditText editText = view.findViewById(R.id.editTextTextMultiLine);
+
         addDescriptionTextListener(view);
         addCheckBoxListeners(view);
         addValuesToArtistTypeSpinner(view);
@@ -94,11 +101,39 @@ public class MainFragment extends Fragment {
         addValuesToResolutionSpinner(view);
         ImageView imageView = view.findViewById(R.id.btn_clear);
         imageView.setOnClickListener(click -> {
-            EditText editText = view.findViewById(R.id.editTextTextMultiLine);
             editText.setText("");
         });
         initRandomWordsSlider(view);
         initSentencesCountSlider(view);
+        CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
+        checkBoxTranslate.setEnabled(false);
+        checkBoxTranslate.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked) {
+                translateEditText(editText.getText().toString());
+            } else {
+                whatToRender.setTranslateToEnglishDescription(editText.getText().toString());
+            }
+
+        });
+        checkTranslation();
+    }
+
+    private void translateEditText(String str) {
+        SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance();
+        if (instance != null) {
+            instance.getTranslator().translate(str)
+                    .addOnSuccessListener(s -> {
+                        whatToRender.setTranslateToEnglishDescription(s);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(containerContext, getText(R.string.unable_to_translate)
+                                + " " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        whatToRender.setTranslateToEnglishDescription("Failure");
+                    });
+
+        } else {
+            Toast.makeText(containerContext, "Sorry, NO TRANSLATOR", Toast.LENGTH_LONG).show();
+        }
     }
 
     // TODO: maybe in a later version, again
@@ -336,6 +371,7 @@ public class MainFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String str = s.toString();
                 whatToRender.setDescription(str);
+                whatToRender.setTranslateToEnglishDescription(str);
                 Button btn = view.findViewById(R.id.btn_next);
                 btn.setEnabled(s.length() > 0);
             }
@@ -396,5 +432,30 @@ public class MainFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void checkTranslation() {
+        DownloadConditions conditions = new DownloadConditions.Builder()
+                .requireWifi()
+                .build();
+        SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance();
+        instance.getTranslator().downloadModelIfNeeded(conditions)
+                .addOnSuccessListener(unused -> {
+                    CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
+                    instance.notifyTranslationAvailable(checkBoxTranslate, SimpleTranslationUtil.getInstance().getTranslator());
+                })
+                .addOnFailureListener(e -> Toast.makeText(containerContext,
+                        getText(R.string.no_translation_ger_to_eng),
+                        Toast.LENGTH_LONG).show());
+    }
+
+    @Override
+    public void onTranslationAvailable() {
+        Log.d(getClass().getName(), "Not my business");
+    }
+
+    @Override
+    public void notifyTranslationAvailable(View view, Translator translator) {
+        view.setEnabled(true);
     }
 }

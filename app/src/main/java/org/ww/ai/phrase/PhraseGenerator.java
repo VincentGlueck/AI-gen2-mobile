@@ -48,7 +48,7 @@ public class PhraseGenerator {
 			RenderResult renderResult = new RenderResult();
 			final List<AttributeValue> list = getGenerateWordSettings(renderResult);
 			String str = TextUtils.join(", ", list.stream().map(AttributeValue::getValue).collect(Collectors.toList()));
-			renderResult.setSentence(whatToRender.getDescription().trim() + ", " + str);
+			renderResult.setSentence(whatToRender.getTranslateToEnglishDescription() + ", " + str);
 			result.add(renderResult);
 		}
 		return result;

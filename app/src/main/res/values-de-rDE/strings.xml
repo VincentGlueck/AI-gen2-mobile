@@ -65,5 +65,8 @@
     <string name="lbl_render_results">Bisher</string>
     <string name="lbl_gallery_title">Galerie</string>
     <string name="lbl_gallery_detail_title">Dein Bild</string>
+    <string name="lbl_clear_text">Löscht deine bisherige Eingabe komplett</string>ed
+    <string name="simple_translation_german_only">Ich möchte den Text auf Deutsch eingeben</string>
+    <string name="no_translation_ger_to_eng">Übersetzung Deutsch … Englisch nicht möglich</string>
 
 </resources>

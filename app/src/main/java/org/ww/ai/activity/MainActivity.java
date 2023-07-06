@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -22,11 +21,13 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.mlkit.common.model.DownloadConditions;
 
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.tools.SimpleTranslationUtil;
 import org.ww.ai.ui.ImageUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkIntentPurpose() {
         ClipData clipData = getIntent().getClipData();
-        if(clipData != null) {
-            if(clipData.getItemCount() > 0) {
+        if (clipData != null) {
+            if (clipData.getItemCount() > 0) {
                 ClipData.Item item = clipData.getItemAt(0);
-                if(item.getUri() != null) {
+                if (item.getUri() != null) {
                     startReceiveImageActivity(item.getUri());
                 }
             }
@@ -97,19 +98,19 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
-    private void showWantToSeeSnackBar (Intent data) {
-        final RenderResult renderResult= (RenderResult) data.getSerializableExtra(RenderResult.class.getCanonicalName());
+    private void showWantToSeeSnackBar(Intent data) {
+        final RenderResult renderResult = (RenderResult) data.getSerializableExtra(RenderResult.class.getCanonicalName());
         SpannableStringBuilder builder = new SpannableStringBuilder();
         Bitmap bitmap = null;
-        if(renderResult != null && renderResult.thumbNail != null) {
+        if (renderResult != null && renderResult.thumbNail != null) {
             bitmap = ImageUtil.IMAGE_UTIL.convertBlobToImage(renderResult.thumbNail);
-            if(bitmap != null) {
+            if (bitmap != null) {
                 bitmap = ImageUtil.IMAGE_UTIL.getScaledBitmap(bitmap, 96);
             }
         }
         builder.append(getText(R.string.history_entry_created_snackbar)).append("    ");
         builder.setSpan(new ImageSpan(MainActivity.this, bitmap), builder.length() - 1, builder.length(), 0);
-        Snackbar snackbar =  Snackbar.make(coordinatorLayout, builder, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, builder, Snackbar.LENGTH_LONG);
         snackbar.setActionTextColor(Color.YELLOW);
 
         snackbar.setAction(getText(R.string.history_entry_show_snackbar), view -> Toast.makeText(getApplicationContext(), R.string.history_entry_show_snackbar, Toast.LENGTH_LONG).show());
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 if (event == 1) {
                     NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main);
                     Bundle bundle = new Bundle();
-                    if(renderResult != null) {
+                    if (renderResult != null) {
                         bundle.putInt("uid", renderResult.uid);
                     }
                     navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment, bundle);
@@ -129,5 +130,6 @@ public class MainActivity extends AppCompatActivity {
         });
         snackbar.show();
     }
+
 
 }

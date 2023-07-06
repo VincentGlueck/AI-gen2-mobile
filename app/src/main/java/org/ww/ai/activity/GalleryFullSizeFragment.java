@@ -84,17 +84,8 @@ public class GalleryFullSizeFragment extends Fragment {
                 }
                 imageDescriptionTextView.setText(result.queryUsed.length() > 0
                         ? result.queryUsed : result.queryString);
-                setActionBarTitle(result.queryString);
             }
         }, containerContext);
-    }
-
-    private void setActionBarTitle(String string) {
-        if (getActivity() != null) {
-            // TODO: later
-        } else {
-            Log.d("SETACTIONBAR", "no title, or attempt to set " + string);
-        }
     }
 
     @Override

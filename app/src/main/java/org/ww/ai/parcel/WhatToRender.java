@@ -35,6 +35,7 @@ public class WhatToRender implements WhatToRenderIF {
     private static final String PREF_RANDOM_RESOLUTION = "useRandomResolution";
     private static final String PREF_RESOLUTION = "resolution";
     private static final String PREF_QUERY_USED = "queryUsed";
+    private static final String PREF_TRANSLATED_QUERY = "translatedQueryUsed";
 
     public WhatToRender() {
     }
@@ -68,6 +69,8 @@ public class WhatToRender implements WhatToRenderIF {
     private String camera;
     private String resolution;
     private String queryUsed;
+
+    private String englishDescription;
 
     private boolean instantCopyToClipBoard;
     @Override
@@ -207,6 +210,17 @@ public class WhatToRender implements WhatToRenderIF {
         dest.writeString(Boolean.toString(useNoArtists));
         dest.writeString(Boolean.toString(randomResolution));
         dest.writeString(camera);
+        dest.writeString(englishDescription);
+    }
+
+    @Override
+    public String getTranslateToEnglishDescription() {
+        return englishDescription;
+    }
+
+    @Override
+    public void setTranslateToEnglishDescription(String englishDescription) {
+        this.englishDescription = englishDescription;
     }
 
     public void setPhraseCount(int phraseCount) {
@@ -247,6 +261,7 @@ public class WhatToRender implements WhatToRenderIF {
             editor.putBoolean(PREF_RANDOM_RESOLUTION, isRandomResolution());
             editor.putString(PREF_RESOLUTION, getResolution());
             editor.putString(PREF_QUERY_USED, getQueryUsed());
+            editor.putString(PREF_TRANSLATED_QUERY, getTranslateToEnglishDescription());
         } finally {
             editor.apply();
         }
@@ -268,6 +283,7 @@ public class WhatToRender implements WhatToRenderIF {
         setResolution(preferences.getString(PREF_RESOLUTION, ""));
         setRandomResolution(preferences.getBoolean(PREF_RANDOM_RESOLUTION, false));
         setQueryUsed(preferences.getString(PREF_QUERY_USED, "undefined"));
+        setTranslateToEnglishDescription(preferences.getString(PREF_TRANSLATED_QUERY, null));
     }
 
     @NonNull

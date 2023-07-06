@@ -65,5 +65,9 @@
     <string name="lbl_render_results">So far</string>
     <string name="lbl_gallery_title">Gallery</string>
     <string name="lbl_gallery_detail_title">Your creation</string>
+    <string name="lbl_clear_text">Clear the input to zero chars</string>
+    <string name="simple_translation_german_only">My input is in German language</string>
+    <string name="no_translation_ger_to_eng">No translation installed for de … en, sorry</string>
+    <string name="unable_to_translate">"Unable to translate: "</string>
 
 </resources>
