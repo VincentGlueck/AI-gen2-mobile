@@ -79,7 +79,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     public void onBindViewHolder(@NonNull RenderResultAdapter.ViewHolder viewHolder, int position) {
         RenderResultLightWeight item = localDataSet.get(position);
         viewHolder.getTextView().setText(item.queryString);
-        viewHolder.getThumb().setImageBitmap(IMAGE_UTIL.convertBlobToImage(item.thumbNail));
+        viewHolder.getThumb().setImageBitmap(IMAGE_UTIL.getScaledBitmap(IMAGE_UTIL.convertBlobToImage(item.thumbNail), 192));
         viewHolder.getTextViewDate().setText(dateFormat.format(new Date(item.createdTime)));
         viewHolder.uidTextView.setText("id: " + item.uid);
         viewHolder.bind(item, listener);
