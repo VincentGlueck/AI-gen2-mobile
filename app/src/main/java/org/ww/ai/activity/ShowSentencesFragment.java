@@ -118,7 +118,7 @@ public class ShowSentencesFragment extends Fragment implements PhraseGeneratorEr
 
         List<RenderResult> textList = phraseGenerator.getAITextsAsRenderResultList();
         for (RenderResult renderResult : textList) {
-            FrameLayout frameLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.single_result, linearLayout, false);
+            FrameLayout frameLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.single_sentence, linearLayout, false);
             final EditText editText = frameLayout.findViewById(R.id.textview_result);
             editText.setText(renderResult.getSentence());
             editText.setSelectAllOnFocus(true);

@@ -69,7 +69,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     @Override
     public RenderResultAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.render_result_row, parent, false);
+                .inflate(R.layout.single_render_result_row, parent, false);
         return new ViewHolder(view);
     }
 

@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -71,6 +72,8 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
 
         renderResultView.setAdapter(adapter);
         renderResultView.setLayoutManager(new LinearLayoutManager(containerContext));
+        renderResultView.addItemDecoration(new DividerItemDecoration(renderResultView.getContext(),
+                DividerItemDecoration.VERTICAL));
         getRenderResultsFromDatabase();
 
         linearLayout = view.findViewById(R.id.render_result_linear_layout);

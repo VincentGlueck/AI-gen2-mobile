@@ -100,11 +100,9 @@ public class MainFragment extends Fragment {
         });
         initRandomWordsSlider(view);
         initSentencesCountSlider(view);
-
-        ImageView btnShow = view.findViewById(R.id.btn_show);
-        btnShow.setOnClickListener(v -> showGeneratorXML());
     }
 
+    // TODO: maybe in a later version, again
     private void showGeneratorXML() {
         try {
             InputStream in = ResourceLoader.RESOURCE_LOADER.getResource(containerContext, GENERATOR_RULES);

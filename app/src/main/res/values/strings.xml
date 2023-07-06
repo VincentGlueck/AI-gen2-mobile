@@ -62,5 +62,6 @@
     <string name="render_results_title">What you\'ve created so far</string>
     <string name="render_details_title">Your creation</string>
     <string name="receive_image_title">Insert render result</string>
+    <string name="lbl_render_results">So far…</string>
 
 </resources>
