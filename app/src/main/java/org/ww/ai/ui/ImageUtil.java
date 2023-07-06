@@ -16,6 +16,8 @@ import java.io.InputStream;
 public enum ImageUtil {
     IMAGE_UTIL;
 
+    public static final int THUMB_NAIL_SIZE = 480;
+
     public byte[] convertImageToBlob(final Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -82,6 +84,19 @@ public enum ImageUtil {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    public Bitmap cropToSquare(Bitmap bitmap, int desiredSize){
+        int width  = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int newWidth = Math.min(height, width);
+        if(newWidth > desiredSize) {
+            newWidth = desiredSize;
+        }
+        int newHeight = (height > width)? height - ( height - width) : height;
+        int cropW = Math.max((width - height) >> 1, 0);
+        int cropH = Math.max((height - width) >> 1, 0);
+        return Bitmap.createBitmap(bitmap, cropW, cropH, newWidth, newHeight);
     }
 
     private static int getPowerOfTwoForSampleRatio(double ratio) {

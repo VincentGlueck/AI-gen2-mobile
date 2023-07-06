@@ -62,6 +62,7 @@
     <string name="history_entry_show_snackbar">Anzeigen</string>
     <string name="history_entry_created_snackbar">Resultat gespeichert.</string>
     <string name="receive_image_title">Kreation einfügen</string>
-    <string name="lbl_render_results">Bisher…</string>
+    <string name="lbl_render_results">Bisher</string>
+    <string name="lbl_gallery_title">Galerie</string>
 
 </resources>

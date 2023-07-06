@@ -31,6 +31,7 @@ import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.ifenum.RenderModel;
 import org.ww.ai.ui.DialogUtil;
+import org.ww.ai.ui.ImageUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +71,7 @@ public class ReceiveImageActivity extends AppCompatActivity {
     private void saveResult() {
         RenderResult renderResult = new RenderResult();
         if(bitmap != null) {
-            Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(bitmap, 128);
+            Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(bitmap, ImageUtil.THUMB_NAIL_SIZE);
             renderResult.thumbNail = IMAGE_UTIL.convertImageToBlob(thumbNail);
             renderResult.image = IMAGE_UTIL.convertImageToBlob(bitmap);
         }

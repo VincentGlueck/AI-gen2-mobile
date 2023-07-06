@@ -313,13 +313,17 @@
             android:padding="4dp"
             android:orientation="horizontal">
 
-        <Button
-            android:padding="8dp"
-            android:id="@+id/btn_render_results"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/lbl_render_results"
-            android:src="@drawable/gallery" />
+            <Button
+                android:id="@+id/btn_render_results"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lbl_render_results" />
+
+            <Button
+                android:id="@+id/btn_gallery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lbl_gallery_title" />
 
         </LinearLayout>
 
