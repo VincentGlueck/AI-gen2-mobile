@@ -49,5 +49,17 @@
             android:id="@+id/action_ShowRenderDetailsFragment_to_RenderResultsFragment"
             app:destination="@id/RenderResultsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/ResultsGalleryFragment"
+        android:name="org.ww.ai.activity.ResultsGalleryFragment"
+        android:label="@string/results_gallery_title"
+        tools:layout="@layout/results_gallery_fragment">
+        <action
+            android:id="@+id/action_ResultsGalleryFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
+        <action
+            android:id="@+id/action_ResultsGalleryFragment_to_ShowRenderDetailsFragment"
+            app:destination="@id/ShowRenderDetailsFragment" />
+    </fragment>
 
 </navigation>

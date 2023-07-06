@@ -38,14 +38,13 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     }
 
-    public void addRenderResults(List<RenderResult> renderResults) {
+    public void addRenderResults(List<RenderResultLightWeight> renderResults) {
         if(renderResults == null || renderResults.isEmpty()) {
             Log.d("ADD_RENDER_RESULTS", "Attempt to add null or empty list of RenderResults");
             return;
         }
         int oldLength = localDataSet.size();
-        localDataSet.addAll(renderResults.stream().map(
-                RenderResultLightWeight::fromRenderResult).collect(Collectors.toList()));
+        localDataSet.addAll(renderResults);
         notifyItemRangeInserted(oldLength, localDataSet.size());
     }
 

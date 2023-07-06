@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,7 +30,6 @@ import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.RenderResultAdapter;
 import org.ww.ai.ui.SwipeToDeleteCallback;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,9 +51,7 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
         assert container != null;
@@ -69,17 +65,14 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.renderResultList.setOnClickListener(view1 -> NavHostFragment
-                .findNavController(RenderResultsFragment.this)
-                .navigate(R.id.action_RenderResultsFragment_to_MainFragment));
+        binding.renderResultList.setOnClickListener(view1 -> NavHostFragment.findNavController(RenderResultsFragment.this).navigate(R.id.action_RenderResultsFragment_to_MainFragment));
 
         renderResultView = view.findViewById(R.id.render_result_List);
         adapter = new RenderResultAdapter(getContext(), this);
 
         renderResultView.setAdapter(adapter);
         renderResultView.setLayoutManager(new LinearLayoutManager(containerContext));
-        renderResultView.addItemDecoration(new DividerItemDecoration(renderResultView.getContext(),
-                DividerItemDecoration.VERTICAL));
+        renderResultView.addItemDecoration(new DividerItemDecoration(renderResultView.getContext(), DividerItemDecoration.VERTICAL));
         getRenderResultsFromDatabase();
 
         linearLayout = view.findViewById(R.id.render_result_linear_layout);
@@ -93,12 +86,10 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
 
                 final int position = viewHolder.getAdapterPosition();
-                renderResultLightWeights.put(adapter.itemAt(position).uid,
-                        new LightWeightDeleteHolder(position, adapter.itemAt(position)));
+                renderResultLightWeights.put(adapter.itemAt(position).uid, new LightWeightDeleteHolder(position, adapter.itemAt(position)));
                 adapter.removeResult(position);
 
-                Snackbar snackbar = Snackbar
-                        .make(linearLayout, getText(R.string.history_entry_deleted_snackbar), Snackbar.LENGTH_LONG);
+                Snackbar snackbar = Snackbar.make(linearLayout, getText(R.string.history_entry_deleted_snackbar), Snackbar.LENGTH_LONG);
                 snackbar.setAction(getText(R.string.undo_snackbar), view -> {
                     AtomicInteger lastPosition = new AtomicInteger();
                     renderResultLightWeights.values().forEach(r -> {
@@ -144,8 +135,8 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
 
     private void getRenderResultsFromDatabase() {
         AppDatabase appDatabase = AppDatabase.getInstance(containerContext);
-        ListenableFuture<List<RenderResult>> listenableFuture = appDatabase.renderResultDao().getAll();
-        AsyncDbFuture<List<RenderResult>> asyncDbFuture = new AsyncDbFuture<>();
+        ListenableFuture<List<RenderResultLightWeight>> listenableFuture = appDatabase.renderResultDao().getAllLightWeights();
+        AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(listenableFuture, renderResults -> {
             adapter.addRenderResults(renderResults);
         }, containerContext);
