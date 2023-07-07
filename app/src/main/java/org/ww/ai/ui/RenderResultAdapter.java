@@ -1,5 +1,6 @@
 package org.ww.ai.ui;
 
+import static org.ww.ai.ui.Animations.ANIMATIONS;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.annotation.SuppressLint;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationSet;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,14 +34,17 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
 
     private final DateFormat dateFormat;
 
-    public RenderResultAdapter(RenderResultAdapter.OnItemClickListener listener) {
+    private Context context;
+
+    public RenderResultAdapter(Context context, RenderResultAdapter.OnItemClickListener listener) {
         this.listener = listener;
+        this.context = context;
         this.localDataSet = new ArrayList<>();
         dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     }
 
     public void addRenderResults(List<RenderResultLightWeight> renderResults) {
-        if(renderResults == null || renderResults.isEmpty()) {
+        if (renderResults == null || renderResults.isEmpty()) {
             Log.d("ADD_RENDER_RESULTS", "Attempt to add null or empty list of RenderResults");
             return;
         }
@@ -49,7 +54,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     }
 
     public void removeResult(int position) {
-        if(position >= 0 && position < localDataSet.size()) {
+        if (position >= 0 && position < localDataSet.size()) {
             localDataSet.remove(position);
             notifyItemRemoved(position);
         } else {
@@ -86,14 +91,32 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
         viewHolder.getTextViewDate().setText(spanString);
         viewHolder.getQueryUsedTextView().setText(item.queryUsed);
+        if (item.flagHighLight) {
+            AnimationSet animationSet = new AnimationSet(true);
+            animationSet.addAnimation(ANIMATIONS.getAlphaAnimation(0.2F, 1.0F, 2000L, true));
+            animationSet.addAnimation(ANIMATIONS.getScaleAnimation(0.2F, 1.0F, 1000L, true));
+            viewHolder.getThumb().setAnimation(animationSet);
+        }
         viewHolder.bind(item, listener);
     }
 
+    public int getPositionOfUid(int uid) {
+        for (int n = 0; n < localDataSet.size(); n++) {
+            if (localDataSet.get(n).uid == uid) {
+                return n;
+            }
+        }
+        return -1;
+    }
 
 
     @Override
     public int getItemCount() {
         return localDataSet.size();
+    }
+
+    public void highLightNewRow(int position) {
+        localDataSet.get(position).flagHighLight = true;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

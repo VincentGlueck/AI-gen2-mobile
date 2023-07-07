@@ -83,7 +83,6 @@ public class RenderDetailsFragment extends Fragment {
     private void fillContentViewFromResult(View view, RenderResult result) {
         ImageView imageView = view.findViewById(R.id.history_bitmap);
         Bitmap bitmap = ImageUtil.IMAGE_UTIL.convertBlobToImage(result.image);
-        Toast.makeText(containerContext, "bitmap: " + bitmap.getWidth() + "x" + bitmap.getHeight(), Toast.LENGTH_LONG).show();
         imageView.setImageBitmap(bitmap);
         EditText textViewWhatWasRendered = view.findViewById(R.id.what_was_rendered_value);
         textViewWhatWasRendered.setText(result.queryString);

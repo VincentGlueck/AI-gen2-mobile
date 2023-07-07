@@ -28,6 +28,7 @@ import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.rds.ifenum.RenderModel;
 import org.ww.ai.ui.DialogUtil;
 import org.ww.ai.ui.ImageUtil;
@@ -93,16 +94,18 @@ public class ReceiveImageActivity extends AppCompatActivity {
 
     private void storeToDatabase(RenderResult renderResult) {
         AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
-        ListenableFuture<Void> listenableFuture = appDatabase.renderResultDao().insertRenderResult(renderResult);
-        AsyncDbFuture<Void> asyncDbFuture = new AsyncDbFuture<>();
-        asyncDbFuture.processFuture(listenableFuture, dummy -> {
-            finishWithResult(renderResult);
+        ListenableFuture<Long> listenableFuture = appDatabase.renderResultDao().insertRenderResult(renderResult);
+        AsyncDbFuture<Long> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(listenableFuture, id -> {
+            RenderResultLightWeight lightWeight = RenderResultLightWeight.fromRenderResult(renderResult);
+            lightWeight.uid = id.intValue();
+            finishWithResult(lightWeight);
         }, getApplicationContext());
     }
 
-    private void finishWithResult(RenderResult renderResult) {
+    private void finishWithResult(RenderResultLightWeight renderResult) {
         Intent intent = new Intent();
-        intent.putExtra(RenderResult.class.getCanonicalName(), renderResult);
+        intent.putExtra(RenderResultLightWeight.class.getCanonicalName(), renderResult);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }

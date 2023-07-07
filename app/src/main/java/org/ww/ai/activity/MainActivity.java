@@ -1,5 +1,7 @@
 package org.ww.ai.activity;
 
+import static org.ww.ai.activity.RenderDetailsFragment.ARG_UID;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -27,6 +30,7 @@ import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,14 +64,20 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void checkIntentPurpose() {
+        boolean foundSomeThing = false;
         ClipData clipData = getIntent().getClipData();
         if (clipData != null) {
             if (clipData.getItemCount() > 0) {
                 ClipData.Item item = clipData.getItemAt(0);
                 if (item.getUri() != null) {
+                    foundSomeThing = true;
                     startReceiveImageActivity(item.getUri());
                 }
             }
+        }
+        if(!foundSomeThing && getIntent().getData() != null) {
+            Uri data = getIntent().getData();
+            startReceiveImageActivity(data);
         }
     }
 
@@ -98,7 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void showWantToSeeSnackBar(Intent data) {
-        final RenderResult renderResult = (RenderResult) data.getSerializableExtra(RenderResult.class.getCanonicalName());
+        final RenderResultLightWeight renderResult = (RenderResultLightWeight)
+                data.getSerializableExtra(RenderResultLightWeight.class.getCanonicalName());
         SpannableStringBuilder builder = new SpannableStringBuilder();
         Bitmap bitmap = null;
         if (renderResult != null && renderResult.thumbNail != null) {
@@ -112,17 +123,18 @@ public class MainActivity extends AppCompatActivity {
         Snackbar snackbar = Snackbar.make(coordinatorLayout, builder, Snackbar.LENGTH_LONG);
         snackbar.setActionTextColor(Color.YELLOW);
 
-        snackbar.setAction(getText(R.string.history_entry_show_snackbar), view -> Toast.makeText(getApplicationContext(), R.string.history_entry_show_snackbar, Toast.LENGTH_LONG).show());
+        snackbar.setAction(getText(R.string.history_entry_show_snackbar), view ->
+                Toast.makeText(getApplicationContext(), R.string.history_entry_show_snackbar, Toast.LENGTH_LONG).show());
         snackbar.addCallback(new Snackbar.Callback() {
             @Override
             public void onDismissed(Snackbar transientBottomBar, int event) {
                 super.onDismissed(transientBottomBar, event);
                 if (event == 1) {
-                    NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main);
+                    NavController navController = Navigation.findNavController(
+                            MainActivity.this, R.id.nav_host_fragment_content_main);
                     Bundle bundle = new Bundle();
-                    if (renderResult != null) {
-                        bundle.putInt("uid", renderResult.uid);
-                    }
+                    bundle.putInt(RenderDetailsFragment.ARG_UID,
+                            renderResult != null ? renderResult.uid : Integer.MIN_VALUE);
                     navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment, bundle);
                 }
             }

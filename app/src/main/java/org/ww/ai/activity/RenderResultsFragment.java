@@ -1,8 +1,11 @@
 package org.ww.ai.activity;
 
+import static org.ww.ai.activity.RenderDetailsFragment.ARG_UID;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,15 +42,20 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
 
     private RenderResultsFragmentBinding binding;
     private Context containerContext;
-
     private RenderResultAdapter adapter;
-
     private LinearLayout linearLayout;
-
     private RecyclerView renderResultView;
-
     private final Map<Integer, LightWeightDeleteHolder> renderResultLightWeights = new HashMap<>();
 
+    private int uid;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            uid = getArguments().getInt(ARG_UID);
+        }
+    }
 
     @Nullable
     @Override
@@ -65,10 +73,11 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.renderResultList.setOnClickListener(view1 -> NavHostFragment.findNavController(RenderResultsFragment.this).navigate(R.id.action_RenderResultsFragment_to_MainFragment));
+        binding.renderResultList.setOnClickListener(view1 -> NavHostFragment.findNavController(
+                RenderResultsFragment.this).navigate(R.id.action_RenderResultsFragment_to_MainFragment));
 
         renderResultView = view.findViewById(R.id.render_result_List);
-        adapter = new RenderResultAdapter(this);
+        adapter = new RenderResultAdapter(containerContext, this);
 
         renderResultView.setAdapter(adapter);
         renderResultView.setLayoutManager(new LinearLayoutManager(containerContext));
@@ -139,6 +148,14 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
         AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(listenableFuture, renderResults -> {
             adapter.addRenderResults(renderResults);
+            if(uid >= 0) {
+                int position = adapter.getPositionOfUid(uid);
+                if(position >= 0) {
+                    renderResultView.scrollToPosition(position);
+                    adapter.highLightNewRow(position);
+                    adapter.notifyItemChanged(position);
+                }
+            }
         }, containerContext);
     }
 
@@ -152,7 +169,7 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
     public void onItemClick(RenderResultLightWeight item) {
         NavController navController = NavHostFragment.findNavController(RenderResultsFragment.this);
         Bundle bundle = new Bundle();
-        bundle.putInt(RenderDetailsFragment.ARG_UID, item.uid);
+        bundle.putInt(ARG_UID, item.uid);
         navController.navigate(R.id.action_RenderResultsFragment_to_ShowRenderDetailsFragment, bundle);
     }
 

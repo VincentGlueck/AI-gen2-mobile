@@ -22,8 +22,7 @@ public interface RenderResultDao {
     @Query("SELECT * from " + TABLE)
     ListenableFuture<List<RenderResult>> getAll();
 
-    @Query("SELECT uid, createdTime, thumbnail, render_engine, query_string, query_used from " +
-            TABLE + " ORDER BY createdTime DESC")
+    @Query("SELECT uid, createdTime, thumbnail, render_engine, query_string, query_used from " + TABLE + " ORDER BY createdTime DESC")
     ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights();
 
     @Query("SELECT * from " + TABLE + " WHERE uid = :id")
@@ -32,8 +31,8 @@ public interface RenderResultDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
 
-    @Insert
-    ListenableFuture<Void> insertRenderResult(RenderResult... renderResults);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    ListenableFuture<Long> insertRenderResult(RenderResult renderResults);
 
     @Delete
     ListenableFuture<Integer> deleteRenderResults(List<RenderResult> renderResults);

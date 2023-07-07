@@ -6,7 +6,9 @@ import androidx.room.PrimaryKey;
 
 import org.ww.ai.rds.ifenum.RenderModel;
 
-public class RenderResultLightWeight {
+import java.io.Serializable;
+
+public class RenderResultLightWeight implements Serializable {
 
     public RenderResultLightWeight() {
     }
@@ -28,6 +30,9 @@ public class RenderResultLightWeight {
 
     @ColumnInfo(name = "query_used")
     public String queryUsed;
+
+    @Ignore
+    public boolean flagHighLight;
 
     @Ignore
     public RenderResultLightWeight (RenderResult renderResult) {
