@@ -69,5 +69,6 @@
     <string name="simple_translation_checkbox">Translate my input so English</string>
     <string name="unable_to_download_translation">Language pack download failed.</string>
     <string name="unable_to_translate">"Unable to translate:"</string>
+    <string name="btn_share">Share</string>
 
 </resources>

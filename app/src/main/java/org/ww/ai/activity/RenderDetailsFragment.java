@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -84,6 +85,13 @@ public class RenderDetailsFragment extends Fragment {
         ImageView imageView = view.findViewById(R.id.history_bitmap);
         Bitmap bitmap = ImageUtil.IMAGE_UTIL.convertBlobToImage(result.image);
         imageView.setImageBitmap(bitmap);
+        TextView titleTextView = view.findViewById(R.id.history_title);
+        titleTextView.setText(result.queryString);
+        Button btnShare = view.findViewById(R.id.btn_share);
+        btnShare.setOnClickListener(v -> {
+            Toast.makeText(containerContext, "Share pressed", Toast.LENGTH_LONG).show();
+        });
+
         EditText textViewWhatWasRendered = view.findViewById(R.id.what_was_rendered_value);
         textViewWhatWasRendered.setText(result.queryString);
         EditText textViewWhatWasUsed = view.findViewById(R.id.what_was_rendered_query_value);

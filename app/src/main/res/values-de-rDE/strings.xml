@@ -69,5 +69,6 @@
     <string name="simple_translation_checkbox">Meinen Text ins Englische übersetzen</string>
     <string name="unable_to_translate">Übersetzung fehlgeschlagen:</string>
     <string name="unable_to_download_translation">Download des Sprachpakets fehlgeschlagen.</string>
+    <string name="btn_share">Teilen</string>
 
 </resources>
