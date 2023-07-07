@@ -62,11 +62,6 @@ public class SettingsCollection implements Serializable {
 			if(split.stream().anyMatch(new HashSet<>(filter)::contains)) {
 				filteredList.add(attributeValue);
 			}
-			/*
-			if(filter.contains(artistType.split(","))) {
-
-			}
-			 */
 		}
 		return filteredList;
 	}

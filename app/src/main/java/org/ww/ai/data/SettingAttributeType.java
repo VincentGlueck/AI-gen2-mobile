@@ -10,7 +10,7 @@ public enum SettingAttributeType {
 	
 	private final String name;
 	
-	private SettingAttributeType(String name) {
+	SettingAttributeType(String name) {
 		this.name = name;
 	}
 	

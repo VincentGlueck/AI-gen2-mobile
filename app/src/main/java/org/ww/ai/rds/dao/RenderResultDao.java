@@ -1,6 +1,5 @@
 package org.ww.ai.rds.dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -18,7 +17,7 @@ import java.util.List;
 @Dao
 public interface RenderResultDao {
 
-    public static final String TABLE = "renderresult";
+    String TABLE = "renderresult";
 
     @Query("SELECT * from " + TABLE)
     ListenableFuture<List<RenderResult>> getAll();

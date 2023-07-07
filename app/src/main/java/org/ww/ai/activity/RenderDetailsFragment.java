@@ -39,19 +39,6 @@ public class RenderDetailsFragment extends Fragment {
     public static final String ARG_UID = "uid";
     private int uid;
 
-    public RenderDetailsFragment() {
-        // Required empty public constructor
-    }
-
-
-    public static RenderDetailsFragment newInstance(int uid) {
-        RenderDetailsFragment fragment = new RenderDetailsFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_UID, uid);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     private RenderDetailsFragmentBinding binding;
 
     private Context containerContext;
@@ -115,5 +102,11 @@ public class RenderDetailsFragment extends Fragment {
         spinnerRenderedBy.setAdapter(renderedByAdapter);
         spinnerRenderedBy.setSelection(result.renderEngine.ordinal());
         spinnerRenderedBy.setEnabled(false);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 }

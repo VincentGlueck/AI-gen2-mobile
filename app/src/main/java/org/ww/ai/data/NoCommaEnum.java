@@ -5,7 +5,7 @@ public enum NoCommaEnum {
 	
 	private final String name;
 	
-	private NoCommaEnum(String name) {
+	NoCommaEnum(String name) {
 		this.name = "by";
 	}
 	

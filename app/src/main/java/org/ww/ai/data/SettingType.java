@@ -9,7 +9,7 @@ public enum SettingType {
 	
 	private final String name;
 	
-	private SettingType(String name) {
+	SettingType(String name) {
 		this.name = name;
 	}
 	

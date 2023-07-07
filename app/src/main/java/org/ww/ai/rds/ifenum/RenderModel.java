@@ -20,7 +20,7 @@ public enum RenderModel {
 
     private final String name;
 
-    private RenderModel(String name) {
+    RenderModel(String name) {
         this.name = name;
     }
 

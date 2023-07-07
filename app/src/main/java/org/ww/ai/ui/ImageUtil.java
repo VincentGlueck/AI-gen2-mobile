@@ -49,7 +49,6 @@ public enum ImageUtil {
 
         BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
         bitmapOptions.inSampleSize = getPowerOfTwoForSampleRatio(ratio);
-        bitmapOptions.inDither = true; //optional
         bitmapOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;//
         input = resolver.openInputStream(uri);
         Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);

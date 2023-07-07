@@ -11,7 +11,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 
-public class AsyncDbFuture<T extends Object> {
+public class AsyncDbFuture<T> {
 
     public void processFuture(ListenableFuture<T> listenableFuture,
                               OnSuccessCallback<T> callback, Context context) {

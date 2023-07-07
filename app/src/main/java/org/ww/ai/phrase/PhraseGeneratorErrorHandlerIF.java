@@ -2,7 +2,7 @@ package org.ww.ai.phrase;
 
 public interface PhraseGeneratorErrorHandlerIF {
 	
-	public enum Severity {
+	enum Severity {
 		INFO,
 		WARN,
 		ERROR,
