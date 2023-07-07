@@ -100,7 +100,7 @@ public class PhraseGenerator {
 	private void processCamera(RenderResult renderResult, List<AttributeValue> result, Setting setting) {
 		AttributeValue camera = getAttributeValueCamera(setting);
 		if(!camera.getValue().isEmpty()) {
-			camera.setValue(camera.getValue() + " lens");
+			camera.setValue(camera.getValue());
 		}
 		result.add(camera);
 		renderResult.setCameraType(camera.getValue());
