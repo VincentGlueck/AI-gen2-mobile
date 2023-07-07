@@ -27,6 +27,7 @@ import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.ifenum.RenderModel;
+import org.ww.ai.tools.ShareImageUtil;
 import org.ww.ai.ui.ImageUtil;
 
 import java.text.DateFormat;
@@ -89,7 +90,7 @@ public class RenderDetailsFragment extends Fragment {
         titleTextView.setText(result.queryString);
         Button btnShare = view.findViewById(R.id.btn_share);
         btnShare.setOnClickListener(v -> {
-            Toast.makeText(containerContext, "Share pressed", Toast.LENGTH_LONG).show();
+            ShareImageUtil.getInstance(getActivity()).startShare(result);
         });
 
         EditText textViewWhatWasRendered = view.findViewById(R.id.what_was_rendered_value);
