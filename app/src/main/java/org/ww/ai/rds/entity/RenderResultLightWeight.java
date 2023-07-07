@@ -26,6 +26,9 @@ public class RenderResultLightWeight {
     @ColumnInfo(name = "query_string")
     public String queryString;
 
+    @ColumnInfo(name = "query_used")
+    public String queryUsed;
+
     @Ignore
     public RenderResultLightWeight (RenderResult renderResult) {
         uid = renderResult.uid;
@@ -33,6 +36,7 @@ public class RenderResultLightWeight {
         thumbNail = renderResult.thumbNail ;
         renderEngine = renderResult.renderEngine;
         queryString = renderResult.queryString;
+        queryUsed = renderResult.queryUsed;
     }
 
     @Ignore

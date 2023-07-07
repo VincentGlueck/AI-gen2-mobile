@@ -1,6 +1,7 @@
 package org.ww.ai.activity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -29,11 +31,6 @@ import org.ww.ai.ui.ImageUtil;
 import java.text.DateFormat;
 import java.util.Date;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RenderDetailsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class RenderDetailsFragment extends Fragment {
 
     public static final String ARG_UID = "uid";
@@ -85,7 +82,9 @@ public class RenderDetailsFragment extends Fragment {
 
     private void fillContentViewFromResult(View view, RenderResult result) {
         ImageView imageView = view.findViewById(R.id.history_bitmap);
-        imageView.setImageBitmap(ImageUtil.IMAGE_UTIL.convertBlobToImage(result.image));
+        Bitmap bitmap = ImageUtil.IMAGE_UTIL.convertBlobToImage(result.image);
+        Toast.makeText(containerContext, "bitmap: " + bitmap.getWidth() + "x" + bitmap.getHeight(), Toast.LENGTH_LONG).show();
+        imageView.setImageBitmap(bitmap);
         EditText textViewWhatWasRendered = view.findViewById(R.id.what_was_rendered_value);
         textViewWhatWasRendered.setText(result.queryString);
         EditText textViewWhatWasUsed = view.findViewById(R.id.what_was_rendered_query_value);

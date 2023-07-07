@@ -4,26 +4,26 @@ import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.ww.ai.R;
-import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapter.ViewHolder> {
 
@@ -32,7 +32,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
 
     private final DateFormat dateFormat;
 
-    public RenderResultAdapter(Context context, RenderResultAdapter.OnItemClickListener listener) {
+    public RenderResultAdapter(RenderResultAdapter.OnItemClickListener listener) {
         this.listener = listener;
         this.localDataSet = new ArrayList<>();
         dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
@@ -78,10 +78,14 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     @Override
     public void onBindViewHolder(@NonNull RenderResultAdapter.ViewHolder viewHolder, int position) {
         RenderResultLightWeight item = localDataSet.get(position);
-        viewHolder.getTextView().setText(item.queryString);
-        viewHolder.getThumb().setImageBitmap(IMAGE_UTIL.getScaledBitmap(IMAGE_UTIL.convertBlobToImage(item.thumbNail), 192));
-        viewHolder.getTextViewDate().setText(dateFormat.format(new Date(item.createdTime)));
-        viewHolder.uidTextView.setText("id: " + item.uid);
+        viewHolder.getQueryStringTextView().setText(item.queryString);
+        viewHolder.getThumb().setImageBitmap(IMAGE_UTIL.getScaledBitmap(
+                IMAGE_UTIL.convertBlobToImage(item.thumbNail), 192));
+        SpannableString spanString = new SpannableString(dateFormat.format(
+                new Date(item.createdTime)) + ", " + item.renderEngine.getName());
+        spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
+        viewHolder.getTextViewDate().setText(spanString);
+        viewHolder.getQueryUsedTextView().setText(item.queryUsed);
         viewHolder.bind(item, listener);
     }
 
@@ -93,19 +97,17 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
+        private final TextView renderTitleTextView;
         private final ImageView thumb;
-
-        protected final TextView uidTextView;
-
+        protected final TextView queryUsedTextView;
         private final TextView textViewDate;
 
         public ViewHolder(View view) {
             super(view);
-            textView = view.findViewById(R.id.render_result_title);
+            renderTitleTextView = view.findViewById(R.id.render_result_title);
             thumb = view.findViewById(R.id.history_render_result_thumb);
             textViewDate = view.findViewById(R.id.render_result_date);
-            uidTextView = view.findViewById(R.id.render_result_uid);
+            queryUsedTextView = view.findViewById(R.id.render_result_query_used);
         }
 
         public void bind(final RenderResultLightWeight item, final OnItemClickListener listener) {
@@ -114,8 +116,12 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
             });
         }
 
-        public TextView getTextView() {
-            return textView;
+        public TextView getQueryStringTextView() {
+            return renderTitleTextView;
+        }
+
+        public TextView getQueryUsedTextView() {
+            return queryUsedTextView;
         }
 
         public ImageView getThumb() {

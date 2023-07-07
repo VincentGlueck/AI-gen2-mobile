@@ -41,10 +41,10 @@
             app:destination="@id/MainFragment" />
         <action
             android:id="@+id/action_RenderResultsFragment_to_ShowRenderDetailsFragment"
-            app:destination="@id/ShowRenderDetailsFragment" />
+            app:destination="@id/RenderDetailsFragment" />
     </fragment>
     <fragment
-        android:id="@+id/ShowRenderDetailsFragment"
+        android:id="@+id/RenderDetailsFragment"
         android:name="org.ww.ai.activity.RenderDetailsFragment"
         android:label="@string/render_details_title"
         tools:layout="@layout/render_details_fragment">

@@ -88,6 +88,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
 
         if (whatToRender == null) {
             whatToRender = new WhatToRender();
+        } else {
+            whatToRender.setQueryUsed("");
         }
 
         EditText editText = view.findViewById(R.id.editTextTextMultiLine);

@@ -2,8 +2,6 @@ package org.ww.ai.activity;
 
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -54,7 +53,7 @@ public class ReceiveImageActivity extends AppCompatActivity {
         textView.setText(R.string.receive_result_header);
 
         bitmap = getBitmapFromUri(bitmapUri);
-        if(bitmap != null) {
+        if (bitmap != null) {
             ImageView imageView = findViewById(R.id.receive_bitmap);
             imageView.setImageBitmap(bitmap);
         }
@@ -71,7 +70,7 @@ public class ReceiveImageActivity extends AppCompatActivity {
 
     private void saveResult() {
         RenderResult renderResult = new RenderResult();
-        if(bitmap != null) {
+        if (bitmap != null) {
             Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(bitmap, ImageUtil.THUMB_NAIL_SIZE);
             renderResult.thumbNail = IMAGE_UTIL.convertImageToBlob(thumbNail);
             renderResult.image = IMAGE_UTIL.convertImageToBlob(bitmap);
@@ -119,7 +118,7 @@ public class ReceiveImageActivity extends AppCompatActivity {
     }
 
     private void checkIfResultExists(WhatToRenderIF whatToRender) {
-        if(whatToRender.getQueryUsed() == null || whatToRender.getQueryUsed().isEmpty()
+        if (whatToRender.getQueryUsed() == null || whatToRender.getQueryUsed().isEmpty()
                 || "undefined".equals(whatToRender.getQueryUsed())) {
             DialogUtil.DIALOG_UTIL.showMessage(this, R.string.title_no_query, R.string.message_no_query, R.drawable.warning);
         }

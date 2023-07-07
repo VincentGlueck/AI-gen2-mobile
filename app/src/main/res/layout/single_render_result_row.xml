@@ -39,18 +39,21 @@
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
         android:textColor="@color/lightGrayTransparent"
+
         android:text="*date*"
-        android:textSize="12sp"
+        android:textSize="14sp"
         tools:ignore="HardcodedText" />
 
     <TextView
-        android:id="@+id/render_result_uid"
+        android:id="@+id/render_result_query_used"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
-        android:textColor="@color/teal_200"
-        android:text="*id*"
+        android:textColor="@color/lightGrayTransparent"
+        android:text="*queryUsed*"
         android:textSize="12sp"
+        android:ellipsize="end"
+        android:maxLines="3"
         tools:ignore="HardcodedText" />
 
     </LinearLayout>
