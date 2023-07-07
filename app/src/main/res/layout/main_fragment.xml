@@ -64,7 +64,7 @@
             android:id="@+id/check_translate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/simple_translation_german_only"
+            android:text="@string/simple_translation_checkbox"
             android:layout_below="@id/main_frameLayout"
             tools:ignore="HardcodedText">
 

@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-public class MainFragment extends Fragment implements TranslationAvailableNotifierIF  {
+public class MainFragment extends Fragment implements TranslationAvailableNotifierIF {
     public static final String GENERATOR_RULES = "generator.xml";
     private static final String KEY_ARTIST_TYPE = "artisttype";
     private MainFragmentBinding binding;
@@ -80,11 +80,14 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
 
-        binding.btnNext.setOnClickListener(view1 -> NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_MainFragment_to_ShowSentencesFragment));
+        binding.btnNext.setOnClickListener(v -> NavHostFragment.findNavController(
+                MainFragment.this).navigate(R.id.action_MainFragment_to_ShowSentencesFragment));
 
-        binding.btnRenderResults.setOnClickListener(v -> NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_MainFragment_to_RenderResultsFragment));
+        binding.btnRenderResults.setOnClickListener(v -> NavHostFragment.findNavController(
+                MainFragment.this).navigate(R.id.action_MainFragment_to_RenderResultsFragment));
 
-        binding.btnGallery.setOnClickListener(v -> NavHostFragment.findNavController(MainFragment.this).navigate(R.id.action_MainFragment_to_ResultsGalleryFragment));
+        binding.btnGallery.setOnClickListener(v -> NavHostFragment.findNavController(
+                MainFragment.this).navigate(R.id.action_MainFragment_to_ResultsGalleryFragment));
 
         if (whatToRender == null) {
             whatToRender = new WhatToRender();
@@ -108,33 +111,19 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         initRandomWordsSlider(view);
         initSentencesCountSlider(view);
         CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
-        checkBoxTranslate.setEnabled(false);
-        checkBoxTranslate.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked) {
-                translateEditText(editText.getText().toString());
-            } else {
-                whatToRender.setTranslateToEnglishDescription(editText.getText().toString());
-            }
-
-        });
         checkTranslation();
     }
 
     private void translateEditText(String str) {
-        SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance();
-        if (instance != null) {
-            instance.getTranslator().translate(str)
-                    .addOnSuccessListener(s -> {
-                        whatToRender.setTranslateToEnglishDescription(s);
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(containerContext, getText(R.string.unable_to_translate)
-                                + " " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        whatToRender.setTranslateToEnglishDescription("Failure");
-                    });
-
-        } else {
-            Toast.makeText(containerContext, "Sorry, NO TRANSLATOR", Toast.LENGTH_LONG).show();
+        SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance(containerContext);
+        if (instance != null && instance.getTranslator() != null) {
+            instance.getTranslator().translate(str).addOnSuccessListener(s -> {
+                whatToRender.setTranslateToEnglishDescription(s);
+            }).addOnFailureListener(e -> {
+                Toast.makeText(containerContext, getText(R.string.unable_to_translate) +
+                        " " + e.getMessage(), Toast.LENGTH_LONG).show();
+                whatToRender.setTranslateToEnglishDescription("Failure");
+            });
         }
     }
 
@@ -158,7 +147,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     @Override
     public void onResume() {
         super.onResume();
-        SharedPreferences preferences = containerContext.getSharedPreferences(WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
+        SharedPreferences preferences = containerContext.getSharedPreferences(
+                WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
         whatToRender = new WhatToRender();
         whatToRender.getFromPreferences(preferences);
         EditText editText = view.findViewById(R.id.editTextTextMultiLine);
@@ -173,6 +163,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         checkRandomCamera.setChecked(whatToRender.isRandomCamera());
         CheckBox checkRandomResolution = view.findViewById(R.id.chk_random_resolution);
         checkRandomResolution.setChecked(whatToRender.isRandomResolution());
+        CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
+        checkBoxTranslate.setChecked(whatToRender.isUseTranslation());
 
         selectSpinner(view.findViewById(R.id.spin_layout), whatToRender.getPreset());
         selectSpinner(view.findViewById(R.id.spin_artist_type), whatToRender.getArtistTypeName());
@@ -376,6 +368,9 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
                 whatToRender.setTranslateToEnglishDescription(str);
                 Button btn = view.findViewById(R.id.btn_next);
                 btn.setEnabled(s.length() > 0);
+                if(whatToRender.isUseTranslation()) {
+                    translateEditText(whatToRender.getDescription());
+                }
             }
 
             @Override
@@ -418,6 +413,10 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
             whatToRender.setRandomResolution(checked);
             resolutionSpinner.setEnabled(!checked);
         });
+        CheckBox checkUseTranslation = view.findViewById(R.id.check_translate);
+        checkUseTranslation.setOnCheckedChangeListener((v, checked) -> {
+            whatToRender.setUseTranslation(checked);
+        });
     }
 
     private void initRandomWordsSlider(View view) {
@@ -437,19 +436,17 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     }
 
     private void checkTranslation() {
-        DownloadConditions conditions = new DownloadConditions.Builder()
-                .requireWifi()
-                .build();
-        SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance();
-        instance.getTranslator().downloadModelIfNeeded(conditions)
-                .addOnSuccessListener(unused -> {
-                    CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
-                    instance.notifyTranslationAvailable(checkBoxTranslate,
-                            SimpleTranslationUtil.getInstance().getTranslator());
-                })
-                .addOnFailureListener(e -> Toast.makeText(containerContext,
-                        getText(R.string.no_translation_ger_to_eng),
-                        Toast.LENGTH_LONG).show());
+        final CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
+        DownloadConditions conditions = new DownloadConditions.Builder().requireWifi().build();
+        SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance(containerContext);
+        if(instance == null) {
+            return;
+        } else if(!instance.isUseTranslator()) {
+            checkBoxTranslate.setVisibility(View.GONE);
+        }
+        instance.getTranslator().downloadModelIfNeeded(conditions).addOnSuccessListener(unused -> {
+            instance.notifyTranslationAvailable(checkBoxTranslate, SimpleTranslationUtil.getInstance(containerContext).getTranslator());
+        }).addOnFailureListener(e -> Toast.makeText(containerContext, getText(R.string.unable_to_translate), Toast.LENGTH_LONG).show());
     }
 
     @Override

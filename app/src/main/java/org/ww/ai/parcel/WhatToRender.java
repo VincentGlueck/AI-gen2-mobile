@@ -36,6 +36,7 @@ public class WhatToRender implements WhatToRenderIF {
     private static final String PREF_RESOLUTION = "resolution";
     private static final String PREF_QUERY_USED = "queryUsed";
     private static final String PREF_TRANSLATED_QUERY = "translatedQueryUsed";
+    private static final String PREF_USE_TRANSLATION = "useTranslation";
 
     public WhatToRender() {
     }
@@ -69,10 +70,11 @@ public class WhatToRender implements WhatToRenderIF {
     private String camera;
     private String resolution;
     private String queryUsed;
-
     private String englishDescription;
-
     private boolean instantCopyToClipBoard;
+    private boolean useTranslation;
+
+
     @Override
     public String getDescription() {
         return description;
@@ -211,6 +213,7 @@ public class WhatToRender implements WhatToRenderIF {
         dest.writeString(Boolean.toString(randomResolution));
         dest.writeString(camera);
         dest.writeString(englishDescription);
+        dest.writeString(Boolean.toString(useTranslation));
     }
 
     @Override
@@ -221,6 +224,16 @@ public class WhatToRender implements WhatToRenderIF {
     @Override
     public void setTranslateToEnglishDescription(String englishDescription) {
         this.englishDescription = englishDescription;
+    }
+
+    @Override
+    public boolean isUseTranslation() {
+        return useTranslation;
+    }
+
+    @Override
+    public void setUseTranslation(boolean use) {
+        useTranslation = use;
     }
 
     public void setPhraseCount(int phraseCount) {
@@ -262,6 +275,7 @@ public class WhatToRender implements WhatToRenderIF {
             editor.putString(PREF_RESOLUTION, getResolution());
             editor.putString(PREF_QUERY_USED, getQueryUsed());
             editor.putString(PREF_TRANSLATED_QUERY, getTranslateToEnglishDescription());
+            editor.putBoolean(PREF_USE_TRANSLATION, isUseTranslation());
         } finally {
             editor.apply();
         }
@@ -284,6 +298,7 @@ public class WhatToRender implements WhatToRenderIF {
         setRandomResolution(preferences.getBoolean(PREF_RANDOM_RESOLUTION, false));
         setQueryUsed(preferences.getString(PREF_QUERY_USED, "undefined"));
         setTranslateToEnglishDescription(preferences.getString(PREF_TRANSLATED_QUERY, null));
+        setUseTranslation(preferences.getBoolean(PREF_USE_TRANSLATION, false));
     }
 
     @NonNull

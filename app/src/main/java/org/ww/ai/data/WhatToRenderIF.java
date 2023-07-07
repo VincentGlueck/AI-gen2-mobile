@@ -64,4 +64,8 @@ public interface WhatToRenderIF extends Parcelable, SharePreferencesIF {
 	String getTranslateToEnglishDescription();
 
 	void setTranslateToEnglishDescription(String englishDescription);
+
+	boolean isUseTranslation();
+
+	void setUseTranslation(boolean use);
 }
