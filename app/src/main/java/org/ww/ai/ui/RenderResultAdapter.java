@@ -96,6 +96,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
             animationSet.addAnimation(ANIMATIONS.getAlphaAnimation(0.2F, 1.0F, 2000L, true));
             animationSet.addAnimation(ANIMATIONS.getScaleAnimation(0.2F, 1.0F, 1000L, true));
             viewHolder.getThumb().setAnimation(animationSet);
+            item.flagHighLight = false;
         }
         viewHolder.bind(item, listener);
     }
