@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -28,6 +29,8 @@ import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startReceiveImageActivity(Uri uri) {
+        if(uri.toString().toLowerCase(Locale.ROOT).endsWith(".xml")) {
+            Toast.makeText(this, "XML pasted", Toast.LENGTH_LONG).show();
+            return;
+        }
         Intent intent = new Intent(this, ReceiveImageActivity.class);
         intent.putExtra(KEY_BITMAP, uri);
         intent.putExtra(KEY_WHAT_TO_RENDER, lastRender);

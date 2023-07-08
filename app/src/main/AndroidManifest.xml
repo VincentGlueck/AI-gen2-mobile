@@ -32,6 +32,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
             </intent-filter>
+            <intent-filter
+                android:scheme="any"
+                tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/xml" />
+                <data android:mimeType="xhtml/*" />
+                <data android:mimeType="xml/*" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".activity.ReceiveImageActivity"
