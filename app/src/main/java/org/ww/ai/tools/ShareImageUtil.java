@@ -2,19 +2,26 @@ package org.ww.ai.tools;
 
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.ww.ai.R;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
@@ -24,6 +31,8 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShareImageUtil {
     private final Activity activity;
@@ -58,14 +67,31 @@ public class ShareImageUtil {
             Log.e("ERROR", "Error saving bitmap", e);
         }
 
+
+
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_STREAM, imageContentUri);
         sendIntent.putExtra(Intent.EXTRA_TEXT, renderResult.queryString);
         sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         sendIntent.setType("image/jpeg");
-        Intent shareIntent = Intent.createChooser(sendIntent, "Share with");
-        activity.startActivity(shareIntent);
+
+        List<ComponentName> excludedComponents  = new ArrayList<>();
+        Intent share = new Intent(android.content.Intent.ACTION_SEND);
+        share.setType("image/*");
+
+        @SuppressLint("QueryPermissionsNeeded")
+        List<ResolveInfo> resInfo = activity.getPackageManager().queryIntentActivities(sendIntent, 0);
+        resInfo.forEach(r -> {
+            String packageName = r.activityInfo.packageName;
+            if (packageName.startsWith(activity.getPackageName())) {
+                excludedComponents.add(new ComponentName(packageName, r.activityInfo.name));
+            }
+        });
+        Intent chooserIntent = Intent.createChooser(sendIntent,
+                activity.getResources().getString(R.string.share_with_title));
+        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toArray(new Parcelable[]{}));
+        activity.startActivity(chooserIntent);
     }
 
     public void startShare(int uid) {
@@ -81,5 +107,6 @@ public class ShareImageUtil {
             }
         }, activity);
     }
+
 
 }

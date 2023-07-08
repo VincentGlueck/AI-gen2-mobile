@@ -32,7 +32,7 @@
     <string name="render_result_dialog_title">Render-Details</string>
     <string name="lbl_camera">Kamera</string>
     <string name="chk_random_camera">Zufällig</string>
-    <string name="lbl_random_words">Zufällige Wörter (von wenige … viele)</string>
+    <string name="lbl_random_words">Zufällige Wörter (wenige … viele)</string>
     <string name="lbl_sentences_count">Wie viele Sätze sollen es denn sein?</string>
     <string name="lbl_resolution">Auflösung</string>
     <string name="chk_random_resolution">Zufällig</string>
@@ -70,5 +70,6 @@
     <string name="unable_to_translate">Übersetzung fehlgeschlagen:</string>
     <string name="unable_to_download_translation">Download des Sprachpakets fehlgeschlagen.</string>
     <string name="btn_share">Teilen</string>
+    <string name="share_with_title">Teilen mit...</string>
 
 </resources>
