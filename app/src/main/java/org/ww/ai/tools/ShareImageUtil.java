@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ShareImageUtil {
-    private static final String WHATS_APP_PACKAGE = "com.whatsapp";
     private final Activity activity;
 
     public ShareImageUtil(Activity activity) {
@@ -68,15 +67,15 @@ public class ShareImageUtil {
         activity.startActivity(shareIntent);
     }
 
-    public void startShare(RenderResult renderResult) {
+    public void startShare(int uid) {
         AppDatabase db = AppDatabase.getInstance(activity);
-        ListenableFuture<RenderResult> future = db.renderResultDao().getById(renderResult.uid);
+        ListenableFuture<RenderResult> future = db.renderResultDao().getById(uid);
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             if (result != null) {
-                Bitmap bitmap = ImageUtil.IMAGE_UTIL.convertBlobToImage(renderResult.image);
+                Bitmap bitmap = ImageUtil.IMAGE_UTIL.convertBlobToImage(result.image);
                 if (bitmap != null) {
-                    shareImage(bitmap, renderResult);
+                    shareImage(bitmap, result);
                 }
             }
         }, activity);

@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -88,9 +87,9 @@ public class RenderDetailsFragment extends Fragment {
         imageView.setImageBitmap(bitmap);
         TextView titleTextView = view.findViewById(R.id.history_title);
         titleTextView.setText(result.queryString);
-        Button btnShare = view.findViewById(R.id.btn_share);
+        Button btnShare = view.findViewById(R.id.btn_share_render_results);
         btnShare.setOnClickListener(v -> {
-            new ShareImageUtil(getActivity()).startShare(result);
+            new ShareImageUtil(getActivity()).startShare(result.uid);
         });
 
         EditText textViewWhatWasRendered = view.findViewById(R.id.what_was_rendered_value);

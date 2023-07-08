@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import org.ww.ai.databinding.GalleryFullSizeFragmentBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.tools.ShareImageUtil;
 import org.ww.ai.ui.MetricsUtil;
 
 import java.util.List;
@@ -68,10 +70,11 @@ public class GalleryFullSizeFragment extends Fragment {
 
         ImageView imageView = view.findViewById(R.id.gallery_full_size_image);
         TextView imageDescriptionTextView = view.findViewById(R.id.lbl_gallery_full_size_footer);
-        loadImageFromDatabase(imageView, imageDescriptionTextView, uid);
+        loadImageFromDatabase(view, imageView, imageDescriptionTextView, uid);
+
     }
 
-    private void loadImageFromDatabase(ImageView imageView, TextView imageDescriptionTextView, int uid) {
+    private void loadImageFromDatabase(View view, ImageView imageView, TextView imageDescriptionTextView, int uid) {
         AppDatabase db = AppDatabase.getInstance(containerContext);
         ListenableFuture<RenderResult> future = db.renderResultDao().getById(uid);
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
@@ -84,6 +87,11 @@ public class GalleryFullSizeFragment extends Fragment {
                 }
                 imageDescriptionTextView.setText(result.queryUsed.length() > 0
                         ? result.queryUsed : result.queryString);
+                Button btnShare = view.findViewById(R.id.btn_share_gallery_full);
+                btnShare.setEnabled(true);
+                btnShare.setOnClickListener(v -> {
+                    new ShareImageUtil(getActivity()).startShare(result.uid);
+                });
             }
         }, containerContext);
     }

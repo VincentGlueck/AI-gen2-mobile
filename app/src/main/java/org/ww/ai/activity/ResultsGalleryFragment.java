@@ -24,6 +24,7 @@ import org.ww.ai.databinding.ResultsGalleryFragmentBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
+import org.ww.ai.tools.ShareImageUtil;
 import org.ww.ai.ui.MetricsUtil;
 
 import java.util.List;
@@ -98,6 +99,10 @@ public class ResultsGalleryFragment extends Fragment {
             count++;
             imageView.setOnClickListener(v -> {
                 onImageClickListener(lightWeight.uid);
+            });
+            imageView.setOnLongClickListener(l -> {
+                new ShareImageUtil(getActivity()).startShare(lightWeight.uid);
+                return true;
             });
             rowLayout.addView(imageView, params);
             if(count >= THUMBS_PER_ROW) {
