@@ -5,7 +5,6 @@ import static org.ww.ai.activity.RenderDetailsFragment.ARG_UID;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

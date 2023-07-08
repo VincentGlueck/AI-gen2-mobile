@@ -49,7 +49,7 @@
     <string name="emptyListText">(Nothing to display)</string>
     <string name="btn_back">Back</string>
     <string name="title_no_query">Warning</string>
-    <string name="message_no_query">I don\'t know what(!) you rendered before as you didn\'t use a text from results.</string>
+    <string name="message_no_query">I don\'t know what(!) you rendered before as you did not use a text from results.</string>
     <string name="title_result_stored">Result stored</string>
     <string name="msg_result_stored">Your rendered result was stored into history\'s database.</string>
     <string name="btn_show_in_history">Show history</string>

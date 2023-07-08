@@ -36,16 +36,11 @@ import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.MainFragmentBinding;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
-import org.ww.ai.tools.ResourceLoader;
 import org.ww.ai.tools.SimpleTranslationUtil;
 import org.ww.ai.tools.TranslationAvailableNotifierIF;
-import org.ww.ai.ui.DialogUtil;
 import org.xml.sax.SAXException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -105,42 +100,21 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         addValuesToCameraSpinner(view);
         addValuesToResolutionSpinner(view);
         ImageView imageView = view.findViewById(R.id.btn_clear);
-        imageView.setOnClickListener(click -> {
-            editText.setText("");
-        });
+        imageView.setOnClickListener(click -> editText.setText(""));
         initRandomWordsSlider(view);
         initSentencesCountSlider(view);
-        CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
         checkTranslation();
     }
 
     private void translateEditText(String str) {
         SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance(containerContext);
         if (instance != null && instance.getTranslator() != null) {
-            instance.getTranslator().translate(str).addOnSuccessListener(s -> {
-                whatToRender.setTranslateToEnglishDescription(s);
-            }).addOnFailureListener(e -> {
+            instance.getTranslator().translate(str).addOnSuccessListener(s ->
+                    whatToRender.setTranslateToEnglishDescription(s)).addOnFailureListener(e -> {
                 Toast.makeText(containerContext, getText(R.string.unable_to_translate) +
                         " " + e.getMessage(), Toast.LENGTH_LONG).show();
                 whatToRender.setTranslateToEnglishDescription("Failure");
             });
-        }
-    }
-
-    // TODO: maybe in a later version, again
-    private void showGeneratorXML() {
-        try {
-            InputStream in = ResourceLoader.RESOURCE_LOADER.getResource(containerContext, GENERATOR_RULES);
-            StringBuilder sb = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-            }
-            DialogUtil.DIALOG_UTIL.showLargeTextDialog(containerContext, R.string.title_activity_main, sb.toString());
-        } catch (IOException e) {
-            Toast.makeText(containerContext, "Error loading " + GENERATOR_RULES, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -414,9 +388,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
             resolutionSpinner.setEnabled(!checked);
         });
         CheckBox checkUseTranslation = view.findViewById(R.id.check_translate);
-        checkUseTranslation.setOnCheckedChangeListener((v, checked) -> {
-            whatToRender.setUseTranslation(checked);
-        });
+        checkUseTranslation.setOnCheckedChangeListener((v, checked) ->
+                whatToRender.setUseTranslation(checked));
     }
 
     private void initRandomWordsSlider(View view) {
@@ -444,9 +417,11 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         } else if(!instance.isUseTranslator()) {
             checkBoxTranslate.setVisibility(View.GONE);
         }
-        instance.getTranslator().downloadModelIfNeeded(conditions).addOnSuccessListener(unused -> {
-            instance.notifyTranslationAvailable(checkBoxTranslate, SimpleTranslationUtil.getInstance(containerContext).getTranslator());
-        }).addOnFailureListener(e -> Toast.makeText(containerContext, getText(R.string.unable_to_translate), Toast.LENGTH_LONG).show());
+        instance.getTranslator().downloadModelIfNeeded(conditions).addOnSuccessListener(
+                unused -> instance.notifyTranslationAvailable(checkBoxTranslate,
+                        SimpleTranslationUtil.getInstance(containerContext).getTranslator()))
+                .addOnFailureListener(e ->
+                        Toast.makeText(containerContext, getText(R.string.unable_to_translate), Toast.LENGTH_LONG).show());
     }
 
     @Override

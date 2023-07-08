@@ -116,9 +116,7 @@ public class ResultsGalleryFragment extends Fragment {
     }
 
     private void addListeners(final RenderResultLightWeight lightWeight, final ImageView imageView) {
-        imageView.setOnClickListener(v -> {
-            onImageClickListener(lightWeight.uid);
-        });
+        imageView.setOnClickListener(v -> onImageClickListener(lightWeight.uid));
         imageView.setOnLongClickListener(l -> {
             new ShareImageUtil(getActivity()).startShare(lightWeight.uid);
             return true;

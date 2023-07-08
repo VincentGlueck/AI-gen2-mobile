@@ -64,9 +64,7 @@ public class ReceiveImageActivity extends AppCompatActivity {
             finish();
         });
         Button btnSave = findViewById(R.id.btn_result_save);
-        btnSave.setOnClickListener(click -> {
-            saveResult();
-        });
+        btnSave.setOnClickListener(click -> saveResult());
     }
 
     private void saveResult() {

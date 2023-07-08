@@ -1,5 +1,7 @@
 package org.ww.ai.tools;
 
+import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -16,7 +18,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
-import org.ww.ai.ui.ImageUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.FileDescriptor;
@@ -73,7 +74,7 @@ public class ShareImageUtil {
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             if (result != null) {
-                Bitmap bitmap = ImageUtil.IMAGE_UTIL.convertBlobToImage(result.image);
+                Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(result.image);
                 if (bitmap != null) {
                     shareImage(bitmap, result);
                 }

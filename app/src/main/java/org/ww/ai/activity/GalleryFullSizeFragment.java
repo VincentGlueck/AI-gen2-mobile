@@ -4,19 +4,16 @@ import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -27,8 +24,6 @@ import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.tools.ShareImageUtil;
 import org.ww.ai.ui.MetricsUtil;
-
-import java.util.List;
 
 public class GalleryFullSizeFragment extends Fragment {
 
@@ -89,9 +84,7 @@ public class GalleryFullSizeFragment extends Fragment {
                         ? result.queryUsed : result.queryString);
                 Button btnShare = view.findViewById(R.id.btn_share_gallery_full);
                 btnShare.setEnabled(true);
-                btnShare.setOnClickListener(v -> {
-                    new ShareImageUtil(getActivity()).startShare(result.uid);
-                });
+                btnShare.setOnClickListener(v -> new ShareImageUtil(getActivity()).startShare(result.uid));
             }
         }, containerContext);
     }

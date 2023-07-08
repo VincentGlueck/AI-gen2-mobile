@@ -1,7 +1,5 @@
 package org.ww.ai.activity;
 
-import static org.ww.ai.activity.RenderDetailsFragment.ARG_UID;
-
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
@@ -11,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -29,7 +26,6 @@ import com.google.android.material.snackbar.Snackbar;
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
-import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 
