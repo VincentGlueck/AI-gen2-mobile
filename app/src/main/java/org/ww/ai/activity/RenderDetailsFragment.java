@@ -1,6 +1,7 @@
 package org.ww.ai.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
@@ -8,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,6 +92,9 @@ public class RenderDetailsFragment extends Fragment {
         Button btnShare = view.findViewById(R.id.btn_share_render_results);
         btnShare.setOnClickListener(v -> new ShareImageUtil(getActivity()).startShare(result.uid));
 
+        Button btnReplace = view.findViewById(R.id.btn_replace_render_results);
+        btnReplace.setOnClickListener(v -> replaceImage(result));
+
         EditText textViewWhatWasRendered = view.findViewById(R.id.what_was_rendered_value);
         textViewWhatWasRendered.setText(result.queryString);
         EditText textViewWhatWasUsed = view.findViewById(R.id.what_was_rendered_query_value);
@@ -106,6 +111,10 @@ public class RenderDetailsFragment extends Fragment {
         spinnerRenderedBy.setAdapter(renderedByAdapter);
         spinnerRenderedBy.setSelection(result.renderEngine.ordinal());
         spinnerRenderedBy.setEnabled(false);
+    }
+
+    private void replaceImage(RenderResult result) {
+        Log.d("REPLACE", "uid: " + result.uid);
     }
 
     @Override

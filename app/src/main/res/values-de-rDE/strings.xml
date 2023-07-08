@@ -58,7 +58,7 @@
     <string name="undo_snackbar">Rückgängig</string>
     <string name="permanent_deleted_toast">Der Eintrag wurde endgültig gelöscht.</string>
     <string name="render_results_title">Deine bisherigen Kreationen</string>
-    <string name="render_details_title">Deine Kreation</string>
+    <string name="render_details_title">Ergebnis</string>
     <string name="history_entry_show_snackbar">Anzeigen</string>
     <string name="history_entry_created_snackbar">Resultat gespeichert.</string>
     <string name="receive_image_title">Kreation einfügen</string>
@@ -70,6 +70,7 @@
     <string name="unable_to_translate">Übersetzung fehlgeschlagen:</string>
     <string name="unable_to_download_translation">Download des Sprachpakets fehlgeschlagen.</string>
     <string name="btn_share">Teilen</string>
-    <string name="share_with_title">Teilen mit...</string>
+    <string name="share_with_title">Teilen mit…</string>
+    <string name="btn_render_details_replace_btn">Ersetzen</string>
 
 </resources>
