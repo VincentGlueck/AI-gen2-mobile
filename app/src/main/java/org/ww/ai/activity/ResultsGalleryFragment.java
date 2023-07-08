@@ -1,6 +1,7 @@
 package org.ww.ai.activity;
 
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
+import static org.ww.ai.ui.ImageUtil.THUMB_NAIL_SIZE;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -80,31 +81,9 @@ public class ResultsGalleryFragment extends Fragment {
             if(rowLayout == null) {
                  rowLayout = createRow(parent);
             }
-            ImageView imageView = new ImageView(containerContext);
-            Bitmap bitmap = IMAGE_UTIL.cropToSquare(IMAGE_UTIL.convertBlobToImage(lightWeight.thumbNail), 512);
-            imageView.setImageBitmap(bitmap);
-            imageView.setPadding(4, 4,4, 4);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-            if(screen != null) {
-                params.width = screen.width / THUMBS_PER_ROW;
-                if(bitmap.getHeight() < params.width) {
-                    params.height = screen.width / THUMBS_PER_ROW;
-                }
-            } else {
-                params.width = 192;
-                params.height = 192;
-
-            }
+            ImageView imageView = createImageView(lightWeight.thumbNail, rowLayout);
             count++;
-            imageView.setOnClickListener(v -> {
-                onImageClickListener(lightWeight.uid);
-            });
-            imageView.setOnLongClickListener(l -> {
-                new ShareImageUtil(getActivity()).startShare(lightWeight.uid);
-                return true;
-            });
-            rowLayout.addView(imageView, params);
+            addListeners(lightWeight, imageView);
             if(count >= THUMBS_PER_ROW) {
                 view.addView(rowLayout);
                 count = 0;
@@ -114,6 +93,36 @@ public class ResultsGalleryFragment extends Fragment {
         if(rowLayout != null) {
             view.addView(rowLayout);
         }
+    }
+
+    private ImageView createImageView(byte[] thumbNail, LinearLayout rowLayout) {
+        ImageView imageView = new ImageView(containerContext);
+        Bitmap bitmap = IMAGE_UTIL.cropToSquare(IMAGE_UTIL.convertBlobToImage(thumbNail), THUMB_NAIL_SIZE);
+        imageView.setImageBitmap(bitmap);
+        imageView.setPadding(4, 4,4, 4);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        if(screen != null) {
+            params.width = screen.width / THUMBS_PER_ROW;
+            if(bitmap.getHeight() < params.width) {
+                params.height = screen.width / THUMBS_PER_ROW;
+            }
+        } else {
+            params.width = 192;
+            params.height = 192;
+        }
+        rowLayout.addView(imageView, params);
+        return imageView;
+    }
+
+    private void addListeners(final RenderResultLightWeight lightWeight, final ImageView imageView) {
+        imageView.setOnClickListener(v -> {
+            onImageClickListener(lightWeight.uid);
+        });
+        imageView.setOnLongClickListener(l -> {
+            new ShareImageUtil(getActivity()).startShare(lightWeight.uid);
+            return true;
+        });
     }
 
 
