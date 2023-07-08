@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         coordinatorLayout = findViewById(R.id.main_activity_scroll_bar);
-
         checkIntentPurpose();
 
     }
@@ -80,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void startReceiveImageActivity(Uri uri) {
+    private void startReceiveImageActivity(Uri uri, int... replaceUid) {
         if(uri.toString().toLowerCase(Locale.ROOT).endsWith(".xml")) {
             Toast.makeText(this, "XML pasted", Toast.LENGTH_LONG).show();
             return;

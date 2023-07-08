@@ -71,5 +71,6 @@
     <string name="unable_to_translate">"Unable to translate:"</string>
     <string name="btn_share">Share</string>
     <string name="share_with_title">Share with app</string>
+    <string name="btn_render_details_replace_btn">Replace</string>
 
 </resources>
