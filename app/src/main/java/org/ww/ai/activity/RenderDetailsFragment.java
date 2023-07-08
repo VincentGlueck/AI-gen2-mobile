@@ -90,7 +90,7 @@ public class RenderDetailsFragment extends Fragment {
         titleTextView.setText(result.queryString);
         Button btnShare = view.findViewById(R.id.btn_share);
         btnShare.setOnClickListener(v -> {
-            ShareImageUtil.getInstance(getActivity()).startShare(result);
+            new ShareImageUtil(getActivity()).startShare(result);
         });
 
         EditText textViewWhatWasRendered = view.findViewById(R.id.what_was_rendered_value);
