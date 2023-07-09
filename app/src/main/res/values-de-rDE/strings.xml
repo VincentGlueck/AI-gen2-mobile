@@ -72,5 +72,8 @@
     <string name="btn_share">Teilen</string>
     <string name="share_with_title">Teilen mit…</string>
     <string name="btn_render_details_replace_btn">Ersetzen</string>
+    <string name="prompt_replace_image">Möchtest du das bisherige Bild (%1$d Bytes) mit dem gewählten Bild (%2$d Bytes) überschreiben?</string>
+    <string name="btn_yes">Ja</string>
+    <string name="btn_no">Nein</string>
 
 </resources>

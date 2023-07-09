@@ -73,8 +73,9 @@ public enum DialogUtil {
                                            int resourceNegative,
                                            final DialogInterface.OnClickListener negativeListener,
                                            int... iconResourceId) {
+        String shortTitle = title.length() > 20 ? (title.substring(0, 18)) + "..." : title;
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(title)
+                .setTitle(shortTitle)
                 .setMessage(msg)
                 .setCancelable(false)
                 .setPositiveButton(resourcePositive, positiveListener)

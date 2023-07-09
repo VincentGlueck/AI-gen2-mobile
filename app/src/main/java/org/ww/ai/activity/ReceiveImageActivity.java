@@ -40,7 +40,7 @@ import java.util.Date;
 
 public class ReceiveImageActivity extends AppCompatActivity {
 
-    private static final int MAX_IMAGE_SIZE = 1600;
+    public static final int MAX_IMAGE_SIZE = 2048;
     private Bitmap bitmap;
 
     private WhatToRenderIF whatToRender;
