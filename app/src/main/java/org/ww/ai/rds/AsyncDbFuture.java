@@ -23,8 +23,7 @@ public class AsyncDbFuture<T> {
                         }
 
                         public void onFailure(@NonNull Throwable thrown) {
-                            Log.d("FAILURE", thrown.getMessage());
-                            Toast.makeText(context, thrown.getMessage(), Toast.LENGTH_LONG).show();
+                           throw new RuntimeException(thrown);
                         }
                     },
                     context.getMainExecutor()

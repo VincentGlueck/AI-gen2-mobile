@@ -13,12 +13,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import org.ww.ai.rds.dao.RenderResultDao;
 import org.ww.ai.rds.entity.RenderResult;
 
-@Database(entities = {RenderResult.class}, exportSchema = true, version = 1,
+@Database(entities = {RenderResult.class}, exportSchema = true, version = 2,
         autoMigrations = {
                 @AutoMigration(from = 1, to = 2, spec = AppDatabase.MigrateRenderResult_1_2.class)
         })
 public abstract class AppDatabase extends RoomDatabase {
-    private static final String DB_NAME = "aigen2";
+    private static final String DB_NAME = "ai-gen-2";
     private static AppDatabase instance;
 
     public static synchronized AppDatabase getInstance(Context context) {
@@ -39,7 +39,9 @@ public abstract class AppDatabase extends RoomDatabase {
                     + " ADD COLUMN width INTEGER");
             db.execSQL("ALTER TABLE renderresult "
                     + " ADD COLUMN height INTEGER");
+
         }
+
     }
 
 }

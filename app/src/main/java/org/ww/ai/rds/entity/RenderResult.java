@@ -50,6 +50,7 @@ public class RenderResult implements Serializable {
     @ColumnInfo(name = "height", defaultValue = "0")
     public int height;
 
+    @NonNull
     @Override
     public String toString() {
         return "RenderResult{" +
