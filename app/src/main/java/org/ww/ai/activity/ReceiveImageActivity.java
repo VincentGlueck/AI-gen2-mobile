@@ -73,6 +73,8 @@ public class ReceiveImageActivity extends AppCompatActivity {
             Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(bitmap, ImageUtil.THUMB_NAIL_SIZE);
             renderResult.thumbNail = IMAGE_UTIL.convertImageToBlob(thumbNail);
             renderResult.image = IMAGE_UTIL.convertImageToBlob(bitmap);
+            renderResult.width = bitmap.getWidth();
+            renderResult.height = bitmap.getHeight();
         }
         Spinner engineSpinner = findViewById(R.id.what_was_rendered_engine_spinner);
         EditText creditsText = findViewById(R.id.what_was_rendered_credits);

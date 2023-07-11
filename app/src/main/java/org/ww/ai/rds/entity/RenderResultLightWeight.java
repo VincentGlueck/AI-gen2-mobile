@@ -7,6 +7,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import org.checkerframework.checker.units.qual.C;
 import org.ww.ai.rds.ifenum.RenderModel;
 
 import java.io.Serializable;
@@ -34,9 +35,10 @@ public class RenderResultLightWeight implements Serializable {
     @ColumnInfo(name = "query_used")
     public String queryUsed;
 
-    @Ignore
+    @ColumnInfo(name = "width", defaultValue = "0")
     public int width;
-    @Ignore
+
+    @ColumnInfo(name = "height", defaultValue = "0")
     public int height;
     @Ignore
     public boolean flagHighLight;
