@@ -5,6 +5,7 @@ import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -84,8 +85,10 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     public void onBindViewHolder(@NonNull RenderResultAdapter.ViewHolder viewHolder, int position) {
         RenderResultLightWeight item = localDataSet.get(position);
         viewHolder.getQueryStringTextView().setText(item.queryString);
-        viewHolder.getThumb().setImageBitmap(IMAGE_UTIL.getScaledBitmap(
-                IMAGE_UTIL.convertBlobToImage(item.thumbNail), 192));
+        Bitmap bitmap = IMAGE_UTIL.getScaledBitmap(
+                IMAGE_UTIL.convertBlobToImage(item.thumbNail), 192);
+        viewHolder.getThumb().setImageBitmap(bitmap);
+        viewHolder.getTextViewSizeLabel().setText(item.width + "x" + item.height);
         SpannableString spanString = new SpannableString(dateFormat.format(
                 new Date(item.createdTime)) + ", " + item.renderEngine.getName());
         spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
@@ -125,6 +128,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         private final ImageView thumb;
         protected final TextView queryUsedTextView;
         private final TextView textViewDate;
+        private final TextView textViewSizeLabel;
 
         public ViewHolder(View view) {
             super(view);
@@ -132,6 +136,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
             thumb = view.findViewById(R.id.history_render_result_thumb);
             textViewDate = view.findViewById(R.id.render_result_date);
             queryUsedTextView = view.findViewById(R.id.render_result_query_used);
+            textViewSizeLabel = view.findViewById(R.id.image_view_size_lbl);
         }
 
         public void bind(final RenderResultLightWeight item, final OnItemClickListener listener) {
@@ -154,6 +159,10 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
 
         public TextView getTextViewDate() {
             return textViewDate;
+        }
+
+        public TextView getTextViewSizeLabel() {
+            return textViewSizeLabel;
         }
     }
 

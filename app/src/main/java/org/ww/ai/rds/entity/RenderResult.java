@@ -44,6 +44,12 @@ public class RenderResult implements Serializable {
     @ColumnInfo(name = "credits", typeAffinity = ColumnInfo.INTEGER)
     public int credits;
 
+    @ColumnInfo(name = "width", defaultValue = "0")
+    public int width;
+
+    @ColumnInfo(name = "height", defaultValue = "0")
+    public int height;
+
     @Override
     public String toString() {
         return "RenderResult{" +

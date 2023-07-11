@@ -1,10 +1,13 @@
 package org.ww.ai.ui;
 
+import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.util.DisplayMetrics;
 
 import java.io.ByteArrayOutputStream;
 
@@ -63,6 +66,22 @@ public enum ImageUtil {
         int cropW = Math.max((width - height) >> 1, 0);
         int cropH = Math.max((height - width) >> 1, 0);
         return Bitmap.createBitmap(bitmap, cropW, cropH, newWidth, newHeight);
+    }
+
+    public Bitmap getBitmapFittingDisplayMetrics(Bitmap bitmap, DisplayMetrics displayMetrics) {
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+        float scale = 1.0f;
+        if(bitmap.getHeight() > bitmap.getWidth()) {
+            if (bitmap.getHeight() > width) {
+                scale = 0.85f * (float) bitmap.getHeight() * (float) height / (float) bitmap.getHeight();
+            }
+        } else {
+            if(bitmap.getWidth() > width) {
+                scale = (float) bitmap.getWidth() * (float) width / (float) bitmap.getWidth();
+            }
+        }
+        return getScaledBitmap(bitmap, (int) scale);
     }
 
     private static int getPowerOfTwoForSampleRatio(double ratio) {

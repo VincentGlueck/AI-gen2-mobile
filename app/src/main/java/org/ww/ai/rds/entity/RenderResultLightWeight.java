@@ -1,5 +1,8 @@
 package org.ww.ai.rds.entity;
 
+import android.util.Pair;
+
+import androidx.annotation.Dimension;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -32,6 +35,10 @@ public class RenderResultLightWeight implements Serializable {
     public String queryUsed;
 
     @Ignore
+    public int width;
+    @Ignore
+    public int height;
+    @Ignore
     public boolean flagHighLight;
 
     @Ignore
@@ -42,6 +49,8 @@ public class RenderResultLightWeight implements Serializable {
         renderEngine = renderResult.renderEngine;
         queryString = renderResult.queryString;
         queryUsed = renderResult.queryUsed;
+        width = renderResult.width;
+        height = renderResult.height;
     }
 
     @Ignore

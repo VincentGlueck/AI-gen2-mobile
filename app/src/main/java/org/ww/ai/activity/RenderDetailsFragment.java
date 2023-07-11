@@ -1,19 +1,26 @@
 package org.ww.ai.activity;
 
 import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -21,19 +28,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -73,6 +69,7 @@ public class RenderDetailsFragment extends Fragment {
         if (getArguments() != null) {
             uid = getArguments().getInt(ARG_UID);
         }
+
         receiveActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                 Intent data = result.getData();
@@ -153,9 +150,7 @@ public class RenderDetailsFragment extends Fragment {
     }
 
     private void fillContentViewFromResult(View view, RenderResult result) {
-        ImageView imageView = view.findViewById(R.id.history_bitmap);
-        Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(result.image);
-        imageView.setImageBitmap(bitmap);
+        setImageViewFromBytes(view, result.image);
         TextView titleTextView = view.findViewById(R.id.history_title);
         titleTextView.setText(result.queryString);
         Button btnShare = view.findViewById(R.id.btn_share_render_results);
@@ -198,15 +193,23 @@ public class RenderDetailsFragment extends Fragment {
         AsyncDbFuture<Integer> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, i -> {
             if (i == 1) {
-                ImageView imageView = view.findViewById(R.id.history_bitmap);
-                Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(bytes);
-                imageView.setImageBitmap(bitmap);
+                setImageViewFromBytes(view, bytes);
             } else {
                 Toast.makeText(getActivity(), "Error updating image", Toast.LENGTH_LONG).show();
             }
         }, getActivity());
     }
 
+    @SuppressLint("SetTextI18n")
+    private void setImageViewFromBytes(View view, byte[] bytes) {
+        SubsamplingScaleImageView imageView = view.findViewById(R.id.history_bitmap);
+        Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(bytes);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        assert getActivity() != null;
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        imageView.setImage(ImageSource.bitmap(
+                IMAGE_UTIL.getBitmapFittingDisplayMetrics(bitmap, displayMetrics)));
+    }
 
     @Override
     public void onDestroy() {
