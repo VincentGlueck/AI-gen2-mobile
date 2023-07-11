@@ -8,13 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -23,15 +23,12 @@ import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.tools.ShareImageUtil;
-import org.ww.ai.ui.MetricsUtil;
 
 public class GalleryFullSizeFragment extends Fragment {
 
     private int uid;
 
     private Context containerContext;
-
-    private MetricsUtil.Screen screen;
 
     private GalleryFullSizeFragmentBinding binding;
 
@@ -59,27 +56,20 @@ public class GalleryFullSizeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (getActivity() != null && getActivity().getWindowManager() != null) {
-            screen = MetricsUtil.getScreen(getActivity().getWindowManager());
-        }
-
-        ImageView imageView = view.findViewById(R.id.gallery_full_size_image);
+        SubsamplingScaleImageView imageView = view.findViewById(R.id.gallery_full_size_image);
         TextView imageDescriptionTextView = view.findViewById(R.id.lbl_gallery_full_size_footer);
         loadImageFromDatabase(view, imageView, imageDescriptionTextView, uid);
 
     }
 
-    private void loadImageFromDatabase(View view, ImageView imageView, TextView imageDescriptionTextView, int uid) {
+    private void loadImageFromDatabase(View view, SubsamplingScaleImageView imageView, TextView imageDescriptionTextView, int uid) {
         AppDatabase db = AppDatabase.getInstance(containerContext);
         ListenableFuture<RenderResult> future = db.renderResultDao().getById(uid);
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             if (result != null) {
-                if (screen != null) {
-                    imageView.setImageBitmap(IMAGE_UTIL.getScaledBitmap(IMAGE_UTIL.convertBlobToImage(result.image), screen.width));
-                } else {
-                    imageView.setImageBitmap(IMAGE_UTIL.convertBlobToImage(result.image));
-                }
+                assert getActivity() != null;
+                IMAGE_UTIL.setFittingImageViewFromBitmap(getActivity(), imageView, result.image);
                 imageDescriptionTextView.setText(result.queryUsed.length() > 0
                         ? result.queryUsed : result.queryString);
                 Button btnShare = view.findViewById(R.id.btn_share_gallery_full);
@@ -88,6 +78,8 @@ public class GalleryFullSizeFragment extends Fragment {
             }
         }, containerContext);
     }
+
+
 
     @Override
     public void onDestroy() {

@@ -1,13 +1,16 @@
 package org.ww.ai.ui;
 
-import android.app.Application;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
+
+import androidx.activity.ComponentActivity;
+
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.io.ByteArrayOutputStream;
 
@@ -55,14 +58,14 @@ public enum ImageUtil {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
-    public Bitmap cropToSquare(Bitmap bitmap, int desiredSize){
-        int width  = bitmap.getWidth();
+    public Bitmap cropToSquare(Bitmap bitmap, int desiredSize) {
+        int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         int newWidth = Math.min(height, width);
-        if(newWidth > desiredSize) {
+        if (newWidth > desiredSize) {
             newWidth = desiredSize;
         }
-        int newHeight = (height > width)? height - ( height - width) : height;
+        int newHeight = (height > width) ? height - (height - width) : height;
         int cropW = Math.max((width - height) >> 1, 0);
         int cropH = Math.max((height - width) >> 1, 0);
         return Bitmap.createBitmap(bitmap, cropW, cropH, newWidth, newHeight);
@@ -72,17 +75,32 @@ public enum ImageUtil {
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
         float scale = 1.0f;
-        if(bitmap.getHeight() > bitmap.getWidth()) {
+        if (bitmap.getHeight() > bitmap.getWidth()) {
             if (bitmap.getHeight() > width) {
                 scale = 0.85f * (float) bitmap.getHeight() * (float) height / (float) bitmap.getHeight();
             }
         } else {
-            if(bitmap.getWidth() > width) {
+            if (bitmap.getWidth() > width) {
                 scale = (float) bitmap.getWidth() * (float) width / (float) bitmap.getWidth();
             }
         }
         return getScaledBitmap(bitmap, (int) scale);
     }
+
+    public void setFittingImageViewFromBitmap(ComponentActivity activity,
+                                              SubsamplingScaleImageView imageView, byte[] bytes) {
+        Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(bytes);
+        setFittingImageViewFromBitmap(activity, imageView, bitmap);
+    }
+
+    public void setFittingImageViewFromBitmap(ComponentActivity activity,
+                                              SubsamplingScaleImageView imageView, Bitmap bitmap) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        imageView.setImage(ImageSource.bitmap(
+                IMAGE_UTIL.getBitmapFittingDisplayMetrics(bitmap, displayMetrics)));
+    }
+
 
     private static int getPowerOfTwoForSampleRatio(double ratio) {
         int k = Integer.highestOneBit((int) Math.floor(ratio));

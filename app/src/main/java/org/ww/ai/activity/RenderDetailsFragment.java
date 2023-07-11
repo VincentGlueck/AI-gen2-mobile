@@ -3,7 +3,6 @@ package org.ww.ai.activity;
 import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -200,15 +197,10 @@ public class RenderDetailsFragment extends Fragment {
         }, getActivity());
     }
 
-    @SuppressLint("SetTextI18n")
     private void setImageViewFromBytes(View view, byte[] bytes) {
         SubsamplingScaleImageView imageView = view.findViewById(R.id.history_bitmap);
-        Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(bytes);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
         assert getActivity() != null;
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        imageView.setImage(ImageSource.bitmap(
-                IMAGE_UTIL.getBitmapFittingDisplayMetrics(bitmap, displayMetrics)));
+        IMAGE_UTIL.setFittingImageViewFromBitmap(getActivity(), imageView, bytes);
     }
 
     @Override

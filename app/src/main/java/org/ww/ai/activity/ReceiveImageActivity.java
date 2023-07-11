@@ -13,13 +13,13 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -55,8 +55,8 @@ public class ReceiveImageActivity extends AppCompatActivity {
 
         bitmap = getBitmapFromUri(bitmapUri);
         if (bitmap != null) {
-            ImageView imageView = findViewById(R.id.receive_bitmap);
-            imageView.setImageBitmap(bitmap);
+            SubsamplingScaleImageView imageView = findViewById(R.id.receive_bitmap);
+            IMAGE_UTIL.setFittingImageViewFromBitmap(this, imageView, bitmap);
         }
         Button btnCancel = findViewById(R.id.btn_result_back);
         btnCancel.setOnClickListener(click -> {
