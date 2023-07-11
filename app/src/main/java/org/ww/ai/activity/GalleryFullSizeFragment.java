@@ -7,13 +7,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -57,24 +57,21 @@ public class GalleryFullSizeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         SubsamplingScaleImageView imageView = view.findViewById(R.id.gallery_full_size_image);
-        TextView imageDescriptionTextView = view.findViewById(R.id.lbl_gallery_full_size_footer);
-        loadImageFromDatabase(view, imageView, imageDescriptionTextView, uid);
+        loadImageFromDatabase(view, imageView, uid);
 
     }
 
-    private void loadImageFromDatabase(View view, SubsamplingScaleImageView imageView, TextView imageDescriptionTextView, int uid) {
+    private void loadImageFromDatabase(View view, SubsamplingScaleImageView imageView, int uid) {
         AppDatabase db = AppDatabase.getInstance(containerContext);
         ListenableFuture<RenderResult> future = db.renderResultDao().getById(uid);
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             if (result != null) {
                 assert getActivity() != null;
-                IMAGE_UTIL.setFittingImageViewFromBitmap(getActivity(), imageView, result.image);
-                imageDescriptionTextView.setText(result.queryUsed.length() > 0
-                        ? result.queryUsed : result.queryString);
-                Button btnShare = view.findViewById(R.id.btn_share_gallery_full);
-                btnShare.setEnabled(true);
-                btnShare.setOnClickListener(v -> new ShareImageUtil(getActivity()).startShare(result.uid));
+                imageView.setImage(ImageSource.bitmap(IMAGE_UTIL.convertBlobToImage(result.image)));
+                ImageView imageViewShare = view.findViewById(R.id.gallery_full_size_share);
+                imageViewShare.setVisibility(View.VISIBLE);
+                imageViewShare.setOnClickListener(v -> new ShareImageUtil(getActivity()).startShare(result.uid));
             }
         }, containerContext);
     }
