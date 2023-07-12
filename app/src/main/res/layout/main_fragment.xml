@@ -335,11 +335,17 @@
             android:drawableStart="@drawable/gallery"
             android:text="@string/next" />
 
+        <Space
+            android:id="@+id/space_01"
+            android:layout_toEndOf="@id/btn_next"
+            android:layout_width="72dp"
+            android:layout_height="wrap_content" />
+
         <Button
             android:id="@+id/btn_render_results"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/btn_next"
+            android:layout_toEndOf="@id/space_01"
             android:layout_marginStart="8dp"
             android:text="@string/lbl_render_results" />
 
