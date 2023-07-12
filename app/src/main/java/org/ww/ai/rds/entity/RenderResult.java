@@ -1,18 +1,19 @@
 package org.ww.ai.rds.entity;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
+import org.ww.ai.rds.converter.EngineUsedNonDaoConverter;
+import org.ww.ai.rds.dao.EngineUsedNonDao;
 import org.ww.ai.rds.dao.RenderResultDao;
 import org.ww.ai.rds.ifenum.RenderModel;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 
 @Entity(tableName = RenderResultDao.TABLE)
 public class RenderResult implements Serializable {
@@ -49,6 +50,10 @@ public class RenderResult implements Serializable {
 
     @ColumnInfo(name = "height", defaultValue = "0")
     public int height;
+
+    @TypeConverters(EngineUsedNonDaoConverter.class)
+    @ColumnInfo(name = "engines_used")
+    public List<EngineUsedNonDao> enginesUsed;
 
     @NonNull
     @Override
