@@ -6,7 +6,7 @@
     <string name="second_fragment_label">Resultate</string>
     <string name="next">Weiter</string>
     <string name="previous">Zurück</string>
-    <string name="lorem_ipsum">
+    <string name="what_to_enter_hint">
        Beschreibe das Bild in natürlicher Sprache (engl.!)\n\n
         \'A bear passing through a spooky forrest\'\n
         \'Donald trump alike dog sitting at a bar\'\n\n

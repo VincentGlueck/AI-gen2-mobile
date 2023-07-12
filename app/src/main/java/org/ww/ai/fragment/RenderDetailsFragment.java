@@ -67,7 +67,6 @@ public class RenderDetailsFragment extends Fragment {
         if (getArguments() != null) {
             uid = getArguments().getInt(ARG_UID);
         }
-
         receiveActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                 Intent data = result.getData();
@@ -92,7 +91,6 @@ public class RenderDetailsFragment extends Fragment {
                 },
                 R.string.btn_no,
                 (dialog, which) -> {
-
                 },
                 R.drawable.question
         );
@@ -161,18 +159,18 @@ public class RenderDetailsFragment extends Fragment {
         textViewWhatWasRendered.setText(result.queryString);
         EditText textViewWhatWasUsed = view.findViewById(R.id.what_was_rendered_query_value);
         textViewWhatWasUsed.setText(result.queryUsed);
-        TextView textViewCredits = view.findViewById(R.id.what_was_rendered_credits);
-        textViewCredits.setText(String.valueOf(result.credits));
+        // TextView textViewCredits = view.findViewById(R.id.what_was_rendered_credits);
+        // textViewCredits.setText(String.valueOf(result.credits));
         TextView textViewDate = view.findViewById(R.id.what_was_rendered_date);
         textViewDate.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT,
                 DateFormat.SHORT).format(new Date(result.createdTime)));
-        Spinner spinnerRenderedBy = view.findViewById(R.id.what_was_rendered_engine_spinner);
-        ArrayAdapter<String> renderedByAdapter = new ArrayAdapter<>(containerContext,
-                android.R.layout.simple_spinner_item, RenderModel.getAvailableModels());
-        renderedByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerRenderedBy.setAdapter(renderedByAdapter);
-        spinnerRenderedBy.setSelection(result.renderEngine.ordinal());
-        spinnerRenderedBy.setEnabled(false);
+//        Spinner spinnerRenderedBy = view.findViewById(R.id.what_was_rendered_engine_spinner);
+//        ArrayAdapter<String> renderedByAdapter = new ArrayAdapter<>(containerContext,
+//                android.R.layout.simple_spinner_item, RenderModel.getAvailableModels());
+//        renderedByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinnerRenderedBy.setAdapter(renderedByAdapter);
+//        spinnerRenderedBy.setSelection(result.renderEngine.ordinal());
+//        spinnerRenderedBy.setEnabled(false);
     }
 
 

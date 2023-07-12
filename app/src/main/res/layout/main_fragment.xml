@@ -37,7 +37,7 @@
                         android:autofillHints=""
                         android:ems="10"
                         android:gravity="start|top"
-                        android:hint="@string/lorem_ipsum"
+                        android:hint="@string/what_to_enter_hint"
                         android:imeOptions="actionGo"
                         android:inputType="textMultiLine"
                         android:maxLines="8"
