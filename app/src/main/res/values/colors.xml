@@ -25,5 +25,6 @@
     <color name="bggreen">#FF006400</color>
     <color name="bgyellow">#FFFFD700</color>
     <color name="bgred">#FF8B0000</color>
+    <color name="colorBtnIcon">"#FFFFFFFF"</color>
 
 </resources>

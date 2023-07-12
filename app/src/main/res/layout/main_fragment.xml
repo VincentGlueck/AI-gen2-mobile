@@ -1,348 +1,352 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activity.MainFragment">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/rel_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/rel_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/id_rel_frag1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="2dp">
+
+                <FrameLayout
+                    android:id="@+id/main_frameLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="0dp">
+
+                    <EditText
+                        android:id="@+id/editTextTextMultiLine"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:autofillHints=""
+                        android:ems="10"
+                        android:gravity="start|top"
+                        android:hint="@string/lorem_ipsum"
+                        android:imeOptions="actionGo"
+                        android:inputType="textMultiLine"
+                        android:maxLines="8"
+                        android:minLines="8" />
+
+                    <ImageView
+                        android:id="@+id/btn_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/delete"
+                        android:contentDescription="@string/lbl_clear_text" />
+
+                </FrameLayout>
+
+                <CheckBox
+                    android:id="@+id/check_translate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/main_frameLayout"
+                    android:text="@string/simple_translation_checkbox"
+                    tools:ignore="HardcodedText">
+
+                </CheckBox>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rel_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/lbl_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/lbl_layout"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/spin_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_toStartOf="@id/chk_no_layout"
+                    android:layout_toEndOf="@id/lbl_layout" />
+
+                <CheckBox
+                    android:id="@+id/chk_no_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_alignBaseline="@id/spin_layout"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/lbl_no_layout"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rel_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/lbl_artist_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/lbl_artist_type"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/spin_artist_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_toEndOf="@id/lbl_artist_type" />
+
+                <CheckBox
+                    android:id="@+id/chk_random_artist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@id/spin_artist_type"
+                    android:text="@string/chk_random_artist_type"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/lbl_resulting_artists"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/lbl_artist_type"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:padding="4dp"
+                    android:textColor="@color/lightGrayTransparent" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rel_artist_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/lbl_num_artists"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/lbl_num_artists"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/spin_num_artists"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_toEndOf="@id/lbl_num_artists" />
+
+                <CheckBox
+                    android:id="@+id/chk_no_artists"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/spin_num_artists"
+                    android:text="@string/lbl_no_artists"
+                    android:textSize="16sp" />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rel_camera"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/lbl_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/lbl_camera"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/spin_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_toEndOf="@id/lbl_camera" />
+
+                <CheckBox
+                    android:id="@+id/chk_random_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/spin_camera"
+                    android:text="@string/chk_random_camera"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rel_resolution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/lbl_resolution"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/lbl_resolution"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/spin_resolution"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_toEndOf="@id/lbl_resolution" />
+
+                <CheckBox
+                    android:id="@+id/chk_random_resolution"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/spin_resolution"
+                    android:text="@string/chk_random_resolution"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+
+            <View style="@style/Divider" />
+
+            <LinearLayout
+                android:id="@+id/rel_random_words"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/lbl_random_words"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/lbl_random_words"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_random_words"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal|end"
+                    android:stepSize="5"
+                    android:value="30"
+                    android:valueFrom="0"
+                    android:valueTo="100"
+                    app:labelBehavior="gone" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rel_word_count"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/lbl_word_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@string/lbl_sentences_count"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_sentences_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal|end"
+                    android:stepSize="1"
+                    android:valueFrom="0"
+                    android:valueTo="25" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <RelativeLayout
-        android:id="@+id/id_rel_frag1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="2dp">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:padding="4dp">
 
         <Button
             android:id="@+id/btn_next"
-            android:layout_width="match_parent"
-
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:drawableStart="@drawable/gallery"
             android:text="@string/next" />
 
-        <FrameLayout
-            android:id="@+id/main_frameLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btn_next"
-            android:layout_marginTop="8dp"
-            android:padding="4dp">
-
-            <EditText
-                android:id="@+id/editTextTextMultiLine"
-                android:layout_marginTop="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:gravity="start|top"
-                android:inputType="textMultiLine"
-                android:minLines="8"
-                android:maxLines="8"
-                android:hint="@string/lorem_ipsum"
-                android:autofillHints=""
-                android:imeOptions="actionGo" />
-
-            <ImageView
-                android:id="@+id/btn_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:layout_gravity="end|bottom"
-                android:background="@drawable/delete"
-                android:contentDescription="@string/lbl_clear_text" />
-
-        </FrameLayout>
-
-        <CheckBox
-            android:id="@+id/check_translate"
+        <Button
+            android:id="@+id/btn_render_results"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/simple_translation_checkbox"
-            android:layout_below="@id/main_frameLayout"
-            tools:ignore="HardcodedText">
+            android:layout_toEndOf="@id/btn_next"
+            android:text="@string/lbl_render_results" />
 
-        </CheckBox>
-
+        <Button
+            android:id="@+id/btn_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/btn_render_results"
+            android:paddingStart="8dp"
+            android:paddingEnd="0dp"
+            android:text="@string/lbl_gallery_title" />
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/rel_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="4dp">
-
-        <TextView
-            android:id="@+id/lbl_layout"
-            android:text="@string/lbl_layout"
-            android:textSize="16sp"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"/>
-
-        <Spinner
-            android:id="@+id/spin_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_toEndOf="@id/lbl_layout"
-            android:layout_toStartOf="@id/chk_no_layout"/>
-
-        <CheckBox
-            android:id="@+id/chk_no_layout"
-            android:textSize="16sp"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:layout_marginStart="8dp"
-            android:layout_alignBaseline="@id/spin_layout"
-            android:text="@string/lbl_no_layout"
-            android:layout_alignParentEnd="true" />
-
-        </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rel_artist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="4dp">
-
-        <TextView
-            android:id="@+id/lbl_artist_type"
-            android:text="@string/lbl_artist_type"
-            android:textSize="16sp"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"/>
-
-        <Spinner
-            android:id="@+id/spin_artist_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_toEndOf="@id/lbl_artist_type"
-            />
-
-        <CheckBox
-            android:id="@+id/chk_random_artist"
-            android:textSize="16sp"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:layout_marginStart="8dp"
-            android:text="@string/chk_random_artist_type"
-            android:layout_toEndOf="@id/spin_artist_type"
-            android:layout_alignParentEnd="true" />
-
-        <TextView
-            android:id="@+id/lbl_resulting_artists"
-            android:padding="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/lightGrayTransparent"
-            android:layout_below="@id/lbl_artist_type"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true" />
-
-    </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rel_artist_count"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="4dp">
-
-            <TextView
-                android:id="@+id/lbl_num_artists"
-                android:text="@string/lbl_num_artists"
-                android:textSize="16sp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"/>
-
-            <Spinner
-                android:id="@+id/spin_num_artists"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_toEndOf="@id/lbl_num_artists"/>
-
-            <CheckBox
-                android:id="@+id/chk_no_artists"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:layout_toEndOf="@+id/spin_num_artists"
-                android:text="@string/lbl_no_artists"
-                android:layout_alignParentEnd="true" />
-
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rel_camera"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="4dp">
-
-            <TextView
-                android:id="@+id/lbl_camera"
-                android:text="@string/lbl_camera"
-                android:textSize="16sp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"/>
-
-            <Spinner
-                android:id="@+id/spin_camera"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_toEndOf="@id/lbl_camera"/>
-
-            <CheckBox
-                android:id="@+id/chk_random_camera"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:layout_toEndOf="@+id/spin_camera"
-                android:text="@string/chk_random_camera"
-                android:layout_alignParentEnd="true" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rel_resolution"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="4dp">
-
-            <TextView
-                android:id="@+id/lbl_resolution"
-                android:text="@string/lbl_resolution"
-                android:textSize="16sp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"/>
-
-            <Spinner
-                android:id="@+id/spin_resolution"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_toEndOf="@id/lbl_resolution"/>
-
-            <CheckBox
-                android:id="@+id/chk_random_resolution"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:layout_toEndOf="@+id/spin_resolution"
-                android:text="@string/chk_random_resolution"
-                android:layout_alignParentEnd="true" />
-
-        </RelativeLayout>
-
-        <View style="@style/Divider"/>
-
-        <LinearLayout
-            android:id="@+id/rel_random_words"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="4dp">
-
-            <TextView
-                android:id="@+id/lbl_random_words"
-                android:text="@string/lbl_random_words"
-                android:textSize="16sp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_random_words"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                app:labelBehavior="gone"
-                android:valueFrom="0"
-                android:valueTo="100"
-                android:gravity="center_horizontal|end"
-                android:stepSize="5"
-                android:value="30" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/rel_word_count"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="4dp">
-
-            <TextView
-                android:id="@+id/lbl_word_count"
-                android:text="@string/lbl_sentences_count"
-                android:textSize="16sp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_sentences_count"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:valueFrom="0"
-                android:valueTo="25"
-                android:gravity="center_horizontal|end"
-                android:stepSize="1"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_render_results"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lbl_render_results" />
-
-            <Space
-                android:layout_width="8dp"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/btn_gallery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lbl_gallery_title" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>
