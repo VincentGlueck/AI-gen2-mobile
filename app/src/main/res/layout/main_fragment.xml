@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="0.93">
 
         <LinearLayout
             android:id="@+id/rel_main"
@@ -89,6 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
+                    style="@style/spinner_style"
                     android:layout_toStartOf="@id/chk_no_layout"
                     android:layout_toEndOf="@id/lbl_layout" />
 
@@ -125,6 +126,7 @@
                     android:id="@+id/spin_artist_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/spinner_style"
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@id/lbl_artist_type" />
 
@@ -171,6 +173,7 @@
                     android:id="@+id/spin_num_artists"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/spinner_style"
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@id/lbl_num_artists" />
 
@@ -208,6 +211,7 @@
                     android:id="@+id/spin_camera"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/spinner_style"
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@id/lbl_camera" />
 
@@ -244,6 +248,7 @@
                     android:id="@+id/spin_resolution"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/spinner_style"
                     android:layout_marginStart="16dp"
                     android:layout_toEndOf="@id/lbl_resolution" />
 
@@ -323,7 +328,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.07"
         android:layout_marginBottom="4dp"
         android:layout_margin="4dp">
 

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/MainFragment"
-        android:name="org.ww.ai.activity.MainFragment"
+        android:name="org.ww.ai.fragment.MainFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/main_fragment">
 
@@ -23,7 +23,7 @@
     </fragment>
     <fragment
         android:id="@+id/ShowSentencesFragment"
-        android:name="org.ww.ai.activity.ShowSentencesFragment"
+        android:name="org.ww.ai.fragment.ShowSentencesFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/show_sentences_fragment">
 
@@ -33,7 +33,7 @@
     </fragment>
     <fragment
         android:id="@+id/RenderResultsFragment"
-        android:name="org.ww.ai.activity.RenderResultsFragment"
+        android:name="org.ww.ai.fragment.RenderResultsFragment"
         android:label="@string/render_results_title"
         tools:layout="@layout/show_sentences_fragment">
         <action
@@ -45,7 +45,7 @@
     </fragment>
     <fragment
         android:id="@+id/RenderDetailsFragment"
-        android:name="org.ww.ai.activity.RenderDetailsFragment"
+        android:name="org.ww.ai.fragment.RenderDetailsFragment"
         android:label="@string/render_details_title"
         tools:layout="@layout/render_details_fragment">
         <action
@@ -54,7 +54,7 @@
     </fragment>
     <fragment
         android:id="@+id/ResultsGalleryFragment"
-        android:name="org.ww.ai.activity.ResultsGalleryFragment"
+        android:name="org.ww.ai.fragment.ResultsGalleryFragment"
         android:label="@string/lbl_gallery_title"
         tools:layout="@layout/results_gallery_fragment">
         <action
@@ -66,7 +66,7 @@
     </fragment>
     <fragment
         android:id="@+id/GalleryFullSizeFragment"
-        android:name="org.ww.ai.activity.GalleryFullSizeFragment"
+        android:name="org.ww.ai.fragment.GalleryFullSizeFragment"
         android:label="@string/lbl_gallery_title"
         tools:layout="@layout/results_gallery_fragment">
         <action

@@ -1,4 +1,4 @@
-package org.ww.ai.activity;
+package org.ww.ai.fragment;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import org.ww.ai.R;
+import org.ww.ai.activity.MainActivity;
 import org.ww.ai.data.RenderResult;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;

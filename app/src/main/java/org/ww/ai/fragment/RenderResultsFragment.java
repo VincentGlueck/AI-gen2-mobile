@@ -1,6 +1,6 @@
-package org.ww.ai.activity;
+package org.ww.ai.fragment;
 
-import static org.ww.ai.activity.RenderDetailsFragment.ARG_UID;
+import static org.ww.ai.fragment.RenderDetailsFragment.ARG_UID;
 
 import android.content.Context;
 import android.graphics.Color;

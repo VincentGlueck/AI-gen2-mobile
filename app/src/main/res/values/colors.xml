@@ -26,5 +26,7 @@
     <color name="bgyellow">#FFFFD700</color>
     <color name="bgred">#FF8B0000</color>
     <color name="colorBtnIcon">#FFFFFFFF</color>
+    <color name="lightPurple">#E0674FA3</color>
+    <color name="purple">#674FA3</color>
 
 </resources>

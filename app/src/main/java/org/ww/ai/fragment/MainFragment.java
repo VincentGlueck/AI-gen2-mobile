@@ -1,4 +1,4 @@
-package org.ww.ai.activity;
+package org.ww.ai.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
