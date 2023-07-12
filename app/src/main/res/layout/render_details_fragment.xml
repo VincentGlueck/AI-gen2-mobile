@@ -1,188 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="4dp"
-    tools:context=".activity.RenderDetailsFragment">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/history_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="4dp">
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp"
+        android:text="*title*"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText" />
 
-        <RelativeLayout
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="4dp" >
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/history_title"
-                android:paddingBottom="8dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+            <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+                android:id="@+id/history_bitmap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/image_received_description"
+                android:src="@drawable/no_image" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:text="*title*"
-                android:textSize="18sp"
-                tools:ignore="HardcodedText" />
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:text="@string/lbl_what_was_rendered" />
 
 
-            <Button
-                android:id="@+id/btn_replace_render_results"
-                android:layout_width="wrap_content"
+                <EditText
+                    android:id="@+id/what_was_rendered_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.75"
+                    android:autofillHints=""
+                    android:background="@null"
+                    android:enabled="false"
+                    android:maxLines="4"
+                    android:textIsSelectable="true"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/history_title"
-                android:text="@string/btn_render_details_replace_btn" />
+                android:orientation="horizontal"
+                android:padding="4dp">
 
-            <Space
-                android:id="@+id/spacer_render_details"
-                android:layout_width="4dp"
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:text="@string/lbl_what_was_rendered_query" />
+
+
+                <EditText
+                    android:id="@+id/what_was_rendered_query_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.75"
+                    android:background="@null"
+                    android:importantForAutofill="no"
+                    android:maxLines="4"
+                    android:textColor="@color/lightGrayTransparent"
+                    android:textIsSelectable="true"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/btn_replace_render_results"/>
+                android:orientation="horizontal"
+                android:padding="4dp">
 
-            <Button
-                android:id="@+id/btn_share_render_results"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:text="@string/lbl_what_was_rendered_date" />
+
+                <TextView
+                    android:id="@+id/what_was_rendered_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.75" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/history_title"
-                android:layout_alignParentEnd="true"
-                android:layout_toEndOf="@id/spacer_render_details"
-                android:text="@string/btn_share" />
+                android:orientation="horizontal"
+                android:padding="4dp">
 
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:text="@string/lbl_what_was_rendered_engine" />
 
+                <Spinner
+                    android:id="@+id/what_was_rendered_engine_spinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.75" />
 
-        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-            android:id="@+id/history_bitmap"
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:text="@string/lbl_what_was_rendered_credits" />
+
+                <TextView
+                    android:id="@+id/what_was_rendered_credits"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.75"
+                    android:maxLength="3"
+                    android:maxLines="1"
+                    android:text="3"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.07"
+        android:layout_margin="4dp"
+        android:layout_marginBottom="4dp">
+
+        <Button
+            android:id="@+id/btn_replace_render_results"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/no_image"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/image_received_description" />
+            android:text="@string/btn_render_details_replace_btn" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Space
+            android:id="@+id/spacer_render_details"
+            android:layout_width="4dp"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:orientation="horizontal">
+            android:layout_toEndOf="@id/btn_replace_render_results" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:text="@string/lbl_what_was_rendered" />
-
-
-            <EditText
-                android:id="@+id/what_was_rendered_value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.75"
-                android:enabled="false"
-                android:textSize="14sp"
-                android:background="@null"
-                android:textIsSelectable="true"
-                android:maxLines="4"
-                android:autofillHints="" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btn_share_render_results"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:orientation="horizontal">
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/spacer_render_details"
+            android:text="@string/btn_share" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:text="@string/lbl_what_was_rendered_query" />
+    </RelativeLayout>
 
-
-            <EditText
-                android:id="@+id/what_was_rendered_query_value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.75"
-                android:textSize="14sp"
-                android:textIsSelectable="true"
-                android:background="@null"
-                android:textColor="@color/lightGrayTransparent"
-                android:maxLines="4"
-                android:importantForAutofill="no" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:text="@string/lbl_what_was_rendered_date" />
-
-            <TextView
-                android:id="@+id/what_was_rendered_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.75" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:text="@string/lbl_what_was_rendered_engine" />
-
-            <Spinner
-                android:id="@+id/what_was_rendered_engine_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.75" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:text="@string/lbl_what_was_rendered_credits" />
-
-            <TextView
-                android:id="@+id/what_was_rendered_credits"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:maxLength="3"
-                android:text="3"
-                android:layout_weight="0.75"
-                tools:ignore="HardcodedText" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>

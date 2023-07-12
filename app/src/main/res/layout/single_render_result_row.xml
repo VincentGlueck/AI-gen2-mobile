@@ -58,7 +58,6 @@
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
         android:textColor="@color/lightGrayTransparent"
-
         android:text="*date*"
         android:textSize="14sp"
         tools:ignore="HardcodedText" />

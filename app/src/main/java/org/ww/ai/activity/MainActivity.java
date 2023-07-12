@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -27,6 +26,7 @@ import com.google.android.material.snackbar.Snackbar;
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
+import org.ww.ai.fragment.RenderDetailsFragment;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 

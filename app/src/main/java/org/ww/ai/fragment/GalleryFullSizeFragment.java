@@ -1,4 +1,4 @@
-package org.ww.ai.activity;
+package org.ww.ai.fragment;
 
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 

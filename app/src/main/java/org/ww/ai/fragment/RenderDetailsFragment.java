@@ -1,4 +1,4 @@
-package org.ww.ai.activity;
+package org.ww.ai.fragment;
 
 import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
@@ -30,6 +30,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
+import org.ww.ai.activity.ReceiveImageActivity;
 import org.ww.ai.databinding.RenderDetailsFragmentBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
