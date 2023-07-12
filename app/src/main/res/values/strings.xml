@@ -68,7 +68,7 @@
     <string name="lbl_gallery_title">Gallery</string>
     <string name="lbl_gallery_detail_title">Your creation</string>
     <string name="lbl_clear_text">Clear the input to zero chars</string>
-    <string name="simple_translation_checkbox">Translate my input so English</string>
+    <string name="simple_translation_checkbox">Translate my input to English</string>
     <string name="unable_to_download_translation">Language pack download failed.</string>
     <string name="unable_to_translate">"Unable to translate:"</string>
     <string name="btn_share">Share</string>
