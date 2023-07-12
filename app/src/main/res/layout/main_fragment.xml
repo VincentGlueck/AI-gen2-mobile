@@ -20,8 +20,7 @@
             <RelativeLayout
                 android:id="@+id/id_rel_frag1"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="2dp">
+                android:layout_height="match_parent" >
 
                 <FrameLayout
                     android:id="@+id/main_frameLayout"
@@ -72,7 +71,8 @@
                 android:id="@+id/rel_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp">
+                android:layout_margin="2dp"
+                android:padding="2dp">
 
                 <TextView
                     android:id="@+id/lbl_layout"
@@ -108,7 +108,8 @@
                 android:id="@+id/rel_artist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp">
+                android:layout_margin="2dp"
+                android:padding="2dp">
 
                 <TextView
                     android:id="@+id/lbl_artist_type"
@@ -153,7 +154,8 @@
                 android:id="@+id/rel_artist_count"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp">
+                android:layout_margin="2dp"
+                android:padding="2dp">
 
                 <TextView
                     android:id="@+id/lbl_num_artists"
@@ -189,7 +191,8 @@
                 android:id="@+id/rel_camera"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp">
+                android:layout_margin="2dp"
+                android:padding="2dp">
 
                 <TextView
                     android:id="@+id/lbl_camera"
@@ -224,7 +227,8 @@
                 android:id="@+id/rel_resolution"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp">
+                android:layout_margin="2dp"
+                android:padding="2dp">
 
                 <TextView
                     android:id="@+id/lbl_resolution"
@@ -262,7 +266,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:padding="4dp">
+                android:layout_margin="2dp"
+                android:padding="2dp">
 
                 <TextView
                     android:id="@+id/lbl_random_words"
@@ -291,7 +296,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:padding="4dp">
+                android:layout_margin="2dp"
+                android:padding="2dp">
 
                 <TextView
                     android:id="@+id/lbl_word_count"
@@ -319,7 +325,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:padding="4dp">
+        android:layout_margin="4dp">
 
         <Button
             android:id="@+id/btn_next"
@@ -334,6 +340,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/btn_next"
+            android:layout_marginStart="8dp"
             android:text="@string/lbl_render_results" />
 
         <Button
@@ -342,8 +349,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@id/btn_render_results"
-            android:paddingStart="8dp"
-            android:paddingEnd="0dp"
+            android:layout_marginStart="8dp"
             android:text="@string/lbl_gallery_title" />
 
     </RelativeLayout>

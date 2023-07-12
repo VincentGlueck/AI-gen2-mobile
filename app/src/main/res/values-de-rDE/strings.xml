@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">AI-gen2-mobile</string>
     <string name="title_activity_main">AI Gen 2</string>
-    <string name="first_fragment_label">Was soll es werden</string>
+    <string name="first_fragment_label">Beschreib\' dein AI Bild</string>
     <string name="second_fragment_label">Resultate</string>
     <string name="next">Weiter</string>
     <string name="previous">Zurück</string>
