@@ -6,7 +6,7 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="lorem_ipsum">
+    <string name="what_to_enter_hint">
         Describe the image in a natural way like\n\n
         \'A bear passing through a spooky forrest\'\n
         \'Donald trump alike dog sitting at a bar\'\n\n

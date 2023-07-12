@@ -76,18 +76,18 @@ public class ReceiveImageActivity extends AppCompatActivity {
             renderResult.width = bitmap.getWidth();
             renderResult.height = bitmap.getHeight();
         }
-        Spinner engineSpinner = findViewById(R.id.what_was_rendered_engine_spinner);
-        EditText creditsText = findViewById(R.id.what_was_rendered_credits);
+        // Spinner engineSpinner = findViewById(R.id.what_was_rendered_engine_spinner);
+        // EditText creditsText = findViewById(R.id.what_was_rendered_credits);
 
         renderResult.queryString = whatToRender.getDescription();
         renderResult.queryUsed = whatToRender.getQueryUsed();
-        try {
-            renderResult.credits = Integer.parseInt(creditsText.getText().toString());
-        } catch (NumberFormatException e) {
-            renderResult.credits = 0;
-        }
-        String selectedItem = (String) engineSpinner.getSelectedItem();
-        renderResult.renderEngine = RenderModel.fromName(selectedItem);
+//        try {
+//            renderResult.credits = Integer.parseInt(creditsText.getText().toString());
+//        } catch (NumberFormatException e) {
+//            renderResult.credits = 0;
+//        }
+//        String selectedItem = (String) engineSpinner.getSelectedItem();
+//        renderResult.renderEngine = RenderModel.fromName(selectedItem);
         renderResult.createdTime = System.currentTimeMillis();
         storeToDatabase(renderResult);
     }
@@ -135,12 +135,12 @@ public class ReceiveImageActivity extends AppCompatActivity {
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
         TextView whatWasRenderedDate = findViewById(R.id.what_was_rendered_date);
         whatWasRenderedDate.setText(dateFormat.format(new Date(System.currentTimeMillis())));
-        Spinner renderedBySpinner = findViewById(R.id.what_was_rendered_engine_spinner);
-        ArrayAdapter<String> renderedByAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, RenderModel.getAvailableModels());
-        renderedByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        renderedBySpinner.setAdapter(renderedByAdapter);
-        renderedBySpinner.setSelection(RenderModel.SDXL_BETA.ordinal());
+//        Spinner renderedBySpinner = findViewById(R.id.what_was_rendered_engine_spinner);
+//        ArrayAdapter<String> renderedByAdapter = new ArrayAdapter<>(this,
+//                android.R.layout.simple_spinner_item, RenderModel.getAvailableModels());
+//        renderedByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        renderedBySpinner.setAdapter(renderedByAdapter);
+//        renderedBySpinner.setSelection(RenderModel.SDXL_BETA.ordinal());
     }
 
     private Bitmap getBitmapFromUri(Uri uri) {

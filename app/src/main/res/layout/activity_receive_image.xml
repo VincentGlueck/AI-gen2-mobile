@@ -102,50 +102,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:text="@string/lbl_what_was_rendered_engine" />
-
-            <Spinner
-                android:id="@+id/what_was_rendered_engine_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.75" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:text="@string/lbl_what_was_rendered_credits" />
-
-            <EditText
-                android:id="@+id/what_was_rendered_credits"
-                android:inputType="number"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:maxLength="3"
-                android:text="3"
-                android:layout_weight="0.75"
-                tools:ignore="HardcodedText" />
-
-        </LinearLayout>
+        <include layout="@layout/comp_render_models" />
 
         <LinearLayout
             android:layout_width="match_parent"

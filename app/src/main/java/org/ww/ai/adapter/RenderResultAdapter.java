@@ -1,4 +1,4 @@
-package org.ww.ai.ui;
+package org.ww.ai.adapter;
 
 import static org.ww.ai.ui.Animations.ANIMATIONS;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;

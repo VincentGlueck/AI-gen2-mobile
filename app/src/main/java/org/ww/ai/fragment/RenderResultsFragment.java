@@ -29,7 +29,7 @@ import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.ui.RenderResultAdapter;
+import org.ww.ai.adapter.RenderResultAdapter;
 import org.ww.ai.ui.SwipeToDeleteCallback;
 
 import java.util.HashMap;
