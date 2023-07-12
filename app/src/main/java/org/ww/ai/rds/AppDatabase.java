@@ -10,14 +10,8 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.AutoMigrationSpec;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.google.common.reflect.TypeToken;
-
-import org.ww.ai.rds.dao.EngineUsedNonDao;
 import org.ww.ai.rds.dao.RenderResultDao;
 import org.ww.ai.rds.entity.RenderResult;
-
-import java.lang.reflect.Type;
-import java.util.List;
 
 @Database(entities = {RenderResult.class}, exportSchema = true, version = 3,
         autoMigrations = {
