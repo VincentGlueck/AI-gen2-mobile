@@ -1,7 +1,5 @@
 package org.ww.ai.rds.converter;
 
-import android.annotation.SuppressLint;
-
 import androidx.room.TypeConverter;
 
 import com.google.common.reflect.TypeToken;
