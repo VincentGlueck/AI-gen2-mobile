@@ -10,12 +10,19 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.AutoMigrationSpec;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.google.common.reflect.TypeToken;
+
+import org.ww.ai.rds.dao.EngineUsedNonDao;
 import org.ww.ai.rds.dao.RenderResultDao;
 import org.ww.ai.rds.entity.RenderResult;
 
-@Database(entities = {RenderResult.class}, exportSchema = true, version = 2,
+import java.lang.reflect.Type;
+import java.util.List;
+
+@Database(entities = {RenderResult.class}, exportSchema = true, version = 3,
         autoMigrations = {
-                @AutoMigration(from = 1, to = 2, spec = AppDatabase.MigrateRenderResult_1_2.class)
+                @AutoMigration(from = 1, to = 2, spec = AppDatabase.MigrateRenderResult_1_2.class),
+                // @AutoMigration(from = 3, to = 4, spec = AppDatabase.MigrateRenderResult_3_4.class)
         })
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DB_NAME = "ai-gen-2";
@@ -39,8 +46,10 @@ public abstract class AppDatabase extends RoomDatabase {
                     + " ADD COLUMN width INTEGER");
             db.execSQL("ALTER TABLE renderresult "
                     + " ADD COLUMN height INTEGER");
-
         }
+    }
+
+    static class MigrateRenderResult_3_4 implements AutoMigrationSpec {
 
     }
 
