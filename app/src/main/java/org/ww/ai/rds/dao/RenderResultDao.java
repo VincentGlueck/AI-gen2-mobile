@@ -22,7 +22,8 @@ public interface RenderResultDao {
     @Query("SELECT * from " + TABLE)
     ListenableFuture<List<RenderResult>> getAll();
 
-    @Query("SELECT uid, createdTime, thumbnail, render_engine, query_string, query_used, width, height from " + TABLE + " ORDER BY createdTime DESC")
+    @Query("SELECT uid, createdTime, thumbnail, render_engine, query_string, query_used, width," +
+            " height, engines_used from " + TABLE + " ORDER BY createdTime DESC")
     ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights();
 
     @Query("SELECT * from " + TABLE + " WHERE uid = :id")

@@ -18,9 +18,11 @@
     <ImageView
         android:id="@+id/imageview_btn_plus"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:layout_height="28dp"
+        android:padding="0dp"
         android:src="@drawable/plus_btn"
+        android:scaleX="0.6"
+        android:scaleY="0.6"
         tools:ignore="ContentDescription" />
 
         <Spinner
@@ -39,7 +41,7 @@
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
             android:paddingEnd="0dp"
-            android:letterSpacing="0.3"
+            android:letterSpacing="0.15"
             android:text="3"
             android:inputType="number"
             android:maxLength="3"

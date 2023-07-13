@@ -6,11 +6,15 @@ import androidx.annotation.Dimension;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 import org.checkerframework.checker.units.qual.C;
+import org.ww.ai.rds.converter.EngineUsedNonDaoConverter;
+import org.ww.ai.rds.dao.EngineUsedNonDao;
 import org.ww.ai.rds.ifenum.RenderModel;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class RenderResultLightWeight implements Serializable {
 
@@ -40,6 +44,11 @@ public class RenderResultLightWeight implements Serializable {
 
     @ColumnInfo(name = "height", defaultValue = "0")
     public int height;
+
+    @TypeConverters(EngineUsedNonDaoConverter.class)
+    @ColumnInfo(name = "engines_used")
+    public List<EngineUsedNonDao> enginesUsed;
+
     @Ignore
     public boolean flagHighLight;
 

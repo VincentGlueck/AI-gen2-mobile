@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.ww.ai.ui.inclues.ShowRenderModelsLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/render_models_root"
+    tools:horizontal_spacing="2dp"
+    tools:vertical_spacing="2dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.google.android.flexbox.FlexboxLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/flex_box_show_layout_tags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        app:flexWrap="wrap"
+        app:flexDirection="row"
+        app:alignItems="flex_start">
+    </com.google.android.flexbox.FlexboxLayout>
+
+
+</org.ww.ai.ui.inclues.ShowRenderModelsLinearLayout>
