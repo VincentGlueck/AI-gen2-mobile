@@ -80,18 +80,11 @@ public class ReceiveImageActivity extends AppCompatActivity {
             renderResult.width = bitmap.getWidth();
             renderResult.height = bitmap.getHeight();
         }
-        // Spinner engineSpinner = findViewById(R.id.what_was_rendered_engine_spinner);
-        // EditText creditsText = findViewById(R.id.what_was_rendered_credits);
-
         renderResult.queryString = whatToRender.getDescription();
         renderResult.queryUsed = whatToRender.getQueryUsed();
-//        try {
-//            renderResult.credits = Integer.parseInt(creditsText.getText().toString());
-//        } catch (NumberFormatException e) {
-//            renderResult.credits = 0;
-//        }
-//        String selectedItem = (String) engineSpinner.getSelectedItem();
-//        renderResult.renderEngine = RenderModel.fromName(selectedItem);
+
+        renderResult.enginesUsed = renderModels.getEngineList();
+
         renderResult.createdTime = System.currentTimeMillis();
         storeToDatabase(renderResult);
     }
@@ -140,7 +133,8 @@ public class ReceiveImageActivity extends AppCompatActivity {
         TextView whatWasRenderedDate = findViewById(R.id.what_was_rendered_date);
         whatWasRenderedDate.setText(dateFormat.format(new Date(System.currentTimeMillis())));
         View view = findViewById(R.id.render_models_root);
-        ((RenderModelsUI) view).init(this, view);
+        renderModels = (RenderModelsUI) view;
+        renderModels.init(this, view);
     }
 
     private Bitmap getBitmapFromUri(Uri uri) {

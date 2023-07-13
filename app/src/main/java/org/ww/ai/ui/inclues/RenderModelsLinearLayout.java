@@ -3,6 +3,7 @@ package org.ww.ai.ui.inclues;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,9 @@ public class RenderModelsLinearLayout extends LinearLayout implements RenderMode
 
     public RenderModelsLinearLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        if(attrs == null) {
+            return;
+        }
     }
 
     public RenderModelsLinearLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -46,8 +50,8 @@ public class RenderModelsLinearLayout extends LinearLayout implements RenderMode
 
     @Override
     public void init(Context context, View view) {
-        Spinner spinner = view.findViewById(R.id.spinner_render_model);
         rootLayout = view.findViewById(R.id.flex_bos_layout_tags);
+        Spinner spinner = view.findViewById(R.id.spinner_render_model);
         ArrayAdapter<String> renderedByAdapter = new ArrayAdapter<>(context,
                 android.R.layout.simple_spinner_item, RenderModel.getAvailableModels());
         renderedByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
