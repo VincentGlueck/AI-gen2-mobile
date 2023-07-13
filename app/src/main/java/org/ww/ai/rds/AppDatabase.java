@@ -1,6 +1,7 @@
 package org.ww.ai.rds;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import androidx.annotation.NonNull;
 import androidx.room.AutoMigration;
@@ -10,13 +11,22 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.AutoMigrationSpec;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
+import org.ww.ai.rds.converter.EngineUsedNonDaoConverter;
+import org.ww.ai.rds.dao.EngineUsedNonDao;
 import org.ww.ai.rds.dao.RenderResultDao;
 import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.rds.ifenum.RenderModel;
 
-@Database(entities = {RenderResult.class}, exportSchema = true, version = 3,
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Database(entities = {RenderResult.class}, exportSchema = true, version = 4,
         autoMigrations = {
                 @AutoMigration(from = 1, to = 2, spec = AppDatabase.MigrateRenderResult_1_2.class),
-                // @AutoMigration(from = 3, to = 4, spec = AppDatabase.MigrateRenderResult_3_4.class)
+                @AutoMigration(from = 3, to = 4, spec = AppDatabase.MigrateRenderResult_3_4.class)
         })
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DB_NAME = "ai-gen-2";
@@ -36,15 +46,42 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
             AutoMigrationSpec.super.onPostMigrate(db);
+            db.beginTransaction();
             db.execSQL("ALTER TABLE renderresult "
                     + " ADD COLUMN width INTEGER");
             db.execSQL("ALTER TABLE renderresult "
                     + " ADD COLUMN height INTEGER");
+            db.endTransaction();
         }
     }
 
     static class MigrateRenderResult_3_4 implements AutoMigrationSpec {
-
+        @Override
+        public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
+            AutoMigrationSpec.super.onPostMigrate(db);
+            Map<Integer, String> updateMap = new HashMap<>();
+            EngineUsedNonDaoConverter converter = new EngineUsedNonDaoConverter();
+            db.beginTransaction();
+            Cursor cursor = db.query("SELECT uid, render_engine, credits FROM renderresult");
+            cursor.moveToFirst();
+            while(!cursor.isAfterLast()) {
+                int uid = cursor.getInt(0);
+                String renderEngine = cursor.getString(1);
+                int renderCosts = cursor.getInt(2);
+                EngineUsedNonDao engineUsedNonDao = new EngineUsedNonDao();
+                engineUsedNonDao.renderModel = RenderModel.valueOf(renderEngine);
+                engineUsedNonDao.credits = renderCosts;
+                List<EngineUsedNonDao> list = List.of(engineUsedNonDao);
+                String json = converter.fromEngineUsedNonDaoList(list);
+                updateMap.put(uid, json);
+            }
+            for(Integer idx : updateMap.keySet()) {
+                String sqlString = "UPDATE renderresult SET engines_used = '" +
+                        updateMap.get(idx) + "' WHERE uid = " + idx;
+                db.execSQL(sqlString);
+            };
+            db.endTransaction();
+        }
     }
 
 }

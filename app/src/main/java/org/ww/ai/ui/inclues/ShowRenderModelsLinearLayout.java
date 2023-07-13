@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -65,6 +66,8 @@ public class ShowRenderModelsLinearLayout extends LinearLayout implements Render
                 .inflate(R.layout.render_model_text_view, rootLayout, false);
         TextView textView = dynamicEntry.findViewById(R.id.render_model);
         textView.setText(entry.renderModel.getName() + " (" + entry.credits + ")");
+        ImageView imageView = dynamicEntry.findViewById(R.id.btn_delete);
+        imageView.setVisibility(GONE);
         rootLayout.addView(dynamicEntry);
     }
 
