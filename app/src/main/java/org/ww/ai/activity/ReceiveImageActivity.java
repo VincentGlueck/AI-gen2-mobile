@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,6 +33,7 @@ import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.rds.ifenum.RenderModel;
 import org.ww.ai.ui.DialogUtil;
 import org.ww.ai.ui.ImageUtil;
+import org.ww.ai.ui.inclues.RenderModelsUI;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +46,8 @@ public class ReceiveImageActivity extends AppCompatActivity {
     private Bitmap bitmap;
 
     private WhatToRenderIF whatToRender;
+
+    private RenderModelsUI renderModels;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,12 +139,8 @@ public class ReceiveImageActivity extends AppCompatActivity {
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
         TextView whatWasRenderedDate = findViewById(R.id.what_was_rendered_date);
         whatWasRenderedDate.setText(dateFormat.format(new Date(System.currentTimeMillis())));
-//        Spinner renderedBySpinner = findViewById(R.id.what_was_rendered_engine_spinner);
-//        ArrayAdapter<String> renderedByAdapter = new ArrayAdapter<>(this,
-//                android.R.layout.simple_spinner_item, RenderModel.getAvailableModels());
-//        renderedByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        renderedBySpinner.setAdapter(renderedByAdapter);
-//        renderedBySpinner.setSelection(RenderModel.SDXL_BETA.ordinal());
+        View view = findViewById(R.id.render_models_root);
+        ((RenderModelsUI) view).init(this, view);
     }
 
     private Bitmap getBitmapFromUri(Uri uri) {
