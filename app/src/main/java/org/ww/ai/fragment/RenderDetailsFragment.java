@@ -13,10 +13,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +33,6 @@ import org.ww.ai.databinding.RenderDetailsFragmentBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
-import org.ww.ai.rds.ifenum.RenderModel;
 import org.ww.ai.tools.ShareImageUtil;
 import org.ww.ai.ui.DialogUtil;
 import org.ww.ai.ui.ImageUtil;
@@ -95,7 +92,6 @@ public class RenderDetailsFragment extends Fragment {
                 R.drawable.question
         );
     }
-
 
     private byte[] getImageFromGallery(Uri imageUri) {
         if (imageUri != null && getActivity() != null && getActivity().getContentResolver() != null) {

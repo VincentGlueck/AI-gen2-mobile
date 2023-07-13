@@ -1,28 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<org.ww.ai.ui.inclues.RenderModelsLinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/single_gallery_row"
+    android:id="@+id/render_models_root"
+    tools:horizontal_spacing="2dp"
+    tools:vertical_spacing="2dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="4dp"
-    android:paddingEnd="4dp"
-    android:orientation="horizontal">
-
-    <ImageView
-        android:id="@+id/imageview_btn_plus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:src="@drawable/plus_btn" />
-
-    <LinearLayout
-        android:id="@+id/linear_layout_tags"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="0dp">
-    </LinearLayout>
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/linear_layout_add"
@@ -30,22 +15,36 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+    <ImageView
+        android:id="@+id/imageview_btn_plus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:src="@drawable/plus_btn"
+        tools:ignore="ContentDescription" />
+
         <Spinner
             android:id="@+id/spinner_render_model"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="4dp"
+            android:paddingTop="2dp"
             android:paddingBottom="0dp"/>
         <EditText
-            android:id="@+id/costs_render_model"
-            android:layout_width="24dp"
+            android:id="@+id/render_costs"
+            android:layout_width="32dp"
             android:layout_height="wrap_content"
-            style="@drawable/black_border"
-            android:background="#00000000"
+            android:background="@drawable/small_edit_rounded"
             android:textSize="14sp"
             android:paddingStart="2dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
             android:paddingEnd="0dp"
-            android:maxLines="1" />
+            android:letterSpacing="0.3"
+            android:text="3"
+            android:inputType="number"
+            android:maxLength="3"
+            android:maxLines="1"
+            tools:ignore="Autofill,HardcodedText" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,4 +56,14 @@
 
     </LinearLayout>
 
-</LinearLayout>
+    <com.google.android.flexbox.FlexboxLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/flex_bos_layout_tags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:flexWrap="wrap"
+        app:flexDirection="row"
+        app:alignItems="flex_start">
+    </com.google.android.flexbox.FlexboxLayout>
+
+</org.ww.ai.ui.inclues.RenderModelsLinearLayout>
