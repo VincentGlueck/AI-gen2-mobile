@@ -74,7 +74,9 @@
         android:maxLines="3"
         tools:ignore="HardcodedText" />
 
-        <include layout="@layout/show_render_models" />
+        <include
+            android:id="@+id/single_render_result_row_include"
+            layout="@layout/render_model_include" />
 
     </LinearLayout>
 

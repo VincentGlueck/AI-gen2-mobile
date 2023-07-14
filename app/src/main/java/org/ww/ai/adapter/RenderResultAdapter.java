@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -90,7 +91,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         RenderResultLightWeight item = localDataSet.get(position);
         viewHolder.getQueryStringTextView().setText(item.queryString);
         Bitmap bitmap = IMAGE_UTIL.getScaledBitmap(
-                IMAGE_UTIL.convertBlobToImage(item.thumbNail), 192);
+                IMAGE_UTIL.convertBlobToImage(item.thumbNail), 224);
         viewHolder.getThumb().setImageBitmap(bitmap);
         viewHolder.getTextViewSizeLabel().setText(item.width + "x" + item.height);
         List<EngineUsedNonDao> enginesUsed = item.enginesUsed;
@@ -106,10 +107,11 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         viewHolder.getTextViewDate().setText(spanString);
         viewHolder.getQueryUsedTextView().setText(item.queryUsed);
         if (item.flagHighLight) {
-            AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(ANIMATIONS.getAlphaAnimation(0.2F, 1.0F, 2000L, true));
-            animationSet.addAnimation(ANIMATIONS.getScaleAnimation(0.2F, 1.0F, 1000L, true));
-            viewHolder.getThumb().setAnimation(animationSet);
+            final AnimationSet animationSet = new AnimationSet(true);
+            animationSet.addAnimation(ANIMATIONS.getAlphaAnimation(0.2F, 1.0F, 1000L, true));
+            animationSet.addAnimation(ANIMATIONS.getScaleAnimation(0.2F, 1.2F, 700L, true));
+            viewHolder.getRootView().setAnimation(animationSet);
+            animationSet.start();
             item.flagHighLight = false;
         }
         viewHolder.bind(item, listener);
