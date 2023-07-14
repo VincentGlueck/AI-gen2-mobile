@@ -76,7 +76,7 @@
 
                 <TextView
                     android:id="@+id/lbl_layout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="120dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:ellipsize="end"
@@ -114,7 +114,7 @@
 
                 <TextView
                     android:id="@+id/lbl_artist_type"
-                    android:layout_width="wrap_content"
+                    android:layout_width="120dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:ellipsize="end"
@@ -140,17 +140,14 @@
                     android:text="@string/chk_random_artist_type"
                     android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/lbl_resulting_artists"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/lbl_artist_type"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentEnd="true"
-                    android:padding="4dp"
-                    android:textColor="@color/lightGrayTransparent" />
-
             </RelativeLayout>
+
+            <TextView
+                android:id="@+id/lbl_resulting_artists"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:textColor="@color/lightGrayTransparent" />
 
             <RelativeLayout
                 android:id="@+id/rel_artist_count"
@@ -161,7 +158,7 @@
 
                 <TextView
                     android:id="@+id/lbl_num_artists"
-                    android:layout_width="wrap_content"
+                    android:layout_width="120dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:ellipsize="end"
@@ -199,7 +196,7 @@
 
                 <TextView
                     android:id="@+id/lbl_camera"
-                    android:layout_width="wrap_content"
+                    android:layout_width="120dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:ellipsize="end"
@@ -236,7 +233,7 @@
 
                 <TextView
                     android:id="@+id/lbl_resolution"
-                    android:layout_width="wrap_content"
+                    android:layout_width="120dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:ellipsize="end"
@@ -256,7 +253,7 @@
                     android:id="@+id/chk_random_resolution"
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
+                    android:layout_toLeftOf="@id/spin_resolution"
                     android:layout_marginStart="8dp"
                     android:layout_toEndOf="@+id/spin_resolution"
                     android:text="@string/chk_random_resolution"
