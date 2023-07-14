@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -95,11 +96,13 @@ public class ResultsGalleryFragment extends Fragment {
         }
     }
 
-    private ImageView createImageView(byte[] thumbNail, LinearLayout rowLayout) {
-        ImageView imageView = new ImageView(containerContext);
+    private ShapeableImageView createImageView(byte[] thumbNail, LinearLayout rowLayout) {
+        ShapeableImageView imageView = (ShapeableImageView) LayoutInflater
+                .from(getActivity()).inflate(R.layout.single_gallery_image, rowLayout, false);
         Bitmap bitmap = IMAGE_UTIL.cropToSquare(IMAGE_UTIL.convertBlobToImage(thumbNail), THUMB_NAIL_SIZE);
         imageView.setImageBitmap(bitmap);
-        imageView.setPadding(4, 4,4, 4);
+        imageView.setPadding(4, 4, 4, 4);
+//        imageView.setClipToOutline(true);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         if(screen != null) {
@@ -132,7 +135,7 @@ public class ResultsGalleryFragment extends Fragment {
     }
 
     private LinearLayout createRow(ViewGroup parent) {
-        return (LinearLayout) LayoutInflater.from(parent.getContext())
+        return (LinearLayout) LayoutInflater.from(getActivity())
                 .inflate(R.layout.single_gallery_row, parent, false);
     }
 

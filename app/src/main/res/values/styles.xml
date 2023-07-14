@@ -18,5 +18,10 @@
         <item name="android:popupBackground">#DFFFFFFF</item>
     </style>
 
+    <style name="gallery_rounded_style">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
 </resources>
 
