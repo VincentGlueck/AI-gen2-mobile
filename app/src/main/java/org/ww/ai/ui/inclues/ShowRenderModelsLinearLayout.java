@@ -3,12 +3,15 @@ package org.ww.ai.ui.inclues;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.flexbox.FlexboxLayout;
@@ -38,15 +41,31 @@ public class ShowRenderModelsLinearLayout extends LinearLayout implements Render
     }
 
     @Override
-    public void init(Context context, View view) {
-        // TODO: this should work somehow different, this impl is too unstable
-        if(LinearLayout.class.isAssignableFrom(view.getClass())) {
-            LinearLayout linearLayout = (LinearLayout) view;
-            LinearLayout child = (LinearLayout) linearLayout.getChildAt(linearLayout.getChildCount() - 1);
-            LinearLayout other = (LinearLayout) child.getChildAt(child.getChildCount() - 1);
-            rootLayout = (FlexboxLayout) other.getChildAt(0);
+    public void init(Context context, @NonNull View view) {
+        if(!ViewGroup.class.isAssignableFrom(view.getClass())) {
+            showIllegalUse();
         }
+        rootLayout = findFlexBoxLayout((ViewGroup) view);
+        if (rootLayout == null) {
+            showIllegalUse();
+        }
+    }
 
+    private FlexboxLayout findFlexBoxLayout(ViewGroup root) {
+        FlexboxLayout result = null;
+        for (int n = 0; n < ((ViewGroup) root).getChildCount(); n++) {
+            View child = ((ViewGroup) root).getChildAt(n);
+            if (FlexboxLayout.class.isAssignableFrom(child.getClass())) {
+                result = (FlexboxLayout) child;
+                break;
+            } else if (ViewGroup.class.isAssignableFrom(child.getClass())) {
+                result = findFlexBoxLayout((ViewGroup) child);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -72,6 +91,7 @@ public class ShowRenderModelsLinearLayout extends LinearLayout implements Render
     }
 
     private void showIllegalUse() {
-        throw new IllegalArgumentException("wrong layout used LinearLayout[1].LinearLayout[1][0] must contain FlexboxLayout");
+        throw new IllegalArgumentException("root layout must a) be a ViewGroup, " +
+                "b) contain FlexboxLayout somewhere in it's children!");
     }
 }

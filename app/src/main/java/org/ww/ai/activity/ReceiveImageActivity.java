@@ -1,5 +1,8 @@
 package org.ww.ai.activity;
 
+import static org.ww.ai.enumif.EventTypes.MODEL_ADDED;
+import static org.ww.ai.enumif.EventTypes.MODEL_REMOVED;
+import static org.ww.ai.event.EventBroker.EVENT_BROKER;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.app.Activity;
@@ -11,10 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,12 +25,12 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
+import org.ww.ai.enumif.ReceiveEventIF;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.rds.ifenum.RenderModel;
 import org.ww.ai.ui.DialogUtil;
 import org.ww.ai.ui.ImageUtil;
 import org.ww.ai.ui.inclues.RenderModelsUI;
@@ -40,7 +40,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class ReceiveImageActivity extends AppCompatActivity {
+public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEventIF {
 
     public static final int MAX_IMAGE_SIZE = 2048;
     private Bitmap bitmap;
@@ -48,6 +48,8 @@ public class ReceiveImageActivity extends AppCompatActivity {
     private WhatToRenderIF whatToRender;
 
     private RenderModelsUI renderModels;
+
+    private Button btnSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +69,10 @@ public class ReceiveImageActivity extends AppCompatActivity {
             setResult(Activity.RESULT_CANCELED);
             finish();
         });
-        Button btnSave = findViewById(R.id.btn_result_save);
+        btnSave = findViewById(R.id.btn_result_save);
         btnSave.setOnClickListener(click -> saveResult());
+        btnSave.setEnabled(false);
+        EVENT_BROKER.registerReceiver(this, MODEL_ADDED, MODEL_REMOVED);
     }
 
     private void saveResult() {
@@ -148,4 +152,8 @@ public class ReceiveImageActivity extends AppCompatActivity {
         return bitmap;
     }
 
+    @Override
+    public void receiveEvent(Object... eventObjects) {
+        btnSave.setEnabled(!renderModels.getEngineList().isEmpty());
+    }
 }
