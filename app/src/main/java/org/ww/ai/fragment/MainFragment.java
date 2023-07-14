@@ -48,27 +48,24 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class MainFragment extends Fragment implements TranslationAvailableNotifierIF {
+
     public static final String GENERATOR_RULES = "generator.xml";
     private static final String KEY_ARTIST_TYPE = "artisttype";
     private MainFragmentBinding binding;
-
     private SettingsCollection settingsCollection;
-
     private WhatToRenderIF whatToRender;
+    private boolean freshStart = false;
     private Context containerContext;
     private View view;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         super.onCreateView(inflater, container, savedInstanceState);
-
         assert container != null;
         this.containerContext = container.getContext();
-
         binding = MainFragmentBinding.inflate(inflater, container, false);
+        freshStart = true;
         return binding.getRoot();
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -155,10 +152,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         if (whatToRender.getPhraseCount() < 2) {
             whatToRender.setPhraseCount(2);
         }
-
         Slider sliderSentencesCount = view.findViewById(R.id.slider_sentences_count);
         sliderSentencesCount.setValue(whatToRender.getPhraseCount());
-
     }
 
     private void selectSpinner(Spinner spinner, String value) {
@@ -196,15 +191,18 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
 
     private void addValuesToArtistTypeSpinner(@NonNull View view) {
         List<String> artistTypes = new ArrayList<>();
-        settingsCollection.getSetting(KEY_ARTIST_TYPE).getAttributes().forEach(a -> artistTypes.add(a.getName()));
+        settingsCollection.getSetting(KEY_ARTIST_TYPE).getAttributes()
+                .forEach(a -> artistTypes.add(a.getName()));
         artistTypes.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         final Spinner spinner = (Spinner) view.findViewById(R.id.spin_artist_type);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, artistTypes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
+                android.R.layout.simple_spinner_item, artistTypes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView,
+                                       View selectedItemView, int position, long id) {
                 String str = spinner.getSelectedItem().toString();
                 whatToRender.setArtistTypeName(str.startsWith("(") ? "" : str);
                 showArtistsMatching(whatToRender.getArtistTypeName());
@@ -222,10 +220,12 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         Setting setting = settingsCollection.getSetting("artists");
         List<AttributeValue> list = new ArrayList<>();
         if (setting != null) {
-            list = settingsCollection.getAttributesMatchingExtraData(KEY_ARTIST_TYPE, artistTypeName, setting);
+            list = settingsCollection.getAttributesMatchingExtraData(KEY_ARTIST_TYPE,
+                    artistTypeName, setting);
         }
         if (!list.isEmpty()) {
-            String artistsStr = list.stream().map(AttributeValue::getValue).collect(Collectors.joining(", "));
+            String artistsStr = list.stream().map(AttributeValue::getValue)
+                    .collect(Collectors.joining(", "));
             artistsView.setText(artistsStr);
             artistsView.setVisibility(View.VISIBLE);
         } else {
@@ -238,12 +238,14 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         settingsCollection.getPresets().forEach(p -> presets.add(p.getName()));
         presets.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, presets);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
+                android.R.layout.simple_spinner_item, presets);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         layoutSpinner.setAdapter(adapter);
         layoutSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView,
+                                       View selectedItemView, int position, long id) {
                 String str = layoutSpinner.getSelectedItem().toString();
                 whatToRender.setPreset(str.startsWith("(") ? "" : str);
             }
@@ -257,7 +259,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     private void addValuesToNumOfArtistsSpinner(@NonNull View view) {
         final String[] selection = new String[]{"1", "2", "3"};
         Spinner spinner = view.findViewById(R.id.spin_num_artists);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, selection);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
+                android.R.layout.simple_spinner_item, selection);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -308,15 +311,19 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         if (setting == null) {
             resolutionSpinner.setEnabled(false);
         } else {
-            List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(s -> s.getValues().stream()).collect(Collectors.toList());
-            resolutions.addAll(attributeValues.stream().map(AttributeValue::getValue).collect(Collectors.toList()));
+            List<AttributeValue> attributeValues = setting.getAttributes().stream()
+                    .flatMap(s -> s.getValues().stream()).collect(Collectors.toList());
+            resolutions.addAll(attributeValues.stream().map(AttributeValue::getValue)
+                    .collect(Collectors.toList()));
         }
-        ArrayAdapter<String> resolutionAdapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, resolutions);
+        ArrayAdapter<String> resolutionAdapter = new ArrayAdapter<>(view.getContext(),
+                android.R.layout.simple_spinner_item, resolutions);
         resolutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         resolutionSpinner.setAdapter(resolutionAdapter);
         resolutionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
                 String str = resolutionSpinner.getSelectedItem().toString();
                 whatToRender.setResolution(str.startsWith("(") ? "" : str);
             }
@@ -364,7 +371,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     private void addCheckBoxListeners(@NonNull View view) {
         CheckBox checkBoxNoLayout = view.findViewById(R.id.chk_no_layout);
         Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
-        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) -> whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem()));
+        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) ->
+                whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem()));
         CheckBox checkBoxNoArtist = view.findViewById(R.id.chk_no_artists);
         Spinner numOfArtist = view.findViewById(R.id.spin_num_artists);
         checkBoxNoArtist.setOnCheckedChangeListener((v, checked) -> {

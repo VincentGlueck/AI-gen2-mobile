@@ -39,9 +39,6 @@ public class RenderModelsLinearLayout extends LinearLayout implements RenderMode
 
     public RenderModelsLinearLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        if(attrs == null) {
-            return;
-        }
     }
 
     public RenderModelsLinearLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -89,6 +86,7 @@ public class RenderModelsLinearLayout extends LinearLayout implements RenderMode
             removeRenderModel(rootLayout, entry);
         });
         TextView textView = dynamicEntry.findViewById(R.id.render_model);
+        textView.setTextSize(8.0f);
         textView.setText(entry.renderModel.getName() + " (" + entry.credits + ")");
         rootLayout.addView(dynamicEntry);
         children.put(entry.hashCode(), dynamicEntry);
