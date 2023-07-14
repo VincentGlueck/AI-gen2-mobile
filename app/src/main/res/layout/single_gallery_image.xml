@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.imageview.ShapeableImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/single_gallery_image_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:shapeAppearance="@style/gallery_rounded_style"
+    app:srcCompat="@drawable/gallery"
+    android:contentDescription="Gallery entry"
+    tools:ignore="HardcodedText" />

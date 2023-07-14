@@ -355,8 +355,10 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putParcelable(whatToRender.getClass().getCanonicalName(), whatToRender);
-        super.onSaveInstanceState(outState);
+        if(whatToRender != null) {
+            outState.putParcelable(whatToRender.getClass().getCanonicalName(), whatToRender);
+            super.onSaveInstanceState(outState);
+        }
     }
 
     private void addCheckBoxListeners(@NonNull View view) {
