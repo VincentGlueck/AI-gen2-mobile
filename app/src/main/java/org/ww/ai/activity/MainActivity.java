@@ -9,23 +9,32 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
+import org.ww.ai.fragment.MainFragment;
 import org.ww.ai.fragment.RenderDetailsFragment;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
@@ -41,6 +50,14 @@ public class MainActivity extends AppCompatActivity {
     private WhatToRenderIF lastRender;
     private CoordinatorLayout coordinatorLayout;
 
+    private NavController navController;
+
+    private Toolbar toolbar;
+
+    private NavHostFragment navHostFragment;
+
+    private int toggleMenuEnable = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,16 +65,46 @@ public class MainActivity extends AppCompatActivity {
         org.ww.ai.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.toolbar);
+        toolbar = binding.toolbar;
+        setSupportActionBar(toolbar);
 
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
         assert navHostFragment != null;
-        NavController navController = navHostFragment.getNavController();
+        navController = navHostFragment.getNavController();
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         coordinatorLayout = findViewById(R.id.main_activity_scroll_bar);
         checkIntentPurpose();
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.mainmenu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (R.id.action_so_far == id) {
+            navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment);
+        } else if (R.id.action_gallery == id) {
+            navController.navigate(R.id.action_MainFragment_to_ResultsGalleryFragment);
+        } else if (R.id.action_settings == id) {
+            Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
+        } else { // otherwise your back button will become useless
+            setToolbarEnabled(true);
+            return false;
+        }
+        setToolbarEnabled(false);
+        return true;
+    }
+
+    private void setToolbarEnabled(boolean enabled) {
+        for(int n=0; n<toolbar.getMenu().size(); n++) {
+            toolbar.getMenu().getItem(n).setEnabled(enabled);
+        }
     }
 
 

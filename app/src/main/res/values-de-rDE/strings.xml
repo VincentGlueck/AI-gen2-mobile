@@ -75,5 +75,6 @@
     <string name="prompt_replace_image">Möchtest du das bisherige Bild (%1$d Bytes) mit dem gewählten Bild (%2$d Bytes) überschreiben?</string>
     <string name="btn_yes">Ja</string>
     <string name="btn_no">Nein</string>
+    <string name="settings">Einstellungen</string>
 
 </resources>
