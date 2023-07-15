@@ -76,5 +76,7 @@
     <string name="btn_render_details_replace_btn">Replace</string>
     <string name="prompt_replace_image">Do you want to replace the original (%1$d bytes) with the chosen image (%2$d bytes)?</string>
     <string name="settings">Settings</string>
+    <string name="no_content">Nothing to display.\n\nPaste your rendered\nresults to me ;-)</string>
+    <string name="empty_result_content_descriptor">Image displaying an empty room.</string>
 
 </resources>

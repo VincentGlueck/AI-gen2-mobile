@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,8 +44,10 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
     private RenderResultsFragmentBinding binding;
     private Context containerContext;
     private RenderResultAdapter adapter;
-    private LinearLayout linearLayout;
+    private RelativeLayout linearLayout;
     private RecyclerView renderResultView;
+
+    private TextView nothingToRenderTextView;
     private final Map<Integer, LightWeightDeleteHolder> renderResultLightWeights = new HashMap<>();
 
     private int uid;
@@ -76,6 +80,7 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
                 RenderResultsFragment.this).navigate(R.id.action_RenderResultsFragment_to_MainFragment));
 
         renderResultView = view.findViewById(R.id.render_result_List);
+        nothingToRenderTextView = view.findViewById(R.id.empty_results);
         adapter = new RenderResultAdapter(containerContext, this);
 
         renderResultView.setAdapter(adapter);
@@ -155,6 +160,7 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
                     adapter.notifyItemChanged(position);
                 }
             }
+            nothingToRenderTextView.setVisibility(renderResults.isEmpty() ? View.VISIBLE : View.GONE);
         }, containerContext);
     }
 

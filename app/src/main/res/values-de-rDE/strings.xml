@@ -76,5 +76,7 @@
     <string name="btn_yes">Ja</string>
     <string name="btn_no">Nein</string>
     <string name="settings">Einstellungen</string>
+    <string name="no_content">Nichts zu sehen.\n\nPaste deine Bilder\nin diese App,\ndamit diese angezeigt werden ;-)</string>
+    <string name="empty_result_content_descriptor">Image displaying an empty room.</string>
 
 </resources>
