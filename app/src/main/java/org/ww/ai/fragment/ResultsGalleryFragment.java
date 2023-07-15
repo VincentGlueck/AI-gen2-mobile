@@ -49,10 +49,8 @@ public class ResultsGalleryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         this.container = container;
-
         assert container != null;
         this.containerContext = container.getContext();
-
         binding = ResultsGalleryFragmentBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
@@ -75,7 +73,8 @@ public class ResultsGalleryFragment extends Fragment {
                 r -> createGallery(viewGroup, linearLayout, r), containerContext);
     }
 
-    private void createGallery(ViewGroup parent, LinearLayout view, List<RenderResultLightWeight> renderResults) {
+    private void createGallery(@NonNull ViewGroup parent, @NonNull LinearLayout view,
+                               @NonNull List<RenderResultLightWeight> renderResults) {
         LinearLayout rowLayout = null;
         int count = 0;
         for(RenderResultLightWeight lightWeight : renderResults) {
@@ -94,6 +93,12 @@ public class ResultsGalleryFragment extends Fragment {
         if(rowLayout != null) {
             view.addView(rowLayout);
         }
+        if(renderResults.isEmpty()) {
+            View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_result,
+                    view, false);
+            view.addView(emptyView);
+
+        }
     }
 
     private ShapeableImageView createImageView(byte[] thumbNail, LinearLayout rowLayout) {
@@ -102,7 +107,6 @@ public class ResultsGalleryFragment extends Fragment {
         Bitmap bitmap = IMAGE_UTIL.cropToSquare(IMAGE_UTIL.convertBlobToImage(thumbNail), THUMB_NAIL_SIZE);
         imageView.setImageBitmap(bitmap);
         imageView.setPadding(4, 4, 4, 4);
-//        imageView.setClipToOutline(true);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         if(screen != null) {
@@ -125,7 +129,6 @@ public class ResultsGalleryFragment extends Fragment {
             return true;
         });
     }
-
 
     private void onImageClickListener(int uid) {
         NavController navController = NavHostFragment.findNavController(ResultsGalleryFragment.this);
