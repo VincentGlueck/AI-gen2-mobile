@@ -1,7 +1,7 @@
-# AI-gen2-mobile
+# AI-gen2
 ## About
-Android mobile phone Generator (**_AI-gen2-mobile_** a.k.a **aigen2**) for AI-based image creation tools like Night Cafe etc.
-Write down your idea and AI-gen2-mobile will (optionally) add a **Preset**, **Artists** and _how many_ to combine, **Resultion**, and **Random words** (_more to come_)
+Android mobile phone Generator (**_AI-gen2_** a.k.a **aigen2**) for AI-based image creation tools like Night Cafe etc.
+Write down your idea and AI-gen2 will (optionally) add a **Preset**, **Artists** and _how many_ to combine, **Resultion**, and **Random words** (_more to come_)
 
 Result from the tool may be pasted to aigen2 and will be stored incl. the orginal phrase used, resulting image and others.
 
