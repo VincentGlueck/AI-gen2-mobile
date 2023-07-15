@@ -9,9 +9,9 @@ import androidx.annotation.NonNull;
 
 import org.ww.ai.data.WhatToRenderIF;
 
-public class WhatToRender implements WhatToRenderIF {
+public class WhatToRender implements WhatToRenderIF, Parcelable {
 
-    public static final Parcelable.Creator<WhatToRender> CREATOR = new Parcelable.Creator() {
+    public static final Creator<WhatToRenderIF> CREATOR = new Creator<>() {
         public WhatToRender createFromParcel(Parcel in) {
             return new WhatToRender(in);
         }
