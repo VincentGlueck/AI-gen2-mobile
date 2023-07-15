@@ -54,7 +54,6 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     private MainFragmentBinding binding;
     private SettingsCollection settingsCollection;
     private WhatToRenderIF whatToRender;
-    private boolean freshStart = false;
     private Context containerContext;
     private View view;
 
@@ -64,7 +63,6 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         assert container != null;
         this.containerContext = container.getContext();
         binding = MainFragmentBinding.inflate(inflater, container, false);
-        freshStart = true;
         return binding.getRoot();
     }
 
@@ -75,11 +73,6 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         binding.btnNext.setOnClickListener(v -> NavHostFragment.findNavController(
                 MainFragment.this).navigate(R.id.action_MainFragment_to_ShowSentencesFragment));
 
-        binding.btnRenderResults.setOnClickListener(v -> NavHostFragment.findNavController(
-                MainFragment.this).navigate(R.id.action_MainFragment_to_RenderResultsFragment));
-
-        binding.btnGallery.setOnClickListener(v -> NavHostFragment.findNavController(
-                MainFragment.this).navigate(R.id.action_MainFragment_to_ResultsGalleryFragment));
 
         if (whatToRender == null) {
             whatToRender = new WhatToRender();

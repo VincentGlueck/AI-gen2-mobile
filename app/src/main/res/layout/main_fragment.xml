@@ -253,7 +253,6 @@
                     android:id="@+id/chk_random_resolution"
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
-                    android:layout_toLeftOf="@id/spin_resolution"
                     android:layout_marginStart="8dp"
                     android:layout_toEndOf="@+id/spin_resolution"
                     android:text="@string/chk_random_resolution"
@@ -334,32 +333,9 @@
             android:id="@+id/btn_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:drawableStart="@drawable/gallery"
             android:text="@string/next" />
-
-        <Space
-            android:id="@+id/space_01"
-            android:layout_toEndOf="@id/btn_next"
-            android:layout_width="72dp"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btn_render_results"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/space_01"
-            android:layout_marginStart="8dp"
-            android:text="@string/lbl_render_results" />
-
-        <Button
-            android:id="@+id/btn_gallery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@id/btn_render_results"
-            android:layout_marginStart="8dp"
-            android:text="@string/lbl_gallery_title" />
 
     </RelativeLayout>
 
