@@ -29,6 +29,4 @@ A nickname from the past used for various projects (not hosted here), all start 
 ## Legal bits
 This project is licensed under GNU GPLv3. Feel free.
 
-![wizard_img](https://github.com/VincentGlueck/AI-gen2-mobile/assets/139572548/e0858659-faac-452e-a534-5d526254e095)
-
 _initiated by Martin Lange a.k.a. **VincentGlueck**, **Helmut** Lange, **Martin Lange**_, _**Whistling Willi**_ (past)
