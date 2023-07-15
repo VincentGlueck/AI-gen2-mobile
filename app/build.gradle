@@ -9,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId "org.ww.ai"
-        minSdk 23
+        minSdk 28
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.3"
 
         javaCompileOptions {
             annotationProcessorOptions {
