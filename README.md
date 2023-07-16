@@ -27,6 +27,5 @@ Currently ai2gen uses Room (2.5.2) as its database.
 A nickname from the past used for various projects (not hosted here), all start with "org.ww" (_Whistling Willi_)
 
 ## Legal bits
-This project is licensed under GNU GPLv3. Feel free.
 
 _initiated by Martin Lange a.k.a. **VincentGlueck**, **Helmut** Lange, **Martin Lange**_, _**Whistling Willi**_ (past)
