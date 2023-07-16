@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void setToolbarEnabled(boolean enabled) {
+    public void setToolbarEnabled(boolean enabled) {
         for(int n=0; n<toolbar.getMenu().size(); n++) {
             toolbar.getMenu().getItem(n).setEnabled(enabled);
         }
