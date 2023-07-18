@@ -29,6 +29,7 @@ import com.google.mlkit.common.model.DownloadConditions;
 import com.google.mlkit.nl.translate.Translator;
 
 import org.ww.ai.R;
+import org.ww.ai.activity.MainActivity;
 import org.ww.ai.data.AttributeValue;
 import org.ww.ai.data.Setting;
 import org.ww.ai.data.SettingsCollection;
@@ -70,8 +71,13 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
 
-        binding.btnNext.setOnClickListener(v -> NavHostFragment.findNavController(
-                MainFragment.this).navigate(R.id.action_MainFragment_to_ShowSentencesFragment));
+        binding.btnNext.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                ((MainActivity) getActivity()).setToolbarEnabled(false);
+            }
+            NavHostFragment.findNavController(MainFragment.this)
+                    .navigate(R.id.action_MainFragment_to_ShowSentencesFragment);
+        });
 
 
         if (whatToRender == null) {
@@ -99,10 +105,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     private void translateEditText(String str) {
         SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance(containerContext);
         if (instance != null && instance.getTranslator() != null) {
-            instance.getTranslator().translate(str).addOnSuccessListener(s ->
-                    whatToRender.setTranslateToEnglishDescription(s)).addOnFailureListener(e -> {
-                Toast.makeText(containerContext, getText(R.string.unable_to_translate) +
-                        " " + e.getMessage(), Toast.LENGTH_LONG).show();
+            instance.getTranslator().translate(str).addOnSuccessListener(s -> whatToRender.setTranslateToEnglishDescription(s)).addOnFailureListener(e -> {
+                Toast.makeText(containerContext, getText(R.string.unable_to_translate) + " " + e.getMessage(), Toast.LENGTH_LONG).show();
                 whatToRender.setTranslateToEnglishDescription("Failure");
             });
         }
@@ -111,8 +115,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     @Override
     public void onResume() {
         super.onResume();
-        SharedPreferences preferences = containerContext.getSharedPreferences(
-                WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
+        SharedPreferences preferences = containerContext.getSharedPreferences(WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
         whatToRender = new WhatToRender();
         whatToRender.getFromPreferences(preferences);
         EditText editText = view.findViewById(R.id.editTextTextMultiLine);
@@ -184,18 +187,15 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
 
     private void addValuesToArtistTypeSpinner(@NonNull View view) {
         List<String> artistTypes = new ArrayList<>();
-        settingsCollection.getSetting(KEY_ARTIST_TYPE).getAttributes()
-                .forEach(a -> artistTypes.add(a.getName()));
+        settingsCollection.getSetting(KEY_ARTIST_TYPE).getAttributes().forEach(a -> artistTypes.add(a.getName()));
         artistTypes.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         final Spinner spinner = (Spinner) view.findViewById(R.id.spin_artist_type);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, artistTypes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, artistTypes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView,
-                                       View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String str = spinner.getSelectedItem().toString();
                 whatToRender.setArtistTypeName(str.startsWith("(") ? "" : str);
                 showArtistsMatching(whatToRender.getArtistTypeName());
@@ -213,12 +213,10 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         Setting setting = settingsCollection.getSetting("artists");
         List<AttributeValue> list = new ArrayList<>();
         if (setting != null) {
-            list = settingsCollection.getAttributesMatchingExtraData(KEY_ARTIST_TYPE,
-                    artistTypeName, setting);
+            list = settingsCollection.getAttributesMatchingExtraData(KEY_ARTIST_TYPE, artistTypeName, setting);
         }
         if (!list.isEmpty()) {
-            String artistsStr = list.stream().map(AttributeValue::getValue)
-                    .collect(Collectors.joining(", "));
+            String artistsStr = list.stream().map(AttributeValue::getValue).collect(Collectors.joining(", "));
             artistsView.setText(artistsStr);
             artistsView.setVisibility(View.VISIBLE);
         } else {
@@ -231,14 +229,12 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         settingsCollection.getPresets().forEach(p -> presets.add(p.getName()));
         presets.add(0, view.getContext().getResources().getString(R.string.spinner_none));
         Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, presets);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, presets);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         layoutSpinner.setAdapter(adapter);
         layoutSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView,
-                                       View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String str = layoutSpinner.getSelectedItem().toString();
                 whatToRender.setPreset(str.startsWith("(") ? "" : str);
             }
@@ -252,8 +248,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     private void addValuesToNumOfArtistsSpinner(@NonNull View view) {
         final String[] selection = new String[]{"1", "2", "3"};
         Spinner spinner = view.findViewById(R.id.spin_num_artists);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, selection);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, selection);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -304,19 +299,15 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         if (setting == null) {
             resolutionSpinner.setEnabled(false);
         } else {
-            List<AttributeValue> attributeValues = setting.getAttributes().stream()
-                    .flatMap(s -> s.getValues().stream()).collect(Collectors.toList());
-            resolutions.addAll(attributeValues.stream().map(AttributeValue::getValue)
-                    .collect(Collectors.toList()));
+            List<AttributeValue> attributeValues = setting.getAttributes().stream().flatMap(s -> s.getValues().stream()).collect(Collectors.toList());
+            resolutions.addAll(attributeValues.stream().map(AttributeValue::getValue).collect(Collectors.toList()));
         }
-        ArrayAdapter<String> resolutionAdapter = new ArrayAdapter<>(view.getContext(),
-                android.R.layout.simple_spinner_item, resolutions);
+        ArrayAdapter<String> resolutionAdapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, resolutions);
         resolutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         resolutionSpinner.setAdapter(resolutionAdapter);
         resolutionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String str = resolutionSpinner.getSelectedItem().toString();
                 whatToRender.setResolution(str.startsWith("(") ? "" : str);
             }
@@ -342,7 +333,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
                 whatToRender.setTranslateToEnglishDescription(str);
                 Button btn = view.findViewById(R.id.btn_next);
                 btn.setEnabled(s.length() > 0);
-                if(whatToRender.isUseTranslation()) {
+                if (whatToRender.isUseTranslation()) {
                     translateEditText(whatToRender.getDescription());
                 }
             }
@@ -355,7 +346,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        if(whatToRender != null) {
+        if (whatToRender != null) {
             outState.putParcelable(whatToRender.getClass().getCanonicalName(), whatToRender);
             super.onSaveInstanceState(outState);
         }
@@ -364,8 +355,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     private void addCheckBoxListeners(@NonNull View view) {
         CheckBox checkBoxNoLayout = view.findViewById(R.id.chk_no_layout);
         Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
-        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) ->
-                whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem()));
+        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) -> whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem()));
         CheckBox checkBoxNoArtist = view.findViewById(R.id.chk_no_artists);
         Spinner numOfArtist = view.findViewById(R.id.spin_num_artists);
         checkBoxNoArtist.setOnCheckedChangeListener((v, checked) -> {
@@ -391,8 +381,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
             resolutionSpinner.setEnabled(!checked);
         });
         CheckBox checkUseTranslation = view.findViewById(R.id.check_translate);
-        checkUseTranslation.setOnCheckedChangeListener((v, checked) ->
-                whatToRender.setUseTranslation(checked));
+        checkUseTranslation.setOnCheckedChangeListener((v, checked) -> whatToRender.setUseTranslation(checked));
     }
 
     private void initRandomWordsSlider(View view) {
@@ -415,16 +404,12 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         final CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
         DownloadConditions conditions = new DownloadConditions.Builder().requireWifi().build();
         SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance(containerContext);
-        if(instance == null) {
+        if (instance == null) {
             return;
-        } else if(!instance.isUseTranslator()) {
+        } else if (!instance.isUseTranslator()) {
             checkBoxTranslate.setVisibility(View.GONE);
         }
-        instance.getTranslator().downloadModelIfNeeded(conditions).addOnSuccessListener(
-                unused -> instance.notifyTranslationAvailable(checkBoxTranslate,
-                        SimpleTranslationUtil.getInstance(containerContext).getTranslator()))
-                .addOnFailureListener(e ->
-                        Toast.makeText(containerContext, getText(R.string.unable_to_translate), Toast.LENGTH_LONG).show());
+        instance.getTranslator().downloadModelIfNeeded(conditions).addOnSuccessListener(unused -> instance.notifyTranslationAvailable(checkBoxTranslate, SimpleTranslationUtil.getInstance(containerContext).getTranslator())).addOnFailureListener(e -> Toast.makeText(containerContext, getText(R.string.unable_to_translate), Toast.LENGTH_LONG).show());
     }
 
     @Override
