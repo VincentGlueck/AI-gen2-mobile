@@ -124,7 +124,8 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
     private void checkIfResultExists(WhatToRenderIF whatToRender) {
         if (whatToRender.getQueryUsed() == null || whatToRender.getQueryUsed().isEmpty()
                 || "undefined".equals(whatToRender.getQueryUsed())) {
-            DialogUtil.DIALOG_UTIL.showMessage(this, R.string.title_no_query, R.string.message_no_query, R.drawable.warning);
+            DialogUtil.DIALOG_UTIL.showMessage(this, R.string.title_no_query,
+                    R.string.message_no_query, R.drawable.warning);
         }
     }
 
