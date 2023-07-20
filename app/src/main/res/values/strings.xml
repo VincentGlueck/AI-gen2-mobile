@@ -79,10 +79,11 @@
     <string name="no_content">Nothing to display.\n\nPaste your rendered\nresults to me ;-)</string>
     <string name="empty_result_content_descriptor">Image displaying an empty room.</string>
     <string name="pref_section_main">General</string>
-    <string name="pref_check_dummy">Use translation (to en-us)</string>
+    <string name="pref_check_translation">Results in English (en-US)</string>
     <string name="pref_section_any">Section what ever</string>
     <string name="pref_title_ai_site_url">AI renderer\'s URL</string>
     <string name="pref_goto_ai_site">Test URL</string>
     <string name="lbl_settings_fragment">Settings</string>
+    <string name="show_license">Licenses</string>
 
 </resources>

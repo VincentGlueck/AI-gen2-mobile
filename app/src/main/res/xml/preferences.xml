@@ -5,7 +5,7 @@
 
         <CheckBoxPreference
             android:key="pref_translate"
-            android:title="@string/pref_check_dummy"
+            android:title="@string/pref_check_translation"
             android:defaultValue="false"/>
 
     </PreferenceCategory>
