@@ -76,7 +76,13 @@
     <string name="btn_yes">Ja</string>
     <string name="btn_no">Nein</string>
     <string name="settings">Einstellungen</string>
-    <string name="no_content">Nichts zu sehen.\n\nPaste deine Bilder\nin diese App,\ndamit diese angezeigt werden ;-)</string>
-    <string name="empty_result_content_descriptor">Image displaying an empty room.</string>
+    <string name="no_content">Nichts zu sehen.\n\nPaste deine Bilder\nin diese App,\ndamit diese angezeigt werden.</string>
+    <string name="empty_result_content_descriptor">Kein Resultat.</string>
+    <string name="pref_section_main">Allgemein</string>
+    <string name="pref_check_dummy">Etwas zum Checken</string>
+    <string name="pref_section_any">Section what ever</string>
+    <string name="pref_title_ai_site_url">AI render URL</string>
+    <string name="pref_goto_ai_site">Zur URL wechseln</string>
+    <string name="lbl_settings_fragment">Einstellungen</string>
 
 </resources>

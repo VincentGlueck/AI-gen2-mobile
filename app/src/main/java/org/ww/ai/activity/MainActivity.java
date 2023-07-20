@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (R.id.action_gallery == id) {
             navController.navigate(R.id.action_MainFragment_to_ResultsGalleryFragment);
         } else if (R.id.action_settings == id) {
-            Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
+            navController.navigate(R.id.action_MainFragment_to_SettingsFragment);
         } else { // otherwise your back button will become useless
             setToolbarEnabled(true);
             return false;
