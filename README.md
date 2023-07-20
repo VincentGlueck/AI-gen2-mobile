@@ -21,10 +21,10 @@ Currently ai2gen uses Room (2.5.2) as its database.
 ### Status
 - basic implementation with static generator rules provided via XML resource
 - sourceCompatibility JavaVersion.VERSION_1_9
-- non-beautiful UI used, UI problems on Pie
+- basic, indeed, it is an approach far away from the goal to be reached, wip.
 
 ### Package name ww?
-A nickname from the past used for various projects (not hosted here), all start with "org.ww" (_Whistling Willi_)
+A nickname from the past used for various projects (not hosted here), all of them start with "org.ww" (_Whistling Willi_)
 
 ## Legal bits
 
