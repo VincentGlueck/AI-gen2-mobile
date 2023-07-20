@@ -23,6 +23,9 @@
         <action
             android:id="@+id/action_MainFragment_to_SettingsFragment"
             app:destination="@id/SettingsFragment" />
+        <action
+            android:id="@+id/action_MainFragment_to_LicenseFragment"
+            app:destination="@id/LicenseFragment" />
     </fragment>
     <fragment
         android:id="@+id/ShowSentencesFragment"
@@ -82,6 +85,14 @@
         android:label="@string/lbl_settings_fragment" >
         <action
             android:id="@+id/action_SettingsFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/LicenseFragment"
+        android:name="org.ww.ai.fragment.LicenseFragment"
+        android:label="@string/show_license" >
+        <action
+            android:id="@+id/action_LicenseFragment_to_MainFragment"
             app:destination="@id/MainFragment" />
     </fragment>
 
