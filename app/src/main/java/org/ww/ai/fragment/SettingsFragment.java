@@ -47,7 +47,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         preferenceBtnTestUrl.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(@NonNull Preference preference) {
-                Toast.makeText(getContext(), "go to: " + aiRenderUrl, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent();
                 intent.setData(Uri.parse(aiRenderUrl));
                 intent.setAction(Intent.ACTION_VIEW);
