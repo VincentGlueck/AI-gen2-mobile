@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_MainFragment_to_ResultsGalleryFragment"
             app:destination="@id/ResultsGalleryFragment" />
+        <action
+            android:id="@+id/action_MainFragment_to_SettingsFragment"
+            app:destination="@id/SettingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/ShowSentencesFragment"
@@ -72,6 +75,14 @@
         <action
             android:id="@+id/action_GalleryFullSizeFragment_to_ResultsGalleryFragment"
             app:destination="@id/ResultsGalleryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/SettingsFragment"
+        android:name="org.ww.ai.fragment.SettingsFragment"
+        android:label="@string/lbl_settings_fragment" >
+        <action
+            android:id="@+id/action_SettingsFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
     </fragment>
 
 </navigation>
