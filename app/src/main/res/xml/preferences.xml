@@ -1,0 +1,31 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/pref_section_main">
+
+        <CheckBoxPreference
+            android:key="pref_translate"
+            android:title="@string/pref_check_dummy"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_section_any">
+
+
+        <EditTextPreference
+            android:defaultValue="https://www."
+            android:key="pref_ai_site_url"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/pref_title_ai_site_url" />
+        <Preference
+            android:key="pref_ai_test_url"
+            android:title="@string/pref_goto_ai_site">
+            <intent android:action="android.intent.action.VIEW" />
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

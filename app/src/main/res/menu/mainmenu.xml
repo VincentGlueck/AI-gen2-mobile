@@ -4,16 +4,21 @@
 
     <item
         android:id="@+id/action_gallery"
-        android:title="@string/lbl_gallery_title"/>
+        android:icon="@drawable/ic_gallery"
+        android:title="@string/lbl_gallery_title"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_so_far"
-        android:title="@string/lbl_render_results">
-    </item>
+        android:icon="@drawable/ic_explore"
+        android:title="@string/lbl_render_results"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_settings"
-        android:visible="false"
-        android:title="@string/settings" />
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings"
+        android:visible="true"
+        app:showAsAction="never" />
 
 </menu>
