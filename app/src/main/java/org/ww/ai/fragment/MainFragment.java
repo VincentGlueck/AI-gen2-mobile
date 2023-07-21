@@ -73,7 +73,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
 
         binding.btnNext.setOnClickListener(v -> {
             if (getActivity() != null) {
-                ((MainActivity) getActivity()).setToolbarEnabled(false);
+                ((MainActivity) getActivity()).setToolbarEnabled(true);
             }
             NavHostFragment.findNavController(MainFragment.this)
                     .navigate(R.id.action_MainFragment_to_ShowSentencesFragment);
@@ -189,7 +189,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         List<String> artistTypes = new ArrayList<>();
         settingsCollection.getSetting(KEY_ARTIST_TYPE).getAttributes().forEach(a -> artistTypes.add(a.getName()));
         artistTypes.add(0, view.getContext().getResources().getString(R.string.spinner_none));
-        final Spinner spinner = (Spinner) view.findViewById(R.id.spin_artist_type);
+        final Spinner spinner = view.findViewById(R.id.spin_artist_type);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_spinner_item, artistTypes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);

@@ -1,8 +1,5 @@
 package org.ww.ai.activity;
 
-import static org.ww.ai.tools.FileUtil.FILE_UTIL;
-import static org.ww.ai.ui.DialogUtil.DIALOG_UTIL;
-
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
@@ -10,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.util.Log;
@@ -37,8 +33,6 @@ import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.fragment.RenderDetailsFragment;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.tools.FileUtil;
-import org.ww.ai.ui.DialogUtil;
 import org.ww.ai.ui.ImageUtil;
 
 import java.util.Locale;
@@ -56,10 +50,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
-    private NavHostFragment navHostFragment;
-
-    private int toggleMenuEnable = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar = binding.toolbar;
         setSupportActionBar(toolbar);
 
-        navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
         assert navHostFragment != null;
         navController = navHostFragment.getNavController();
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
@@ -98,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.action_MainFragment_to_SettingsFragment);
         } else if (R.id.action_license == id) {
             navController.navigate(R.id.action_MainFragment_to_LicenseFragment);
-        } else { // otherwise your back button will become useless
+        } else {
             setToolbarEnabled(true);
             return false;
         }
@@ -106,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setToolbarEnabled(boolean enabled) {
-        for(int n=0; n<toolbar.getMenu().size(); n++) {
+        for (int n = 0; n < toolbar.getMenu().size(); n++) {
             toolbar.getMenu().getItem(n).setEnabled(enabled);
         }
     }
@@ -115,6 +105,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setToolbarEnabled(true);
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d("ON_RESTART", "yes");
+        super.onRestart();
     }
 
     private void checkIntentPurpose() {
@@ -129,14 +125,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        if(!foundSomeThing && getIntent().getData() != null) {
+        if (!foundSomeThing && getIntent().getData() != null) {
             Uri data = getIntent().getData();
             startReceiveImageActivity(data);
         }
     }
 
     private void startReceiveImageActivity(Uri uri, int... replaceUid) {
-        if(uri.toString().toLowerCase(Locale.ROOT).endsWith(".xml")) {
+        // ignore parameter for now
+        if (uri.toString().toLowerCase(Locale.ROOT).endsWith(".xml")) {
             Toast.makeText(this, "XML pasted", Toast.LENGTH_LONG).show();
             return;
         }
@@ -201,4 +198,16 @@ public class MainActivity extends AppCompatActivity {
         setToolbarEnabled(true);
     }
 
+
+
+    @Override
+    public void onBackPressed() {
+        if (navController.getCurrentBackStackEntry() != null && navController.getCurrentBackStackEntry() != null) {
+            if("LicenseFragment".equals(getResources().getResourceEntryName(navController.getCurrentBackStackEntry().getDestination().getId()))) {
+                Log.d("GIVE UP", "Yes, I saw you, but don't know how to cast you to BackPressedIF");
+            }
+        }
+        setToolbarEnabled(true);
+        super.onBackPressed();
+    }
 }
