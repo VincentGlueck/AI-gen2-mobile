@@ -36,12 +36,14 @@ import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.fragment.LicenseFragment;
+import org.ww.ai.fragment.MainFragment;
 import org.ww.ai.fragment.RenderDetailsFragment;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -94,39 +96,17 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.action_MainFragment_to_SettingsFragment);
         } else if (R.id.action_license == id) {
             navController.navigate(R.id.action_MainFragment_to_LicenseFragment);
-//            FragmentManager fragmentManager = getSupportFragmentManager();
-//            fragmentManager
-//                    .beginTransaction()
-//                    .add(new LicenseFragment(), LicenseFragment.class.getName())
-//                    .addToBackStack(LicenseFragment.class.getName())
-//                    .commit();
         } else {
-            enableToolbarOnMainFragment();
+            setToolbarEnabled(true);
             return false;
         }
         return true;
-    }
-
-    private void enableToolbarOnMainFragment() {
-        setToolbarEnabled(navController.getVisibleEntries().getValue().size() <= 1);
     }
 
     public void setToolbarEnabled(boolean enabled) {
         for (int n = 0; n < toolbar.getMenu().size(); n++) {
             toolbar.getMenu().getItem(n).setEnabled(enabled);
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        enableToolbarOnMainFragment();
-    }
-
-    @Override
-    protected void onRestart() {
-        Log.d("ON_RESTART", "yes");
-        super.onRestart();
     }
 
     private void checkIntentPurpose() {
@@ -211,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         snackbar.show();
-        enableToolbarOnMainFragment();
     }
 
     @Override
@@ -227,6 +206,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         super.onBackPressed();
-        enableToolbarOnMainFragment();
+        setToolbarEnabled(true);
     }
 }

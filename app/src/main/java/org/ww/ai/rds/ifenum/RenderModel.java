@@ -13,9 +13,13 @@ public enum RenderModel {
     STABLE_DIFFUSION_20("Stable diffusion 2.0"),
     SDXL_BETA("SDXL BETA"),
     SDXL_0_9("SDXL 0.9"),
+
+    SDXL_1_0("SDXL 1.0"),
     DALL_E_2("DALL-E 2"),
     STABLE_INP_1_0("Stable Inpainting 1.0"),
-    STABLE_INP_2_0("Stable Inpainting 2.0");
+    STABLE_INP_2_0("Stable Inpainting 2.0"),
+
+    OTHER("other");
 
 
     private final String name;
