@@ -3,7 +3,9 @@ package org.ww.ai.activity;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.BlendMode;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -106,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
     public void setToolbarEnabled(boolean enabled) {
         for (int n = 0; n < toolbar.getMenu().size(); n++) {
             toolbar.getMenu().getItem(n).setEnabled(enabled);
+            toolbar.getMenu().getItem(0).setIconTintList(
+                    enabled ? ColorStateList.valueOf(Color.WHITE): ColorStateList.valueOf(Color.GRAY));
         }
     }
 
