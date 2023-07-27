@@ -34,25 +34,22 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         aiRenderUrl = Objects.requireNonNull(getPreferenceManager().getSharedPreferences()).getString("pref_ai_site_url", "");
         PreferenceScreen preferenceScreen = getPreferenceManager().getPreferenceScreen();
         Preference preferenceSiteUrl = preferenceScreen.findPreference("pref_ai_site_url");
-        assert preferenceSiteUrl != null;
-        Preference preferenceBtnTestUrl = preferenceScreen.findPreference("pref_ai_test_url");
-        preferenceSiteUrl.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
+        if (preferenceSiteUrl != null) {
+            preferenceSiteUrl.setSummary(aiRenderUrl);
+            Preference preferenceBtnTestUrl = preferenceScreen.findPreference("pref_ai_test_url");
+            preferenceSiteUrl.setOnPreferenceChangeListener((preference, newValue) -> {
                 aiRenderUrl = newValue.toString();
                 return true;
+            });
+            if (preferenceBtnTestUrl != null) {
+                preferenceBtnTestUrl.setOnPreferenceClickListener(preference -> {
+                    Intent intent = new Intent();
+                    intent.setData(Uri.parse(aiRenderUrl));
+                    intent.setAction(Intent.ACTION_VIEW);
+                    startActivity(intent);
+                    return false;
+                });
             }
-        });
-        assert preferenceBtnTestUrl != null;
-        preferenceBtnTestUrl.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(@NonNull Preference preference) {
-                Intent intent = new Intent();
-                intent.setData(Uri.parse(aiRenderUrl));
-                intent.setAction(Intent.ACTION_VIEW);
-                startActivity(intent);
-                return false;
-            }
-        });
+        }
     }
 }
