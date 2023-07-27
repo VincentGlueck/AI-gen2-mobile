@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -20,6 +21,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -31,10 +35,12 @@ import com.google.android.material.snackbar.Snackbar;
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
+import org.ww.ai.fragment.LicenseFragment;
 import org.ww.ai.fragment.RenderDetailsFragment;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -88,11 +94,21 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.action_MainFragment_to_SettingsFragment);
         } else if (R.id.action_license == id) {
             navController.navigate(R.id.action_MainFragment_to_LicenseFragment);
+//            FragmentManager fragmentManager = getSupportFragmentManager();
+//            fragmentManager
+//                    .beginTransaction()
+//                    .add(new LicenseFragment(), LicenseFragment.class.getName())
+//                    .addToBackStack(LicenseFragment.class.getName())
+//                    .commit();
         } else {
-            setToolbarEnabled(true);
+            enableToolbarOnMainFragment();
             return false;
         }
         return true;
+    }
+
+    private void enableToolbarOnMainFragment() {
+        setToolbarEnabled(navController.getVisibleEntries().getValue().size() <= 1);
     }
 
     public void setToolbarEnabled(boolean enabled) {
@@ -104,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setToolbarEnabled(true);
+        enableToolbarOnMainFragment();
     }
 
     @Override
@@ -195,19 +211,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         snackbar.show();
-        setToolbarEnabled(true);
+        enableToolbarOnMainFragment();
     }
-
-
 
     @Override
     public void onBackPressed() {
-        if (navController.getCurrentBackStackEntry() != null && navController.getCurrentBackStackEntry() != null) {
-            if("LicenseFragment".equals(getResources().getResourceEntryName(navController.getCurrentBackStackEntry().getDestination().getId()))) {
-                Log.d("GIVE UP", "Yes, I saw you, but don't know how to cast you to BackPressedIF");
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment_content_main);
+        assert navHostFragment != null;
+        Fragment currentFragment = navHostFragment.getChildFragmentManager().getFragments().get(0);
+        if(LicenseFragment.class.isAssignableFrom(currentFragment.getClass())) {
+            LicenseFragment licenseFragment = (LicenseFragment) currentFragment;
+            if(licenseFragment.canGoBackMyself()) {
+                return;
             }
         }
-        setToolbarEnabled(true);
         super.onBackPressed();
+        enableToolbarOnMainFragment();
     }
 }
