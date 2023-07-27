@@ -4,7 +4,6 @@ import static org.ww.ai.tools.FileUtil.FILE_UTIL;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import org.ww.ai.databinding.LicenseFragmentBinding;
-import org.ww.ai.enumif.BackPressedIF;
 
-public class LicenseFragment extends Fragment implements BackPressedIF {
+public class LicenseFragment extends Fragment {
 
     private Context mContainerContext;
 
@@ -50,9 +48,12 @@ public class LicenseFragment extends Fragment implements BackPressedIF {
         mWebView.loadData(html, "text/html; charset=utf-8", "UTF-8");
     }
 
-    @Override
-    public boolean onNavBack() {
-        Log.d("ONNAVBACK", "webView: " + mWebView.copyBackForwardList().getSize());
-        return true;
+    public boolean canGoBackMyself() {
+        if(mWebView.copyBackForwardList().getCurrentIndex() > 0) {
+            mWebView.goBack();
+            return true;
+        }
+        return false;
     }
+
 }
