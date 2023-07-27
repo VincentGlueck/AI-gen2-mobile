@@ -73,7 +73,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
 
         binding.btnNext.setOnClickListener(v -> {
             if (getActivity() != null) {
-                ((MainActivity) getActivity()).setToolbarEnabled(true);
+                ((MainActivity) getActivity()).setToolbarEnabled(false);
             }
             NavHostFragment.findNavController(MainFragment.this)
                     .navigate(R.id.action_MainFragment_to_ShowSentencesFragment);
