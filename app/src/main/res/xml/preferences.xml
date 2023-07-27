@@ -20,6 +20,7 @@
             android:key="pref_ai_site_url"
             android:selectAllOnFocus="true"
             android:singleLine="true"
+            
             android:title="@string/pref_title_ai_site_url"
             android:summary="@string/pref_summary_ai_site_url"/>
         <Preference

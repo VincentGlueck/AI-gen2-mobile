@@ -3,53 +3,58 @@ package org.ww.ai.fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
+import android.text.InputType;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
 import org.ww.ai.R;
 
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-    private String aiRenderUrl;
+    private static final String PREF_AI_RENDER_URL = "pref_ai_site_url";
+    private static final String PREF_AI_TEST_URL = "pref_ai_test_url";
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
+        initPreferences();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        aiRenderUrl = Objects.requireNonNull(getPreferenceManager().getSharedPreferences()).getString("pref_ai_site_url", "");
+    private void initPreferences() {
+        AtomicReference<String> aiRenderUrl = new AtomicReference<>();
+        assert getPreferenceManager().getSharedPreferences() != null;
+        String strRenderUrl = getPreferenceManager().getSharedPreferences().getString(PREF_AI_RENDER_URL, null);
+        aiRenderUrl.set(strRenderUrl);
         PreferenceScreen preferenceScreen = getPreferenceManager().getPreferenceScreen();
-        Preference preferenceSiteUrl = preferenceScreen.findPreference("pref_ai_site_url");
-        if (preferenceSiteUrl != null) {
-            preferenceSiteUrl.setSummary(aiRenderUrl);
-            Preference preferenceBtnTestUrl = preferenceScreen.findPreference("pref_ai_test_url");
-            preferenceSiteUrl.setOnPreferenceChangeListener((preference, newValue) -> {
-                aiRenderUrl = newValue.toString();
-                return true;
-            });
-            if (preferenceBtnTestUrl != null) {
-                preferenceBtnTestUrl.setOnPreferenceClickListener(preference -> {
-                    Intent intent = new Intent();
-                    intent.setData(Uri.parse(aiRenderUrl));
-                    intent.setAction(Intent.ACTION_VIEW);
-                    startActivity(intent);
-                    return false;
-                });
-            }
+        EditTextPreference editRenderUrl = getPreferenceManager().findPreference(PREF_AI_RENDER_URL);
+        Preference preferenceSiteUrl = preferenceScreen.findPreference(PREF_AI_TEST_URL);
+        assert editRenderUrl != null;
+        assert preferenceSiteUrl != null;
+        if (aiRenderUrl.get() != null) {
+            editRenderUrl.setSummary(aiRenderUrl.get());
+            preferenceSiteUrl.setSummary(aiRenderUrl.get());
         }
+        editRenderUrl.setOnBindEditTextListener(t -> t.setInputType(InputType.TYPE_TEXT_VARIATION_URI));
+        editRenderUrl.setOnPreferenceChangeListener((p, newVal) -> {
+            aiRenderUrl.set((String) newVal);
+            editRenderUrl.setSummary(aiRenderUrl.get());
+            preferenceSiteUrl.setSummary(aiRenderUrl.get());
+            return false;
+        });
+        preferenceSiteUrl.setOnPreferenceClickListener(preference -> {
+            Intent intent = new Intent();
+            intent.setData(Uri.parse(aiRenderUrl.get()));
+            intent.setAction(Intent.ACTION_VIEW);
+            startActivity(intent);
+            return false;
+        });
     }
+
 }
+
