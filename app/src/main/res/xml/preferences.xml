@@ -6,6 +6,7 @@
         <CheckBoxPreference
             android:key="pref_translate"
             android:title="@string/pref_check_translation"
+            android:summary="@string/pref_summary_translation"
             android:defaultValue="false"/>
 
     </PreferenceCategory>
@@ -19,10 +20,13 @@
             android:key="pref_ai_site_url"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="@string/pref_title_ai_site_url" />
+            
+            android:title="@string/pref_title_ai_site_url"
+            android:summary="@string/pref_summary_ai_site_url"/>
         <Preference
             android:key="pref_ai_test_url"
-            android:title="@string/pref_goto_ai_site">
+            android:title="@string/pref_goto_ai_site"
+            android:summary="@string/pref_summary_goto_ai_site">
             <intent android:action="android.intent.action.VIEW" />
         </Preference>
 

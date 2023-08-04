@@ -3,7 +3,9 @@ package org.ww.ai.activity;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.BlendMode;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -88,15 +90,23 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         setToolbarEnabled(false);
-        if (R.id.action_so_far == id) {
-            navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment);
-        } else if (R.id.action_gallery == id) {
-            navController.navigate(R.id.action_MainFragment_to_ResultsGalleryFragment);
-        } else if (R.id.action_settings == id) {
-            navController.navigate(R.id.action_MainFragment_to_SettingsFragment);
-        } else if (R.id.action_license == id) {
-            navController.navigate(R.id.action_MainFragment_to_LicenseFragment);
-        } else {
+        try {
+            if (R.id.action_so_far == id) {
+                navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment);
+            } else if (R.id.action_gallery == id) {
+                navController.navigate(R.id.action_MainFragment_to_ResultsGalleryFragment);
+            } else if (R.id.action_settings == id) {
+                navController.navigate(R.id.action_MainFragment_to_SettingsFragment);
+            } else if (R.id.action_license == id) {
+                navController.navigate(R.id.action_MainFragment_to_LicenseFragment);
+            } else {
+                setToolbarEnabled(true);
+                return false;
+            }
+        } catch (IllegalArgumentException e) {
+            Log.d("NAVGRAPH", "Sorry, no route for this. Trying to go back to MainFragment");
+            Toast.makeText(this, "BUG, yeah, this nav route is in-existent", Toast.LENGTH_LONG).show();
+            navController.navigate(R.id.MainFragment);
             setToolbarEnabled(true);
             return false;
         }
@@ -106,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
     public void setToolbarEnabled(boolean enabled) {
         for (int n = 0; n < toolbar.getMenu().size(); n++) {
             toolbar.getMenu().getItem(n).setEnabled(enabled);
+            toolbar.getMenu().getItem(0).setIconTintList(
+                    enabled ? ColorStateList.valueOf(Color.WHITE): ColorStateList.valueOf(Color.GRAY));
         }
     }
 
@@ -206,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         super.onBackPressed();
-        setToolbarEnabled(true);
+        if(RenderDetailsFragment.class.isAssignableFrom(currentFragment.getClass())) {
+            setToolbarEnabled(true);
+        }
     }
 }
