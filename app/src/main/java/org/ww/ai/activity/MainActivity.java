@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.OnBackPressedDispatcher;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,6 +75,14 @@ public class MainActivity extends AppCompatActivity {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
         assert navHostFragment != null;
         navController = navHostFragment.getNavController();
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button event
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
+
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         coordinatorLayout = findViewById(R.id.main_activity_coordinator_layout);
@@ -198,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putInt(RenderDetailsFragment.ARG_UID,
                             renderResult != null ? renderResult.uid : Integer.MIN_VALUE);
+                    setToolbarEnabled(false);
                     navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment, bundle);
                 }
             }
@@ -217,8 +228,12 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
+        enableOrDisableHamburger(currentFragment);
         super.onBackPressed();
-        if(RenderDetailsFragment.class.isAssignableFrom(currentFragment.getClass())) {
+    }
+
+    private void enableOrDisableHamburger(Fragment fragment) {
+        if(RenderDetailsFragment.class.isAssignableFrom(fragment.getClass())) {
             setToolbarEnabled(true);
         }
     }
