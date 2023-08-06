@@ -75,14 +75,6 @@ public class MainActivity extends AppCompatActivity {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
         assert navHostFragment != null;
         navController = navHostFragment.getNavController();
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
-            @Override
-            public void handleOnBackPressed() {
-                // Handle the back button event
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, callback);
-
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         coordinatorLayout = findViewById(R.id.main_activity_coordinator_layout);
@@ -115,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (IllegalArgumentException e) {
             Log.d("NAVGRAPH", "Sorry, no route for this. Trying to go back to MainFragment");
-            Toast.makeText(this, "BUG, yeah, this nav route is in-existent", Toast.LENGTH_LONG).show();
             navController.navigate(R.id.MainFragment);
             setToolbarEnabled(true);
             return false;
