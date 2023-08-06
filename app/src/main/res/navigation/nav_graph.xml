@@ -48,6 +48,18 @@
         <action
             android:id="@+id/action_RenderResultsFragment_to_ShowRenderDetailsFragment"
             app:destination="@id/RenderDetailsFragment" />
+        <action
+            android:id="@+id/action_RenderResultsFragment_to_GalleryFullSizeFragment"
+            app:destination="@id/GalleryFullSizeFragment" />
+        <action
+            android:id="@+id/action_RenderResultsFragment_to_GalleryFullSizeFragment2"
+            app:destination="@id/GalleryFullSizeFragment" />
+        <action
+            android:id="@+id/action_RenderResultsFragment_to_GalleryFullSizeFragment3"
+            app:destination="@id/GalleryFullSizeFragment" />
+        <action
+            android:id="@+id/action_RenderResultsFragment_to_RenderDetailsFragment"
+            app:destination="@id/RenderDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/RenderDetailsFragment"
@@ -57,6 +69,15 @@
         <action
             android:id="@+id/action_ShowRenderDetailsFragment_to_RenderResultsFragment"
             app:destination="@id/RenderResultsFragment" />
+        <action
+            android:id="@+id/action_RenderDetailsFragment_to_GalleryFullSizeFragment"
+            app:destination="@id/GalleryFullSizeFragment" />
+        <action
+            android:id="@+id/action_RenderDetailsFragment_to_ResultsGalleryFragment"
+            app:destination="@id/ResultsGalleryFragment" />
+        <action
+            android:id="@+id/action_RenderDetailsFragment_to_GalleryFullSizeFragment2"
+            app:destination="@id/GalleryFullSizeFragment" />
     </fragment>
     <fragment
         android:id="@+id/ResultsGalleryFragment"
