@@ -5,12 +5,13 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
+import android.widget.ImageView;
 
 import androidx.activity.ComponentActivity;
 
-import com.davemorrissey.labs.subscaleview.ImageSource;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.io.ByteArrayOutputStream;
 
@@ -87,20 +88,22 @@ public enum ImageUtil {
         return getScaledBitmap(bitmap, (int) scale);
     }
 
-    public void setFittingImageViewFromBitmap(ComponentActivity activity,
-                                              SubsamplingScaleImageView imageView, byte[] bytes) {
-        Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(bytes);
-        setFittingImageViewFromBitmap(activity, imageView, bitmap);
+    public RectF getImageBounds(ImageView imageView) {
+        RectF bounds = new RectF();
+        Drawable drawable = imageView.getDrawable();
+        if (drawable != null) {
+            imageView.getImageMatrix().mapRect(bounds, new RectF(drawable.getBounds()));
+        }
+        return bounds;
     }
 
     public void setFittingImageViewFromBitmap(ComponentActivity activity,
-                                              SubsamplingScaleImageView imageView, Bitmap bitmap) {
+                                              ImageView imageView, byte[] bytes) {
+        Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(bytes);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        imageView.setImage(ImageSource.bitmap(
-                IMAGE_UTIL.getBitmapFittingDisplayMetrics(bitmap, displayMetrics)));
+        imageView.setImageBitmap(IMAGE_UTIL.getBitmapFittingDisplayMetrics(bitmap, displayMetrics));
     }
-
 
     private static int getPowerOfTwoForSampleRatio(double ratio) {
         int k = Integer.highestOneBit((int) Math.floor(ratio));

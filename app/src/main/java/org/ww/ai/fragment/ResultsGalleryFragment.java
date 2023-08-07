@@ -1,10 +1,8 @@
 package org.ww.ai.fragment;
 
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
-import static org.ww.ai.ui.ImageUtil.THUMB_NAIL_SIZE;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +16,10 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -97,21 +99,25 @@ public class ResultsGalleryFragment extends Fragment {
             View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_result,
                     view, false);
             view.addView(emptyView);
-
         }
     }
 
     private ShapeableImageView createImageView(byte[] thumbNail, LinearLayout rowLayout) {
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(4));
         ShapeableImageView imageView = (ShapeableImageView) LayoutInflater
                 .from(getActivity()).inflate(R.layout.single_gallery_image, rowLayout, false);
-        Bitmap bitmap = IMAGE_UTIL.cropToSquare(IMAGE_UTIL.convertBlobToImage(thumbNail), THUMB_NAIL_SIZE);
-        imageView.setImageBitmap(bitmap);
+        Glide.with(containerContext)
+                .asBitmap()
+                .load(IMAGE_UTIL.convertBlobToImage(thumbNail))
+                .apply(requestOptions)
+                .into(imageView);
         imageView.setPadding(4, 4, 4, 4);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         if(screen != null) {
             params.width = screen.width / THUMBS_PER_ROW;
-            if(bitmap.getHeight() < params.width) {
+            if(IMAGE_UTIL.getImageBounds(imageView).height() < params.width) {
                 params.height = screen.width / THUMBS_PER_ROW;
             }
         } else {

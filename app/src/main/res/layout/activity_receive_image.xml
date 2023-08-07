@@ -20,7 +20,7 @@
             android:text=""
             android:textSize="22sp" />
 
-        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        <ImageView
             android:id="@+id/receive_bitmap"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

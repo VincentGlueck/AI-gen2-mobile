@@ -13,14 +13,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.bumptech.glide.Glide;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -51,28 +55,43 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
 
     private Button btnSave;
 
+    private Uri bitmapUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_image);
-        Uri bitmapUri = (Uri) getIntent().getExtras().get(MainActivity.KEY_BITMAP);
+        assert getIntent() != null;
+        assert getIntent().getExtras() != null;
+        bitmapUri = (Uri) getIntent().getExtras().get(MainActivity.KEY_BITMAP);
         TextView textView = findViewById(R.id.receive_title);
         textView.setText(R.string.receive_result_header);
 
-        bitmap = getBitmapFromUri(bitmapUri);
-        if (bitmap != null) {
-            SubsamplingScaleImageView imageView = findViewById(R.id.receive_bitmap);
-            IMAGE_UTIL.setFittingImageViewFromBitmap(this, imageView, bitmap);
-        }
         Button btnCancel = findViewById(R.id.btn_result_back);
         btnCancel.setOnClickListener(click -> {
             setResult(Activity.RESULT_CANCELED);
             finish();
         });
+
         btnSave = findViewById(R.id.btn_result_save);
         btnSave.setOnClickListener(click -> saveResult());
         btnSave.setEnabled(false);
         EVENT_BROKER.registerReceiver(this, MODEL_ADDED, MODEL_REMOVED);
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
+        bitmap = getBitmapFromUri(bitmapUri);
+        if (bitmap != null) {
+            ImageView imageView = findViewById(R.id.receive_bitmap);
+            Glide.with(context)
+                    .asBitmap()
+                    .load(bitmap)
+                    .into(imageView);
+        }
+        return super.onCreateView(name, context, attrs);
     }
 
     private void saveResult() {
@@ -148,7 +167,7 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
             bitmap = BitmapFactory.decodeStream(in);
             bitmap = IMAGE_UTIL.getScaledBitmap(bitmap, MAX_IMAGE_SIZE);
         } catch (IOException e) {
-            Toast.makeText(this, "ERR: unable to get image: " + uri.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "ERR: unable to get image: " + uri, Toast.LENGTH_LONG).show();
         }
         return bitmap;
     }
