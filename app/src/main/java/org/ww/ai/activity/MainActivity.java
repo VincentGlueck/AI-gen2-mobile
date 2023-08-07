@@ -5,9 +5,9 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.BlendMode;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
@@ -15,19 +15,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.webkit.WebView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.activity.OnBackPressedDispatcher;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -45,9 +41,7 @@ import org.ww.ai.fragment.RenderDetailsFragment;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 
-import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,9 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private WhatToRenderIF lastRender;
     private CoordinatorLayout coordinatorLayout;
-
     private NavController navController;
-
     private Toolbar toolbar;
 
     @Override
@@ -102,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
             } else if (R.id.action_license == id) {
                 navController.navigate(R.id.action_MainFragment_to_LicenseFragment);
             } else {
-                setToolbarEnabled(true);
                 return false;
             }
         } catch (IllegalArgumentException e) {
@@ -219,13 +210,11 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
-        enableOrDisableHamburger(currentFragment);
         super.onBackPressed();
+        enableOrDisableHamburger(navHostFragment.getChildFragmentManager().getFragments().get(0));
     }
 
-    private void enableOrDisableHamburger(Fragment fragment) {
-        if(RenderDetailsFragment.class.isAssignableFrom(fragment.getClass())) {
-            setToolbarEnabled(true);
-        }
+    public void enableOrDisableHamburger(Fragment fragment) {
+        setToolbarEnabled(MainFragment.class.isAssignableFrom(fragment.getClass()));
     }
 }

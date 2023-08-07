@@ -79,7 +79,6 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
                     .navigate(R.id.action_MainFragment_to_ShowSentencesFragment);
         });
 
-
         if (whatToRender == null) {
             whatToRender = new WhatToRender();
         } else {
@@ -100,6 +99,9 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         initRandomWordsSlider(view);
         initSentencesCountSlider(view);
         checkTranslation();
+
+        assert getActivity() != null;
+        ((MainActivity)getActivity()).enableOrDisableHamburger(this);
     }
 
     private void translateEditText(String str) {
@@ -421,4 +423,5 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     public void notifyTranslationAvailable(View view, Translator translator) {
         view.setEnabled(true);
     }
+
 }
