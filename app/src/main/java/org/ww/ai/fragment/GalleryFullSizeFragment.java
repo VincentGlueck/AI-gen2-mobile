@@ -27,9 +27,7 @@ import org.ww.ai.tools.ShareImageUtil;
 public class GalleryFullSizeFragment extends Fragment {
 
     private int uid;
-
     private Context containerContext;
-
     private GalleryFullSizeFragmentBinding binding;
 
     @Override
@@ -75,7 +73,6 @@ public class GalleryFullSizeFragment extends Fragment {
             }
         }, containerContext);
     }
-
 
 
     @Override
