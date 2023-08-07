@@ -74,7 +74,6 @@ dependencies {
     implementation "androidx.concurrent:concurrent-futures:1.1.0"
 
     implementation 'com.google.mlkit:translate:17.0.1'
-    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
