@@ -5,9 +5,9 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.BlendMode;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
@@ -15,17 +15,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.webkit.WebView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -43,9 +41,7 @@ import org.ww.ai.fragment.RenderDetailsFragment;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 
-import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,9 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private WhatToRenderIF lastRender;
     private CoordinatorLayout coordinatorLayout;
-
     private NavController navController;
-
     private Toolbar toolbar;
 
     @Override
@@ -100,12 +94,10 @@ public class MainActivity extends AppCompatActivity {
             } else if (R.id.action_license == id) {
                 navController.navigate(R.id.action_MainFragment_to_LicenseFragment);
             } else {
-                setToolbarEnabled(true);
                 return false;
             }
         } catch (IllegalArgumentException e) {
             Log.d("NAVGRAPH", "Sorry, no route for this. Trying to go back to MainFragment");
-            Toast.makeText(this, "BUG, yeah, this nav route is in-existent", Toast.LENGTH_LONG).show();
             navController.navigate(R.id.MainFragment);
             setToolbarEnabled(true);
             return false;
@@ -198,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putInt(RenderDetailsFragment.ARG_UID,
                             renderResult != null ? renderResult.uid : Integer.MIN_VALUE);
+                    setToolbarEnabled(false);
                     navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment, bundle);
                 }
             }
@@ -218,8 +211,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         super.onBackPressed();
-        if(RenderDetailsFragment.class.isAssignableFrom(currentFragment.getClass())) {
-            setToolbarEnabled(true);
-        }
+        enableOrDisableHamburger(navHostFragment.getChildFragmentManager().getFragments().get(0));
+    }
+
+    public void enableOrDisableHamburger(Fragment fragment) {
+        setToolbarEnabled(MainFragment.class.isAssignableFrom(fragment.getClass()));
     }
 }

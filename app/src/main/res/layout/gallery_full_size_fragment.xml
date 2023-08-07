@@ -26,8 +26,8 @@
             android:paddingStart="16dp"
             android:paddingEnd="8dp"
             android:scaleType="center"
-            android:scaleX="2"
-            android:scaleY="2"
+            android:scaleX="1"
+            android:scaleY="1"
             android:src="@drawable/ic_share" />
 
 
