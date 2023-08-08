@@ -5,7 +5,6 @@ import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -13,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -40,6 +37,7 @@ import java.util.List;
 
 public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapter.ViewHolder> {
 
+    private static final int PREVIEW_SIZE = 272;
     private final List<RenderResultLightWeight> localDataSet;
     private final OnItemClickListener listener;
 
@@ -97,11 +95,11 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         RenderResultLightWeight item = localDataSet.get(position);
         viewHolder.getQueryStringTextView().setText(item.queryString);
         RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(4));
+        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(16));
         Glide.with(context)
                 .asBitmap()
                 .load(IMAGE_UTIL.convertBlobToImage(item.thumbNail))
-                .override(228)
+                .override(PREVIEW_SIZE)
                 .apply(requestOptions)
                 .into(viewHolder.getThumb());
         viewHolder.getTextViewSizeLabel().setText(item.width + "x" + item.height);

@@ -39,7 +39,7 @@
     </fragment>
     <fragment
         android:id="@+id/RenderResultsFragment"
-        android:name="org.ww.ai.fragment.RenderResultsFragment"
+        android:name="org.ww.ai.fragment.RenderHistoryFragment"
         android:label="@string/render_results_title"
         tools:layout="@layout/show_sentences_fragment">
         <action
