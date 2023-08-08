@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -19,11 +18,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.material.imageview.ShapeableImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -31,7 +28,6 @@ import org.ww.ai.databinding.ResultsGalleryFragmentBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.tools.ShareImageUtil;
 import org.ww.ai.ui.MetricsUtil;
 
 import java.util.List;
@@ -49,6 +45,12 @@ public class ResultsGalleryFragment extends Fragment {
     private ViewGroup container;
     private MetricsUtil.Screen screen;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,7 +60,6 @@ public class ResultsGalleryFragment extends Fragment {
         this.containerContext = container.getContext();
         binding = ResultsGalleryFragmentBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     @Override
@@ -86,10 +87,19 @@ public class ResultsGalleryFragment extends Fragment {
             if(rowLayout == null) {
                  rowLayout = createRow(parent);
             }
-            LinearLayout imageLayout = createImageView(lightWeight.thumbNail, rowLayout);
+            LinearLayout layoutHolder = createImageView(lightWeight.thumbNail, rowLayout);
             count++;
-            addListeners(lightWeight, imageLayout);
-            addListeners(lightWeight, imageLayout.findViewById(R.id.check_single_entry));
+
+            ImageView imageView = layoutHolder.findViewById(R.id.single_gallery_image_view);
+            final CheckBox checkBox = layoutHolder.findViewById(R.id.check_single_entry);
+            imageView.setOnClickListener(v -> onImageClickListener(lightWeight.uid));
+            imageView.setOnLongClickListener(l -> {
+                lightWeight.flagChecked = !lightWeight.flagChecked;
+                checkBox.setChecked(lightWeight.flagChecked);
+                return true;
+            });
+
+            checkBox.setOnCheckedChangeListener((v, isChecked) -> lightWeight.flagChecked = isChecked);
             if(count >= THUMBS_PER_ROW) {
                 view.addView(rowLayout);
                 count = 0;
@@ -130,23 +140,9 @@ public class ResultsGalleryFragment extends Fragment {
             params.height = 192;
         }
         rowLayout.addView(linearLayout, params);
+        linearLayout.setClickable(true);
+        linearLayout.setLongClickable(true);
         return linearLayout;
-    }
-
-    private void addListeners(final RenderResultLightWeight lightWeight, final View view) {
-        if(view.getId() == R.id.single_gallery_image_view) {
-            view.setOnClickListener(v -> onImageClickListener(lightWeight.uid));
-            view.setOnLongClickListener(l -> {
-                new ShareImageUtil(getActivity()).startShare(lightWeight.uid);
-                return true;
-            });
-        } else if (view.getId() == R.id.check_single_entry) {
-            CheckBox checkBox = (CheckBox) view;
-            checkBox.setOnCheckedChangeListener((v, isChecked) -> {
-                lightWeight.flagChecked = isChecked;
-            });
-        }
-
     }
 
     private void onImageClickListener(int uid) {

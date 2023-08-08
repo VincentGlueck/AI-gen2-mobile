@@ -8,6 +8,7 @@
 
     <ImageView
         android:id="@+id/single_gallery_image_view"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:shapeAppearance="@style/gallery_rounded_style"
@@ -22,8 +23,8 @@
     <CheckBox
         android:id="@+id/check_single_entry"
         android:theme="@style/checkBoxGalleryStyle"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="17dp"
+        android:layout_height="17dp"
         android:background="@color/whiteTransparent"
         android:layout_gravity="end|bottom"
         android:layout_marginTop="-28dp"

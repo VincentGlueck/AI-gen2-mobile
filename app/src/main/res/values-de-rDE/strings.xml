@@ -7,11 +7,11 @@
     <string name="next">Weiter</string>
     <string name="previous">Zurück</string>
     <string name="what_to_enter_hint">
-       Beschreibe das Bild in natürlicher Sprache (engl.!)\n\n
-        \'A bear passing through a spooky forrest\'\n
-        \'Donald trump alike dog sitting at a bar\'\n\n
+       Beschreib\' dein Bild, z.B.\n\n
+        \'Ein Bär läuft durch einen verwunschenen Wald\'\n
+        \'Ein Typ, der aussieht wie xyz in einer Bar\'\n\n
         …
-        anything you want!
+        was du willst.
     </string>
     <string name="lbl_layout">Preset</string>
     <string name="lbl_no_layout">Ohne</string>
@@ -66,7 +66,7 @@
     <string name="lbl_gallery_title">Galerie</string>
     <string name="lbl_gallery_detail_title">Dein Bild</string>
     <string name="lbl_clear_text">Löscht deine bisherige Eingabe komplett</string>ed
-    <string name="simple_translation_checkbox">Meinen Text ins Englische übersetzen</string>
+    <string name="simple_translation_checkbox">Den Text ins Englische übersetzen</string>
     <string name="unable_to_translate">Übersetzung fehlgeschlagen:</string>
     <string name="unable_to_download_translation">Download des Sprachpakets fehlgeschlagen.</string>
     <string name="btn_share">Teilen</string>
