@@ -103,7 +103,6 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
                 .load(IMAGE_UTIL.convertBlobToImage(item.thumbNail))
                 .override(228)
                 .apply(requestOptions)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(viewHolder.getThumb());
         viewHolder.getTextViewSizeLabel().setText(item.width + "x" + item.height);
         List<EngineUsedNonDao> enginesUsed = item.enginesUsed;
