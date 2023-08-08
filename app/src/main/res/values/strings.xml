@@ -88,5 +88,6 @@
     <string name="pref_summary_ai_site_url">The URL of your preferred AI generator</string>
     <string name="pref_summary_translation">Some engines require en-US language as their input</string>
     <string name="pref_summary_goto_ai_site">Click to validate URL</string>
+    <string name="btn_delete">Delete image</string>
 
 </resources>

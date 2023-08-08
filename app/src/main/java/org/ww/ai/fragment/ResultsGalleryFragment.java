@@ -112,7 +112,6 @@ public class ResultsGalleryFragment extends Fragment {
                 .asBitmap()
                 .load(IMAGE_UTIL.convertBlobToImage(thumbNail))
                 .apply(requestOptions)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageView);
         imageView.setPadding(4, 4, 4, 4);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
