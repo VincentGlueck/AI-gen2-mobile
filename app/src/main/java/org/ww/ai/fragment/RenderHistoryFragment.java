@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RenderResultsFragment extends Fragment implements RenderResultAdapter.OnItemClickListener {
+public class RenderHistoryFragment extends Fragment implements RenderResultAdapter.OnItemClickListener {
 
     private RenderResultsFragmentBinding binding;
     private Context containerContext;
@@ -77,7 +76,7 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
         super.onViewCreated(view, savedInstanceState);
 
         binding.renderResultList.setOnClickListener(view1 -> NavHostFragment.findNavController(
-                RenderResultsFragment.this).navigate(R.id.action_RenderResultsFragment_to_MainFragment));
+                RenderHistoryFragment.this).navigate(R.id.action_RenderResultsFragment_to_MainFragment));
 
         renderResultView = view.findViewById(R.id.render_result_List);
         nothingToRenderTextView = view.findViewById(R.id.empty_results);
@@ -172,7 +171,7 @@ public class RenderResultsFragment extends Fragment implements RenderResultAdapt
 
     @Override
     public void onItemClick(RenderResultLightWeight item) {
-        NavController navController = NavHostFragment.findNavController(RenderResultsFragment.this);
+        NavController navController = NavHostFragment.findNavController(RenderHistoryFragment.this);
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_UID, item.uid);
         navController.navigate(R.id.action_RenderResultsFragment_to_ShowRenderDetailsFragment, bundle);

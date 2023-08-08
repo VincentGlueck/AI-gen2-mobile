@@ -5,20 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:baselineAligned="false"
     android:paddingTop="4dp">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="0.3"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UseCompoundDrawables">
 
-        <com.google.android.material.imageview.ShapeableImageView
+        <ImageView
             android:id="@+id/history_render_result_thumb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="4dp"
+            android:contentDescription="@string/history_thumb_content_description"
             app:shapeAppearance="@style/gallery_rounded_style"
             app:srcCompat="@drawable/gallery" />
 
@@ -32,7 +35,7 @@
             android:paddingEnd="2dp"
             android:paddingBottom="2dp"
             android:text="dummy"
-            android:textColor="@color/lightGrayTransparent"
+            android:textColor="@color/colorGray"
             tools:ignore="HardcodedText" />
 
     </LinearLayout>
@@ -61,7 +64,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="2dp"
             android:text="*date*"
-            android:textColor="@color/lightGrayTransparent"
+            android:textColor="@color/colorGray"
             android:textSize="14sp"
             tools:ignore="HardcodedText" />
 
@@ -73,7 +76,7 @@
             android:maxLines="3"
             android:paddingBottom="2dp"
             android:text="*queryUsed*"
-            android:textColor="@color/lightGrayTransparent"
+            android:textColor="@color/colorGray"
             android:textSize="12sp"
             tools:ignore="HardcodedText" />
 

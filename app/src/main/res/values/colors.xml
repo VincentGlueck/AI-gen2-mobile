@@ -28,5 +28,6 @@
     <color name="colorBtnIcon">#FFFFFFFF</color>
     <color name="lightPurple">#E0674FA3</color>
     <color name="purple">#674FA3</color>
+    <color name="selectorBackground">#00668b</color>
 
 </resources>
