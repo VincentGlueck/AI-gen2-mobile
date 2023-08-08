@@ -58,6 +58,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     private Context containerContext;
     private View view;
 
+    private ImageView clearBtnImageView;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -94,14 +96,19 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         addValuesToNumOfArtistsSpinner(view);
         addValuesToCameraSpinner(view);
         addValuesToResolutionSpinner(view);
-        ImageView imageView = view.findViewById(R.id.btn_clear);
-        imageView.setOnClickListener(click -> editText.setText(""));
+        clearBtnImageView = view.findViewById(R.id.btn_clear);
+        clearBtnImageView.setOnClickListener(click -> editText.setText(""));
+        setClearButtonEnabled();
         initRandomWordsSlider(view);
         initSentencesCountSlider(view);
         checkTranslation();
 
         assert getActivity() != null;
         ((MainActivity)getActivity()).enableOrDisableHamburger(this);
+    }
+
+    private void setClearButtonEnabled() {
+
     }
 
     private void translateEditText(String str) {
@@ -338,6 +345,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
                 if (whatToRender.isUseTranslation()) {
                     translateEditText(whatToRender.getDescription());
                 }
+                clearBtnImageView.setVisibility(str.isEmpty() ? View.GONE : View.VISIBLE);
             }
 
             @Override

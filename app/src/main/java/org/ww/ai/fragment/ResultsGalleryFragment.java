@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -19,11 +18,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.material.imageview.ShapeableImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -31,7 +28,6 @@ import org.ww.ai.databinding.ResultsGalleryFragmentBinding;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.tools.ShareImageUtil;
 import org.ww.ai.ui.MetricsUtil;
 
 import java.util.List;
@@ -49,6 +45,12 @@ public class ResultsGalleryFragment extends Fragment {
     private ViewGroup container;
     private MetricsUtil.Screen screen;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,7 +60,6 @@ public class ResultsGalleryFragment extends Fragment {
         this.containerContext = container.getContext();
         binding = ResultsGalleryFragmentBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     @Override
@@ -98,9 +99,7 @@ public class ResultsGalleryFragment extends Fragment {
                 return true;
             });
 
-            checkBox.setOnCheckedChangeListener((v, isChecked) -> {
-                lightWeight.flagChecked = isChecked;
-            });
+            checkBox.setOnCheckedChangeListener((v, isChecked) -> lightWeight.flagChecked = isChecked);
             if(count >= THUMBS_PER_ROW) {
                 view.addView(rowLayout);
                 count = 0;
