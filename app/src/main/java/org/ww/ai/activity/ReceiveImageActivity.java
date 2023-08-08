@@ -25,6 +25,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -47,6 +50,7 @@ import java.util.Date;
 public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEventIF {
 
     public static final int MAX_IMAGE_SIZE = 2048;
+    private static final int MAX_PREVIEW_SIZE = 800;
     private Bitmap bitmap;
 
     private WhatToRenderIF whatToRender;
@@ -76,23 +80,24 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
         btnSave = findViewById(R.id.btn_result_save);
         btnSave.setOnClickListener(click -> saveResult());
         btnSave.setEnabled(false);
+
+        ImageView imageView = findViewById(R.id.receive_bitmap);
+        bitmap = getBitmapFromUri(bitmapUri);
+        if (bitmap != null) {
+            RequestOptions requestOptions = new RequestOptions();
+            requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(32));
+            Glide.with(this)
+                    .asBitmap()
+                    .load(bitmap)
+                    .override(MAX_PREVIEW_SIZE)
+                    .apply(requestOptions)
+                    .into(imageView);
+        }
+
         EVENT_BROKER.registerReceiver(this, MODEL_ADDED, MODEL_REMOVED);
 
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
-        bitmap = getBitmapFromUri(bitmapUri);
-        if (bitmap != null) {
-            ImageView imageView = findViewById(R.id.receive_bitmap);
-            Glide.with(context)
-                    .asBitmap()
-                    .load(bitmap)
-                    .into(imageView);
-        }
-        return super.onCreateView(name, context, attrs);
-    }
 
     private void saveResult() {
         RenderResult renderResult = new RenderResult();
