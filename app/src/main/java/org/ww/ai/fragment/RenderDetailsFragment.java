@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -83,9 +83,7 @@ public class RenderDetailsFragment extends Fragment {
                 originalRenderResult.queryString,
                 msg,
                 R.string.btn_yes,
-                (dialog, which) -> {
-                    updateImage(bytes);
-                },
+                (dialog, which) -> updateImage(bytes),
                 R.string.btn_no,
                 (dialog, which) -> {
                 },
@@ -184,7 +182,7 @@ public class RenderDetailsFragment extends Fragment {
     }
 
     private void setImageViewFromBytes(View view, byte[] bytes) {
-        SubsamplingScaleImageView imageView = view.findViewById(R.id.history_bitmap);
+        ImageView imageView = view.findViewById(R.id.history_bitmap);
         assert getActivity() != null;
         IMAGE_UTIL.setFittingImageViewFromBitmap(getActivity(), imageView, bytes);
     }

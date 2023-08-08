@@ -22,6 +22,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
+
 import org.ww.ai.R;
 import org.ww.ai.rds.dao.EngineUsedNonDao;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
@@ -90,9 +96,14 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     public void onBindViewHolder(@NonNull RenderResultAdapter.ViewHolder viewHolder, int position) {
         RenderResultLightWeight item = localDataSet.get(position);
         viewHolder.getQueryStringTextView().setText(item.queryString);
-        Bitmap bitmap = IMAGE_UTIL.getScaledBitmap(
-                IMAGE_UTIL.convertBlobToImage(item.thumbNail), 224);
-        viewHolder.getThumb().setImageBitmap(bitmap);
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(4));
+        Glide.with(context)
+                .asBitmap()
+                .load(IMAGE_UTIL.convertBlobToImage(item.thumbNail))
+                .override(228)
+                .apply(requestOptions)
+                .into(viewHolder.getThumb());
         viewHolder.getTextViewSizeLabel().setText(item.width + "x" + item.height);
         List<EngineUsedNonDao> enginesUsed = item.enginesUsed;
         if(enginesUsed != null && !enginesUsed.isEmpty()) {
@@ -108,8 +119,8 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         viewHolder.getQueryUsedTextView().setText(item.queryUsed);
         if (item.flagHighLight) {
             final AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(ANIMATIONS.getAlphaAnimation(0.2F, 1.0F, 1000L, true));
-            animationSet.addAnimation(ANIMATIONS.getScaleAnimation(0.2F, 1.2F, 700L, true));
+            animationSet.addAnimation(ANIMATIONS.getAlphaAnimation(0.4F, 1.0F, 1000L, true));
+            animationSet.addAnimation(ANIMATIONS.getScaleAnimation(0.3F, 1.0F, 700L, true));
             viewHolder.getRootView().setAnimation(animationSet);
             animationSet.start();
             item.flagHighLight = false;

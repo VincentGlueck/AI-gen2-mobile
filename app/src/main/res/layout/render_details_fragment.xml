@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            <ImageView
                 android:id="@+id/history_bitmap"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
