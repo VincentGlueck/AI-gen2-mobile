@@ -86,10 +86,21 @@ public class ResultsGalleryFragment extends Fragment {
             if(rowLayout == null) {
                  rowLayout = createRow(parent);
             }
-            LinearLayout imageLayout = createImageView(lightWeight.thumbNail, rowLayout);
+            LinearLayout layoutHolder = createImageView(lightWeight.thumbNail, rowLayout);
             count++;
-            addListeners(lightWeight, imageLayout);
-            addListeners(lightWeight, imageLayout.findViewById(R.id.check_single_entry));
+
+            ImageView imageView = layoutHolder.findViewById(R.id.single_gallery_image_view);
+            final CheckBox checkBox = layoutHolder.findViewById(R.id.check_single_entry);
+            imageView.setOnClickListener(v -> onImageClickListener(lightWeight.uid));
+            imageView.setOnLongClickListener(l -> {
+                lightWeight.flagChecked = !lightWeight.flagChecked;
+                checkBox.setChecked(lightWeight.flagChecked);
+                return true;
+            });
+
+            checkBox.setOnCheckedChangeListener((v, isChecked) -> {
+                lightWeight.flagChecked = isChecked;
+            });
             if(count >= THUMBS_PER_ROW) {
                 view.addView(rowLayout);
                 count = 0;
@@ -130,23 +141,9 @@ public class ResultsGalleryFragment extends Fragment {
             params.height = 192;
         }
         rowLayout.addView(linearLayout, params);
+        linearLayout.setClickable(true);
+        linearLayout.setLongClickable(true);
         return linearLayout;
-    }
-
-    private void addListeners(final RenderResultLightWeight lightWeight, final View view) {
-        if(view.getId() == R.id.single_gallery_image_view) {
-            view.setOnClickListener(v -> onImageClickListener(lightWeight.uid));
-            view.setOnLongClickListener(l -> {
-                new ShareImageUtil(getActivity()).startShare(lightWeight.uid);
-                return true;
-            });
-        } else if (view.getId() == R.id.check_single_entry) {
-            CheckBox checkBox = (CheckBox) view;
-            checkBox.setOnCheckedChangeListener((v, isChecked) -> {
-                lightWeight.flagChecked = isChecked;
-            });
-        }
-
     }
 
     private void onImageClickListener(int uid) {
