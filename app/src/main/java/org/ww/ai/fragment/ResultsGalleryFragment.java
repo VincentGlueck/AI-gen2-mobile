@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -84,9 +86,10 @@ public class ResultsGalleryFragment extends Fragment {
             if(rowLayout == null) {
                  rowLayout = createRow(parent);
             }
-            ImageView imageView = createImageView(lightWeight.thumbNail, rowLayout);
+            LinearLayout imageLayout = createImageView(lightWeight.thumbNail, rowLayout);
             count++;
-            addListeners(lightWeight, imageView);
+            addListeners(lightWeight, imageLayout);
+            addListeners(lightWeight, imageLayout.findViewById(R.id.check_single_entry));
             if(count >= THUMBS_PER_ROW) {
                 view.addView(rowLayout);
                 count = 0;
@@ -103,38 +106,47 @@ public class ResultsGalleryFragment extends Fragment {
         }
     }
 
-    private ShapeableImageView createImageView(byte[] thumbNail, LinearLayout rowLayout) {
+    private LinearLayout createImageView(byte[] thumbNail, LinearLayout rowLayout) {
         RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(4));
-        ShapeableImageView imageView = (ShapeableImageView) LayoutInflater
+        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(32));
+        LinearLayout linearLayout = (LinearLayout) LayoutInflater
                 .from(getActivity()).inflate(R.layout.single_gallery_image, rowLayout, false);
+        ImageView imageView = linearLayout.findViewById(R.id.single_gallery_image_view);
         Glide.with(containerContext)
                 .asBitmap()
                 .load(IMAGE_UTIL.convertBlobToImage(thumbNail))
                 .apply(requestOptions)
                 .into(imageView);
-        imageView.setPadding(4, 4, 4, 4);
+        linearLayout.setPadding(0, 0, 4, 4);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         if(screen != null) {
-            params.width = screen.width / THUMBS_PER_ROW;
+            params.width = (screen.width - 4 * THUMBS_PER_ROW) / THUMBS_PER_ROW;
             if(IMAGE_UTIL.getImageBounds(imageView).height() < params.width) {
-                params.height = screen.width / THUMBS_PER_ROW;
+                params.height = (screen.width - 4 * THUMBS_PER_ROW) / THUMBS_PER_ROW;
             }
         } else {
             params.width = 192;
             params.height = 192;
         }
-        rowLayout.addView(imageView, params);
-        return imageView;
+        rowLayout.addView(linearLayout, params);
+        return linearLayout;
     }
 
-    private void addListeners(final RenderResultLightWeight lightWeight, final ImageView imageView) {
-        imageView.setOnClickListener(v -> onImageClickListener(lightWeight.uid));
-        imageView.setOnLongClickListener(l -> {
-            new ShareImageUtil(getActivity()).startShare(lightWeight.uid);
-            return true;
-        });
+    private void addListeners(final RenderResultLightWeight lightWeight, final View view) {
+        if(view.getId() == R.id.single_gallery_image_view) {
+            view.setOnClickListener(v -> onImageClickListener(lightWeight.uid));
+            view.setOnLongClickListener(l -> {
+                new ShareImageUtil(getActivity()).startShare(lightWeight.uid);
+                return true;
+            });
+        } else if (view.getId() == R.id.check_single_entry) {
+            CheckBox checkBox = (CheckBox) view;
+            checkBox.setOnCheckedChangeListener((v, isChecked) -> {
+                lightWeight.flagChecked = isChecked;
+            });
+        }
+
     }
 
     private void onImageClickListener(int uid) {

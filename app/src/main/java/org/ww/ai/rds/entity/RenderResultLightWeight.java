@@ -53,6 +53,9 @@ public class RenderResultLightWeight implements Serializable {
     public boolean flagHighLight;
 
     @Ignore
+    public boolean flagChecked;
+
+    @Ignore
     public RenderResultLightWeight (RenderResult renderResult) {
         uid = renderResult.uid;
         createdTime = renderResult.createdTime;

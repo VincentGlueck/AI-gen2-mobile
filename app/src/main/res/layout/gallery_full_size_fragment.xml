@@ -10,16 +10,16 @@
         <ImageView
             android:id="@+id/gallery_full_size_image"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.9"
+            android:layout_height="match_parent"
             android:importantForAccessibility="no"
             android:src="@drawable/no_image" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:orientation="horizontal"
             android:layout_gravity="start|bottom"
+            android:layout_marginTop="-48dp"
             android:layout_marginStart="4dp"
             android:layout_marginBottom="16dp"
             android:layout_marginEnd="4dp">
@@ -29,7 +29,9 @@
             android:id="@+id/gallery_full_size_share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="0dp"
             android:layout_weight="5"
             android:contentDescription="@string/btn_share"
             android:scaleType="center"
@@ -45,7 +47,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="100"
-            android:layout_gravity="end"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="8dp"
             android:contentDescription="@string/btn_delete"
             android:scaleType="center"
             android:src="@drawable/ic_delete"
