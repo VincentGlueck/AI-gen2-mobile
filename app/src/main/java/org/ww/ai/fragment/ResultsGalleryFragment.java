@@ -17,6 +17,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -111,6 +112,7 @@ public class ResultsGalleryFragment extends Fragment {
                 .asBitmap()
                 .load(IMAGE_UTIL.convertBlobToImage(thumbNail))
                 .apply(requestOptions)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageView);
         imageView.setPadding(4, 4, 4, 4);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
