@@ -13,15 +13,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -50,16 +47,14 @@ import java.util.Date;
 public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEventIF {
 
     public static final int MAX_IMAGE_SIZE = 2048;
-    private static final int MAX_PREVIEW_SIZE = 800;
-    private Bitmap bitmap;
+    private static final int MAX_PREVIEW_SIZE = 720;
+    private Bitmap mBitmap;
 
-    private WhatToRenderIF whatToRender;
+    private WhatToRenderIF mWhatToRender;
 
-    private RenderModelsUI renderModels;
+    private RenderModelsUI mRenderModels;
 
-    private Button btnSave;
-
-    private Uri bitmapUri;
+    private Button mBtnSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +62,7 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
         setContentView(R.layout.activity_receive_image);
         assert getIntent() != null;
         assert getIntent().getExtras() != null;
-        bitmapUri = (Uri) getIntent().getExtras().get(MainActivity.KEY_BITMAP);
+        Uri bitmapUri = (Uri) getIntent().getExtras().get(MainActivity.KEY_BITMAP);
         TextView textView = findViewById(R.id.receive_title);
         textView.setText(R.string.receive_result_header);
 
@@ -77,18 +72,18 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
             finish();
         });
 
-        btnSave = findViewById(R.id.btn_result_save);
-        btnSave.setOnClickListener(click -> saveResult());
-        btnSave.setEnabled(false);
+        mBtnSave = findViewById(R.id.btn_result_save);
+        mBtnSave.setOnClickListener(click -> saveResult());
+        mBtnSave.setEnabled(false);
 
         ImageView imageView = findViewById(R.id.receive_bitmap);
-        bitmap = getBitmapFromUri(bitmapUri);
-        if (bitmap != null) {
+        mBitmap = getBitmapFromUri(bitmapUri);
+        if (mBitmap != null) {
             RequestOptions requestOptions = new RequestOptions();
             requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(32));
             Glide.with(this)
                     .asBitmap()
-                    .load(bitmap)
+                    .load(mBitmap)
                     .override(MAX_PREVIEW_SIZE)
                     .apply(requestOptions)
                     .into(imageView);
@@ -101,17 +96,17 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
 
     private void saveResult() {
         RenderResult renderResult = new RenderResult();
-        if (bitmap != null) {
-            Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(bitmap, ImageUtil.THUMB_NAIL_SIZE);
+        if (mBitmap != null) {
+            Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(mBitmap, ImageUtil.THUMB_NAIL_SIZE);
             renderResult.thumbNail = IMAGE_UTIL.convertImageToBlob(thumbNail);
-            renderResult.image = IMAGE_UTIL.convertImageToBlob(bitmap);
-            renderResult.width = bitmap.getWidth();
-            renderResult.height = bitmap.getHeight();
+            renderResult.image = IMAGE_UTIL.convertImageToBlob(mBitmap);
+            renderResult.width = mBitmap.getWidth();
+            renderResult.height = mBitmap.getHeight();
         }
-        renderResult.queryString = whatToRender.getDescription();
-        renderResult.queryUsed = whatToRender.getQueryUsed();
+        renderResult.queryString = mWhatToRender.getDescription();
+        renderResult.queryUsed = mWhatToRender.getQueryUsed();
 
-        renderResult.enginesUsed = renderModels.getEngineList();
+        renderResult.enginesUsed = mRenderModels.getmEngineList();
 
         renderResult.createdTime = System.currentTimeMillis();
         storeToDatabase(renderResult);
@@ -139,10 +134,10 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
     public void onResume() {
         super.onResume();
         SharedPreferences preferences = getSharedPreferences(WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
-        whatToRender = new WhatToRender();
-        whatToRender.getFromPreferences(preferences);
-        fillRenderValues(whatToRender);
-        checkIfResultExists(whatToRender);
+        mWhatToRender = new WhatToRender();
+        mWhatToRender.getFromPreferences(preferences);
+        fillRenderValues(mWhatToRender);
+        checkIfResultExists(mWhatToRender);
     }
 
     private void checkIfResultExists(WhatToRenderIF whatToRender) {
@@ -162,8 +157,8 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
         TextView whatWasRenderedDate = findViewById(R.id.what_was_rendered_date);
         whatWasRenderedDate.setText(dateFormat.format(new Date(System.currentTimeMillis())));
         View view = findViewById(R.id.render_models_root);
-        renderModels = (RenderModelsUI) view;
-        renderModels.init(this, view);
+        mRenderModels = (RenderModelsUI) view;
+        mRenderModels.init(this, view);
     }
 
     private Bitmap getBitmapFromUri(Uri uri) {
@@ -179,6 +174,6 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
 
     @Override
     public void receiveEvent(Object... eventObjects) {
-        btnSave.setEnabled(!renderModels.getEngineList().isEmpty());
+        mBtnSave.setEnabled(!mRenderModels.getmEngineList().isEmpty());
     }
 }

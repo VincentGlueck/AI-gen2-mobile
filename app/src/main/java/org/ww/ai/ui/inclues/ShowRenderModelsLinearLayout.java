@@ -3,7 +3,6 @@ package org.ww.ai.ui.inclues;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +24,8 @@ import java.util.List;
 
 public class ShowRenderModelsLinearLayout extends LinearLayout implements RenderModelsUI {
 
-    private List<EngineUsedNonDao> engineList = new ArrayList<>();
-    private FlexboxLayout rootLayout;
+    private List<EngineUsedNonDao> mEngineList = new ArrayList<>();
+    private FlexboxLayout mRootLayout;
 
     public ShowRenderModelsLinearLayout(Context context) {
         super(context);
@@ -41,20 +40,30 @@ public class ShowRenderModelsLinearLayout extends LinearLayout implements Render
     }
 
     @Override
-    public void init(Context context, @NonNull View view) {
+    public void init(Context context, View view) {
         if(!ViewGroup.class.isAssignableFrom(view.getClass())) {
             showIllegalUse();
         }
-        rootLayout = findFlexBoxLayout((ViewGroup) view);
-        if (rootLayout == null) {
+        mRootLayout = findFlexBoxLayout((ViewGroup) view);
+        if (mRootLayout == null) {
             showIllegalUse();
         }
     }
 
+    @Override
+    public void init(Context context, @NonNull View view,
+                     @NonNull List<EngineUsedNonDao> engineList) {
+        init(context, view);
+        setEngineList(engineList);
+    }
+
     private FlexboxLayout findFlexBoxLayout(ViewGroup root) {
+        if(FlexboxLayout.class.isAssignableFrom(root.getClass())) {
+            return (FlexboxLayout) root;
+        }
         FlexboxLayout result = null;
-        for (int n = 0; n < ((ViewGroup) root).getChildCount(); n++) {
-            View child = ((ViewGroup) root).getChildAt(n);
+        for (int n = 0; n < root.getChildCount(); n++) {
+            View child = root.getChildAt(n);
             if (FlexboxLayout.class.isAssignableFrom(child.getClass())) {
                 result = (FlexboxLayout) child;
                 break;
@@ -70,24 +79,24 @@ public class ShowRenderModelsLinearLayout extends LinearLayout implements Render
 
     @Override
     public void setEngineList(@Nullable List<EngineUsedNonDao> list) {
-        engineList = new ArrayList<>(list != null ? list : Collections.emptyList());
-        engineList.forEach(el -> addEngineUsedToLayout(el, engineList.size()));
+        mEngineList = new ArrayList<>(list != null ? list : Collections.emptyList());
+        mEngineList.forEach(this::addEngineUsedToLayout);
     }
 
     @Override
-    public List<EngineUsedNonDao> getEngineList() {
-        return engineList;
+    public List<EngineUsedNonDao> getmEngineList() {
+        return mEngineList;
     }
 
     @SuppressLint("SetTextI18n")
-    private void addEngineUsedToLayout(EngineUsedNonDao entry, int idx) {
+    private void addEngineUsedToLayout(EngineUsedNonDao entry) {
         LinearLayout dynamicEntry = (LinearLayout) LayoutInflater.from(getContext())
-                .inflate(R.layout.render_model_text_view, rootLayout, false);
+                .inflate(R.layout.render_model_text_view, mRootLayout, false);
         TextView textView = dynamicEntry.findViewById(R.id.render_model);
         textView.setText(entry.renderModel.getName() + " (" + entry.credits + ")");
         ImageView imageView = dynamicEntry.findViewById(R.id.btn_delete);
         imageView.setVisibility(GONE);
-        rootLayout.addView(dynamicEntry);
+        mRootLayout.addView(dynamicEntry);
     }
 
     private void showIllegalUse() {

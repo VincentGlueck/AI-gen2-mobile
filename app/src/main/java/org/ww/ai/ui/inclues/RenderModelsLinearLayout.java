@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.flexbox.FlexboxLayout;
@@ -31,7 +32,10 @@ import java.util.Map;
 
 public class RenderModelsLinearLayout extends LinearLayout implements RenderModelsUI {
 
-    private final Map<Integer, View> children = new HashMap<>();
+    private final Map<Integer, View> mChildren = new HashMap<>();
+    private List<EngineUsedNonDao> mEngineList = new ArrayList<>();
+    private FlexboxLayout mRootLayout;
+
 
     public RenderModelsLinearLayout(Context context) {
         super(context);
@@ -44,27 +48,28 @@ public class RenderModelsLinearLayout extends LinearLayout implements RenderMode
     public RenderModelsLinearLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-
-    private List<EngineUsedNonDao> engineList = new ArrayList<>();
-    private FlexboxLayout rootLayout;
-
+    @Override
+    public void init(Context context, @NonNull View view, @NonNull List<EngineUsedNonDao> engineList) {
+        mEngineList = engineList;
+        init(context, view);
+    }
 
     @Override
     public void init(Context context, View view) {
-        rootLayout = view.findViewById(R.id.render_model_include);
+        mRootLayout = view.findViewById(R.id.render_model_include);
         Spinner spinner = view.findViewById(R.id.spinner_render_model);
         ArrayAdapter<String> renderedByAdapter = new ArrayAdapter<>(context,
                 android.R.layout.simple_spinner_item, RenderModel.getAvailableModels());
         renderedByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(renderedByAdapter);
-        spinner.setSelection(RenderModel.SDXL_BETA.ordinal());
+        spinner.setSelection(RenderModel.SDXL_1_0.ordinal());
         ImageView btnPlus = view.findViewById(R.id.imageview_btn_plus);
         btnPlus.setOnClickListener(click -> {
             EngineUsedNonDao entry = getSelectedEngine(view);
-            engineList.add(entry);
+            mEngineList.add(entry);
             addEngineUsedToLayout(entry);
         });
-        rootLayout.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
+        mRootLayout.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
             @Override
             public void onChildViewAdded(View parent, View child) {
                 EventBroker.EVENT_BROKER.notifyReceivers(EventTypes.MODEL_ADDED);
@@ -77,37 +82,36 @@ public class RenderModelsLinearLayout extends LinearLayout implements RenderMode
         });
     }
 
+
     @SuppressLint("SetTextI18n")
     private void addEngineUsedToLayout(EngineUsedNonDao entry) {
         LinearLayout dynamicEntry = (LinearLayout) LayoutInflater.from(getContext())
-                .inflate(R.layout.render_model_text_view, rootLayout, false);
+                .inflate(R.layout.render_model_text_view, mRootLayout, false);
         ImageView clearImageView = dynamicEntry.findViewById(R.id.btn_delete);
-        clearImageView.setOnClickListener(click -> {
-            removeRenderModel(rootLayout, entry);
-        });
+        clearImageView.setOnClickListener(click -> removeRenderModel(mRootLayout, entry));
         TextView textView = dynamicEntry.findViewById(R.id.render_model);
         textView.setTextSize(8.0f);
         textView.setText(entry.renderModel.getName() + " (" + entry.credits + ")");
-        rootLayout.addView(dynamicEntry);
-        children.put(entry.hashCode(), dynamicEntry);
+        mRootLayout.addView(dynamicEntry);
+        mChildren.put(entry.hashCode(), dynamicEntry);
     }
 
     private void removeRenderModel(ViewGroup viewGroup, EngineUsedNonDao entry) {
-        engineList.remove(entry);
-        View view = children.getOrDefault(entry.hashCode(), null);
-        if(view != null) {
+        mEngineList.remove(entry);
+        View view = mChildren.getOrDefault(entry.hashCode(), null);
+        if (view != null) {
             viewGroup.removeView(view);
         }
     }
 
     @Override
-    public List<EngineUsedNonDao> getEngineList() {
-        return engineList;
+    public List<EngineUsedNonDao> getmEngineList() {
+        return mEngineList;
     }
 
     public void setEngineList(@Nullable final List<EngineUsedNonDao> list) {
-        engineList = new ArrayList<>(list != null ? list : Collections.emptyList());
-        engineList.forEach(this::addEngineUsedToLayout);
+        mEngineList = new ArrayList<>(list != null ? list : Collections.emptyList());
+        mEngineList.forEach(this::addEngineUsedToLayout);
     }
 
     private EngineUsedNonDao getSelectedEngine(View view) {
