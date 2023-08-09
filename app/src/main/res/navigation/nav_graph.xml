@@ -81,7 +81,7 @@
     </fragment>
     <fragment
         android:id="@+id/ResultsGalleryFragment"
-        android:name="org.ww.ai.fragment.ResultsGalleryFragment"
+        android:name="org.ww.ai.fragment.GalleryFragment"
         android:label="@string/lbl_gallery_title"
         tools:layout="@layout/results_gallery_fragment">
         <action

@@ -35,6 +35,7 @@ import org.ww.ai.data.Setting;
 import org.ww.ai.data.SettingsCollection;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.MainFragmentBinding;
+import org.ww.ai.enumif.MenuEnableIF;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.tools.SimpleTranslationUtil;
@@ -74,9 +75,6 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         this.view = view;
 
         binding.btnNext.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                ((MainActivity) getActivity()).setToolbarEnabled(false);
-            }
             NavHostFragment.findNavController(MainFragment.this)
                     .navigate(R.id.action_MainFragment_to_ShowSentencesFragment);
         });
@@ -98,18 +96,11 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         addValuesToResolutionSpinner(view);
         clearBtnImageView = view.findViewById(R.id.btn_clear);
         clearBtnImageView.setOnClickListener(click -> editText.setText(""));
-        setClearButtonEnabled();
         initRandomWordsSlider(view);
         initSentencesCountSlider(view);
         checkTranslation();
-
-        assert getActivity() != null;
-        ((MainActivity)getActivity()).enableOrDisableHamburger(this);
     }
 
-    private void setClearButtonEnabled() {
-
-    }
 
     private void translateEditText(String str) {
         SimpleTranslationUtil instance = SimpleTranslationUtil.getInstance(containerContext);
@@ -159,6 +150,10 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         }
         Slider sliderSentencesCount = view.findViewById(R.id.slider_sentences_count);
         sliderSentencesCount.setValue(whatToRender.getPhraseCount());
+
+        if(MenuEnableIF.class.isAssignableFrom(requireActivity().getClass())) {
+            ((MenuEnableIF)requireActivity()).addMenuIfRequired();
+        }
     }
 
     private void selectSpinner(Spinner spinner, String value) {

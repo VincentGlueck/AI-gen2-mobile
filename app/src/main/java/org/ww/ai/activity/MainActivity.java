@@ -3,11 +3,9 @@ package org.ww.ai.activity;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
@@ -19,10 +17,11 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -35,6 +34,8 @@ import com.google.android.material.snackbar.Snackbar;
 import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
+import org.ww.ai.enumif.MenuEnableIF;
+import org.ww.ai.fragment.GalleryFragment;
 import org.ww.ai.fragment.LicenseFragment;
 import org.ww.ai.fragment.MainFragment;
 import org.ww.ai.fragment.RenderDetailsFragment;
@@ -43,16 +44,17 @@ import org.ww.ai.ui.ImageUtil;
 
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MenuEnableIF {
 
     public final static String KEY_BITMAP = "bitmap";
     public static final String KEY_WHAT_TO_RENDER = "whatToRender";
     private static final int SIZE_SNACK_THUMB_MAX = 96;
-    private AppBarConfiguration appBarConfiguration;
-    private WhatToRenderIF lastRender;
-    private CoordinatorLayout coordinatorLayout;
-    private NavController navController;
-    private Toolbar toolbar;
+    private AppBarConfiguration mAppBarConfiguration;
+    private WhatToRenderIF mLastRender;
+    private CoordinatorLayout mCoordinatorLayout;
+    private NavController mNavController;
+    private NavHostFragment mNavHostFragment;
+    private MenuProvider mMenuProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,56 +63,50 @@ public class MainActivity extends AppCompatActivity {
         org.ww.ai.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        toolbar = binding.toolbar;
+        Toolbar toolbar = binding.toolbar;
         setSupportActionBar(toolbar);
 
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
-        assert navHostFragment != null;
-        navController = navHostFragment.getNavController();
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        coordinatorLayout = findViewById(R.id.main_activity_coordinator_layout);
+        mNavHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        assert mNavHostFragment != null;
+        mNavController = mNavHostFragment.getNavController();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(mNavController.getGraph()).build();
+        NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
+        mCoordinatorLayout = findViewById(R.id.main_activity_coordinator_layout);
         checkIntentPurpose();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.mainmenu, menu);
-        return true;
-    }
+    private void addMenu() {
+        mMenuProvider = new MenuProvider() {
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        setToolbarEnabled(false);
-        try {
-            if (R.id.action_so_far == id) {
-                navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment);
-            } else if (R.id.action_gallery == id) {
-                navController.navigate(R.id.action_MainFragment_to_ResultsGalleryFragment);
-            } else if (R.id.action_settings == id) {
-                navController.navigate(R.id.action_MainFragment_to_SettingsFragment);
-            } else if (R.id.action_license == id) {
-                navController.navigate(R.id.action_MainFragment_to_LicenseFragment);
-            } else {
-                return false;
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.mainmenu, menu);
             }
-        } catch (IllegalArgumentException e) {
-            Log.d("NAVGRAPH", "Sorry, no route for this. Trying to go back to MainFragment");
-            navController.navigate(R.id.MainFragment);
-            setToolbarEnabled(true);
-            return false;
-        }
-        return true;
-    }
-
-    public void setToolbarEnabled(boolean enabled) {
-        for (int n = 0; n < toolbar.getMenu().size(); n++) {
-            toolbar.getMenu().getItem(n).setEnabled(enabled);
-            toolbar.getMenu().getItem(0).setIconTintList(
-                    enabled ? ColorStateList.valueOf(Color.WHITE): ColorStateList.valueOf(Color.GRAY));
-        }
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                try {
+                    removeMenuProvider(mMenuProvider);
+                    if (R.id.action_so_far == id) {
+                        mNavController.navigate(R.id.action_MainFragment_to_RenderResultsFragment);
+                    } else if (R.id.action_gallery == id) {
+                        mNavController.navigate(R.id.action_MainFragment_to_ResultsGalleryFragment);
+                    } else if (R.id.action_settings == id) {
+                        mNavController.navigate(R.id.action_MainFragment_to_SettingsFragment);
+                    } else if (R.id.action_license == id) {
+                        mNavController.navigate(R.id.action_MainFragment_to_LicenseFragment);
+                    } else {
+                        return false;
+                    }
+                } catch (IllegalArgumentException e) {
+                    Log.d("NAVGRAPH", "Sorry, no route for this. Trying to go back to MainFragment");
+                    mNavController.navigate(R.id.MainFragment);
+                    return false;
+                }
+                return true;
+            }
+        };
+        addMenuProvider(mMenuProvider);
     }
 
     private void checkIntentPurpose() {
@@ -139,18 +135,28 @@ public class MainActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(this, ReceiveImageActivity.class);
         intent.putExtra(KEY_BITMAP, uri);
-        intent.putExtra(KEY_WHAT_TO_RENDER, lastRender);
+        intent.putExtra(KEY_WHAT_TO_RENDER, mLastRender);
         receiveActivityResultLauncher.launch(intent);
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp();
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
+    }
+
+
+
+    @Override
+    public void addMenuIfRequired() {
+        Fragment fragment = mNavHostFragment.getChildFragmentManager().getFragments().get(0);
+        if(MainFragment.class.isAssignableFrom(fragment.getClass())) {
+            addMenu();
+        }
     }
 
     public void setLastQuery(WhatToRenderIF whatToRenderIF) {
-        lastRender = whatToRenderIF;
+        mLastRender = whatToRenderIF;
     }
 
     ActivityResultLauncher<Intent> receiveActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -175,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         }
         builder.append(getText(R.string.history_entry_created_snackbar)).append("    ");
         builder.setSpan(new ImageSpan(MainActivity.this, bitmap), builder.length() - 1, builder.length(), 0);
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, builder, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(mCoordinatorLayout, builder, Snackbar.LENGTH_LONG);
         snackbar.setActionTextColor(Color.YELLOW);
 
         snackbar.setAction(getText(R.string.history_entry_show_snackbar), view ->
@@ -190,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putInt(RenderDetailsFragment.ARG_UID,
                             renderResult != null ? renderResult.uid : Integer.MIN_VALUE);
-                    setToolbarEnabled(false);
                     navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment, bundle);
                 }
             }
@@ -211,10 +216,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         super.onBackPressed();
-        enableOrDisableHamburger(navHostFragment.getChildFragmentManager().getFragments().get(0));
     }
 
-    public void enableOrDisableHamburger(Fragment fragment) {
-        setToolbarEnabled(MainFragment.class.isAssignableFrom(fragment.getClass()));
-    }
 }
