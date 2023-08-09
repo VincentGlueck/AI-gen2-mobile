@@ -36,6 +36,7 @@ import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.tools.ShareImageUtil;
 import org.ww.ai.ui.DialogUtil;
 import org.ww.ai.ui.ImageUtil;
+import org.ww.ai.ui.inclues.ShowRenderModelsLinearLayout;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,15 +49,16 @@ public class RenderDetailsFragment extends Fragment {
     public static final String ARG_UID = "uid";
     private int uid;
 
-    private RenderDetailsFragmentBinding binding;
+    private RenderDetailsFragmentBinding mBinding;
 
-    private Context containerContext;
+    private Context mContainerContext;
 
-    private ActivityResultLauncher<Intent> receiveActivityResultLauncher;
+    private ActivityResultLauncher<Intent> mReceiveActivityResultLauncher;
 
-    private RenderResult originalRenderResult;
+    private RenderResult mOrriginalRenderResult;
 
-    private View view;
+    private View mLocalView;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,13 +66,13 @@ public class RenderDetailsFragment extends Fragment {
         if (getArguments() != null) {
             uid = getArguments().getInt(ARG_UID);
         }
-        receiveActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        mReceiveActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                 Intent data = result.getData();
                 Uri imageUri = data.getData();
                 byte[] bytes = getImageFromGallery(imageUri);
                 if (bytes != null) {
-                    promptReplace(bytes, originalRenderResult.image.length);
+                    promptReplace(bytes, mOrriginalRenderResult.image.length);
                 }
             }
         });
@@ -80,7 +82,7 @@ public class RenderDetailsFragment extends Fragment {
         assert getContext() != null;
         String msg = getContext().getResources().getString(R.string.prompt_replace_image, lengthOld, bytes.length);
         DialogUtil.DIALOG_UTIL.showPrompt(getContext(),
-                originalRenderResult.queryString,
+                mOrriginalRenderResult.queryString,
                 msg,
                 R.string.btn_yes,
                 (dialog, which) -> updateImage(bytes),
@@ -110,33 +112,34 @@ public class RenderDetailsFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         assert container != null;
-        this.containerContext = container.getContext();
-        binding = RenderDetailsFragmentBinding.inflate(inflater, container, false);
+        this.mContainerContext = container.getContext();
+        mBinding = RenderDetailsFragmentBinding.inflate(inflater, container, false);
         if (savedInstanceState != null) {
+            //noinspection DataFlowIssue
             uid = (int) savedInstanceState.get(ARG_UID);
         }
-        return binding.getRoot();
+        return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.view = view;
+        this.mLocalView = view;
         if (uid > Integer.MIN_VALUE) {
             loadRenderResultFromDatabase(view, uid);
         }
     }
 
     private void loadRenderResultFromDatabase(View view, int uid) {
-        AppDatabase db = AppDatabase.getInstance(containerContext);
+        AppDatabase db = AppDatabase.getInstance(mContainerContext);
         ListenableFuture<RenderResult> future = db.renderResultDao().getById(uid);
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             if (result != null) {
-                originalRenderResult = result;
+                mOrriginalRenderResult = result;
                 fillContentViewFromResult(view, result);
             }
-        }, containerContext);
+        }, mContainerContext);
     }
 
     private void fillContentViewFromResult(View view, RenderResult result) {
@@ -156,25 +159,33 @@ public class RenderDetailsFragment extends Fragment {
         TextView textViewDate = view.findViewById(R.id.what_was_rendered_date);
         textViewDate.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT,
                 DateFormat.SHORT).format(new Date(result.createdTime)));
+
+        if(result.enginesUsed != null && !result.enginesUsed.isEmpty()) {
+            ViewGroup engineLayout = view.findViewById(R.id.render_details_include);
+            ShowRenderModelsLinearLayout enginesUsedView = new ShowRenderModelsLinearLayout(mContainerContext);
+            enginesUsedView.init(mContainerContext, engineLayout, result.enginesUsed);
+            engineLayout.addView(enginesUsedView);
+        }
+
     }
 
 
     private void replaceImage() {
         Intent intent = new Intent(Intent.ACTION_PICK, EXTERNAL_CONTENT_URI);
-        receiveActivityResultLauncher.launch(intent);
+        mReceiveActivityResultLauncher.launch(intent);
     }
 
     private void updateImage(byte[] bytes) {
-        originalRenderResult.image = bytes;
+        mOrriginalRenderResult.image = bytes;
         Bitmap thumbNail = IMAGE_UTIL.getScaledBitmap(IMAGE_UTIL.convertBlobToImage(bytes), ImageUtil.THUMB_NAIL_SIZE);
-        originalRenderResult.thumbNail = IMAGE_UTIL.convertImageToBlob(thumbNail);
+        mOrriginalRenderResult.thumbNail = IMAGE_UTIL.convertImageToBlob(thumbNail);
         AppDatabase db = AppDatabase.getInstance(getActivity());
         assert getActivity() != null;
-        ListenableFuture<Integer> future = db.renderResultDao().updateRenderResults(List.of(originalRenderResult));
+        ListenableFuture<Integer> future = db.renderResultDao().updateRenderResults(List.of(mOrriginalRenderResult));
         AsyncDbFuture<Integer> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, i -> {
             if (i == 1) {
-                setImageViewFromBytes(view, bytes);
+                setImageViewFromBytes(mLocalView, bytes);
             } else {
                 Toast.makeText(getActivity(), "Error updating image", Toast.LENGTH_LONG).show();
             }
@@ -190,6 +201,6 @@ public class RenderDetailsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        binding = null;
+        mBinding = null;
     }
 }

@@ -38,19 +38,17 @@ import java.util.List;
 public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapter.ViewHolder> {
 
     private static final int PREVIEW_SIZE = 272;
-    private final List<RenderResultLightWeight> localDataSet;
-    private final OnItemClickListener listener;
-
-    private final DateFormat dateFormat;
-
-    private final Context context;
+    private final List<RenderResultLightWeight> mLocalDataSet;
+    private final OnItemClickListener mOnItemClickListener;
+    private final DateFormat mDateFormat;
+    private final Context mContext;
 
 
-    public RenderResultAdapter(Context context, OnItemClickListener listener) {
-        this.context = context;
-        this.listener = listener;
-        this.localDataSet = new ArrayList<>();
-        dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    public RenderResultAdapter(Context context, OnItemClickListener onItemClickListener) {
+        mContext = context;
+        mOnItemClickListener = onItemClickListener;
+        mLocalDataSet = new ArrayList<>();
+        mDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     }
 
     public void addRenderResults(List<RenderResultLightWeight> renderResults) {
@@ -58,27 +56,27 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
             Log.d("ADD_RENDER_RESULTS", "Attempt to add null or empty list of RenderResults");
             return;
         }
-        int oldLength = localDataSet.size();
-        localDataSet.addAll(renderResults);
-        notifyItemRangeInserted(oldLength, localDataSet.size());
+        int oldLength = mLocalDataSet.size();
+        mLocalDataSet.addAll(renderResults);
+        notifyItemRangeInserted(oldLength, mLocalDataSet.size());
     }
 
     public void removeResult(int position) {
-        if (position >= 0 && position < localDataSet.size()) {
-            localDataSet.remove(position);
+        if (position >= 0 && position < mLocalDataSet.size()) {
+            mLocalDataSet.remove(position);
             notifyItemRemoved(position);
         } else {
-            Log.e("REMOVE_RESULT", "with position " + position + ", but localDataSet.size() is " + localDataSet.size());
+            Log.e("REMOVE_RESULT", "with position " + position + ", but localDataSet.size() is " + mLocalDataSet.size());
         }
     }
 
     public void restoreResult(RenderResultLightWeight renderResult, int position) {
-        localDataSet.add(position, renderResult);
+        mLocalDataSet.add(position, renderResult);
         notifyItemInserted(position);
     }
 
     public RenderResultLightWeight itemAt(int position) {
-        return localDataSet.get(position);
+        return mLocalDataSet.get(position);
     }
 
     @NonNull
@@ -92,11 +90,11 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull RenderResultAdapter.ViewHolder viewHolder, int position) {
-        RenderResultLightWeight item = localDataSet.get(position);
+        RenderResultLightWeight item = mLocalDataSet.get(position);
         viewHolder.getQueryStringTextView().setText(item.queryString);
         RequestOptions requestOptions = new RequestOptions();
         requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(16));
-        Glide.with(context)
+        Glide.with(mContext)
                 .asBitmap()
                 .load(IMAGE_UTIL.convertBlobToImage(item.thumbNail))
                 .override(PREVIEW_SIZE)
@@ -104,13 +102,12 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
                 .into(viewHolder.getThumb());
         viewHolder.getTextViewSizeLabel().setText(item.width + "x" + item.height);
         List<EngineUsedNonDao> enginesUsed = item.enginesUsed;
-        if(enginesUsed != null && !enginesUsed.isEmpty()) {
-            ShowRenderModelsLinearLayout enginesUsedView = new ShowRenderModelsLinearLayout(context);
-            enginesUsedView.init(context, viewHolder.getRootView());
+        if (enginesUsed != null && !enginesUsed.isEmpty()) {
+            ShowRenderModelsLinearLayout enginesUsedView = new ShowRenderModelsLinearLayout(mContext);
+            enginesUsedView.init(mContext, viewHolder.getRootView(), enginesUsed);
             viewHolder.getLinearLayout().addView(enginesUsedView);
-            enginesUsedView.setEngineList(enginesUsed);
         }
-        SpannableString spanString = new SpannableString(dateFormat.format(
+        SpannableString spanString = new SpannableString(mDateFormat.format(
                 new Date(item.createdTime)));
         spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
         viewHolder.getTextViewDate().setText(spanString);
@@ -123,12 +120,12 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
             animationSet.start();
             item.flagHighLight = false;
         }
-        viewHolder.bind(item, listener);
+        viewHolder.bind(item, mOnItemClickListener);
     }
 
     public int getPositionOfUid(int uid) {
-        for (int n = 0; n < localDataSet.size(); n++) {
-            if (localDataSet.get(n).uid == uid) {
+        for (int n = 0; n < mLocalDataSet.size(); n++) {
+            if (mLocalDataSet.get(n).uid == uid) {
                 return n;
             }
         }
@@ -138,11 +135,11 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
 
     @Override
     public int getItemCount() {
-        return localDataSet.size();
+        return mLocalDataSet.size();
     }
 
     public void highLightNewRow(int position) {
-        localDataSet.get(position).flagHighLight = true;
+        mLocalDataSet.get(position).flagHighLight = true;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -168,9 +165,7 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
         }
 
         public void bind(final RenderResultLightWeight item, final OnItemClickListener listener) {
-            itemView.setOnClickListener(l -> {
-                listener.onItemClick(item);
-            });
+            itemView.setOnClickListener(l -> listener.onItemClick(item));
         }
 
         public TextView getQueryStringTextView() {

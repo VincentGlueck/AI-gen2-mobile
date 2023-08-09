@@ -81,7 +81,7 @@
             tools:ignore="HardcodedText" />
 
         <include
-            android:id="@+id/single_render_result_row_include"
+            android:id="@+id/render_details_include"
             layout="@layout/render_model_include" />
 
     </LinearLayout>
