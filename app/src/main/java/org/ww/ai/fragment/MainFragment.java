@@ -75,6 +75,8 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         this.view = view;
 
         binding.btnNext.setOnClickListener(v -> {
+            requireActivity().removeMenuProvider(((MainActivity) requireActivity()).getMenuProvider());
+            ((MainActivity)requireActivity()).setMenuProvider(null);
             NavHostFragment.findNavController(MainFragment.this)
                     .navigate(R.id.action_MainFragment_to_ShowSentencesFragment);
         });

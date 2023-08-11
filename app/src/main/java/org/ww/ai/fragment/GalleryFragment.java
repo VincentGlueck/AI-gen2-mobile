@@ -4,6 +4,7 @@ import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -121,6 +122,7 @@ public class GalleryFragment extends Fragment {
         View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_result,
                 mLinearLayout, false);
         mLinearLayout.addView(emptyView);
+        mLinearLayout.setBackgroundColor(Color.BLACK);
     }
 
     private void initSingleImageView(RenderResultLightWeight lightWeight, LinearLayout layoutHolder) {
@@ -203,16 +205,16 @@ public class GalleryFragment extends Fragment {
 
     private void performDelete() {
         AppDatabase db = AppDatabase.getInstance(requireContext());
-//        mSelectedSet.forEach(r -> {
-//            ListenableFuture<RenderResult> future = db.renderResultDao().getById(Integer.parseInt(r));
-//            AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
-//            asyncDbFuture.processFuture(future, result -> {
-//                ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
-//                AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
-//                asyncDbFutureDel.processFuture(delFuture, i -> {
-//                }, requireContext());
-//            }, requireContext());
-//        });
+        mSelectedSet.forEach(r -> {
+            ListenableFuture<RenderResult> future = db.renderResultDao().getById(Integer.parseInt(r));
+            AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
+            asyncDbFuture.processFuture(future, result -> {
+                ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
+                AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
+                asyncDbFutureDel.processFuture(delFuture, i -> {
+                }, requireContext());
+            }, requireContext());
+        });
         mSelectedSet.forEach(uid -> {
             Optional<RenderResultLightWeight> optional = mRenderResults.stream()
                     .filter(r -> r.uid == Integer.parseInt(uid)).findFirst();

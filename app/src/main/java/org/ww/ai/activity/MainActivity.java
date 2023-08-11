@@ -35,7 +35,6 @@ import org.ww.ai.R;
 import org.ww.ai.data.WhatToRenderIF;
 import org.ww.ai.databinding.ActivityMainBinding;
 import org.ww.ai.enumif.MenuEnableIF;
-import org.ww.ai.fragment.GalleryFragment;
 import org.ww.ai.fragment.LicenseFragment;
 import org.ww.ai.fragment.MainFragment;
 import org.ww.ai.fragment.RenderDetailsFragment;
@@ -76,8 +75,8 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
     }
 
     private void addMenu() {
-        mMenuProvider = new MenuProvider() {
 
+        mMenuProvider = new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menuInflater.inflate(R.menu.mainmenu, menu);
@@ -87,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
                 int id = menuItem.getItemId();
                 try {
                     removeMenuProvider(mMenuProvider);
+                    mMenuProvider = null;
                     if (R.id.action_so_far == id) {
                         mNavController.navigate(R.id.action_MainFragment_to_RenderResultsFragment);
                     } else if (R.id.action_gallery == id) {
@@ -151,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
     public void addMenuIfRequired() {
         Fragment fragment = mNavHostFragment.getChildFragmentManager().getFragments().get(0);
         if(MainFragment.class.isAssignableFrom(fragment.getClass())) {
-            addMenu();
+            if(mMenuProvider == null) {
+                addMenu();
+            }
         }
     }
 
@@ -216,6 +218,14 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
             }
         }
         super.onBackPressed();
+    }
+
+    public MenuProvider getMenuProvider() {
+        return mMenuProvider;
+    }
+
+    public void setMenuProvider(MenuProvider menuProvider) {
+        mMenuProvider = menuProvider;
     }
 
 }
