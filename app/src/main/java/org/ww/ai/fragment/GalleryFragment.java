@@ -132,10 +132,13 @@ public class GalleryFragment extends Fragment {
     private void initSingleImageView(RenderResultLightWeight lightWeight, LinearLayout layoutHolder) {
         ImageView imageView = layoutHolder.findViewById(R.id.single_gallery_image_view);
         lightWeight.checkBox = layoutHolder.findViewById(R.id.check_single_entry);
+        lightWeight.checkBox.setVisibility(View.GONE);
         imageView.setOnClickListener(v -> {
             if(lightWeight.checkBox.isChecked()) {
                 lightWeight.checkBox.setChecked(false);
                 animateOne(lightWeight, false);
+                mSelectedSet = getSelectedSet();
+                showCheckOnAll(!mSelectedSet.isEmpty());
             } else {
                 onImageClickListener(lightWeight.uid);
             }
@@ -144,6 +147,10 @@ public class GalleryFragment extends Fragment {
             lightWeight.checkBox.setChecked(!lightWeight.checkBox.isChecked());
             animateOne(lightWeight, lightWeight.checkBox.isChecked());
             updateToolbar();
+            mSelectedSet = getSelectedSet();
+            if(mSelectedSet != null) {
+                showCheckOnAll(!mSelectedSet.isEmpty());
+            }
             return true;
         });
         lightWeight.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
@@ -175,6 +182,10 @@ public class GalleryFragment extends Fragment {
         }
     }
 
+    private void showCheckOnAll(boolean visible) {
+        mRenderResults.forEach(r -> r.checkBox.setVisibility(visible ? View.VISIBLE : View.GONE));
+    }
+
     private void removeFromView(ViewGroup root, RenderResultLightWeight lightweight) {
         if (root == null) {
             return;
@@ -200,6 +211,7 @@ public class GalleryFragment extends Fragment {
             }
             if(!deleteChecked && deleteMode) {
                 removeMenuToolbar();
+                showCheckOnAll(false);
             }
         }
     }
@@ -339,9 +351,6 @@ public class GalleryFragment extends Fragment {
     }
 
     private Set<String> getSelectedSet() {
-        if(mRenderResults == null) {
-            return null;
-        }
         return mRenderResults.stream().filter(r -> r.checkBox.isChecked())
                 .map(m -> String.valueOf(m.uid)).collect(Collectors.toSet());
     }
