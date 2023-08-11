@@ -23,10 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Database(entities = {RenderResult.class}, exportSchema = true, version = 4,
+@Database(entities = {RenderResult.class}, version = 6,
         autoMigrations = {
                 @AutoMigration(from = 1, to = 2, spec = AppDatabase.MigrateRenderResult_1_2.class),
-                @AutoMigration(from = 3, to = 4, spec = AppDatabase.MigrateRenderResult_3_4.class)
+                @AutoMigration(from = 3, to = 4, spec = AppDatabase.MigrateRenderResult_3_4.class),
+                @AutoMigration(from = 5, to = 6, spec = AppDatabase.MigrateRenderResult_5_6.class)
         })
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DB_NAME = "ai-gen-2";
@@ -80,6 +81,17 @@ public abstract class AppDatabase extends RoomDatabase {
                         updateMap.get(idx) + "' WHERE uid = " + idx;
                 db.execSQL(sqlString);
             };
+            db.endTransaction();
+        }
+    }
+
+    static class MigrateRenderResult_5_6 implements AutoMigrationSpec {
+        @Override
+        public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
+            AutoMigrationSpec.super.onPostMigrate(db);
+            db.beginTransaction();
+            db.execSQL("ALTER TABLE renderresult "
+                    + " ADD COLUMN deleted BOOLEAN");
             db.endTransaction();
         }
     }
