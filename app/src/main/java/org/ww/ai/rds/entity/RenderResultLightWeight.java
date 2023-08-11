@@ -1,6 +1,7 @@
 package org.ww.ai.rds.entity;
 
 import android.util.Pair;
+import android.widget.CheckBox;
 
 import androidx.annotation.Dimension;
 import androidx.room.ColumnInfo;
@@ -52,8 +53,9 @@ public class RenderResultLightWeight implements Serializable {
     @Ignore
     public boolean flagHighLight;
 
+
     @Ignore
-    public boolean flagChecked;
+    public CheckBox checkBox;
 
     @Ignore
     public RenderResultLightWeight (RenderResult renderResult) {

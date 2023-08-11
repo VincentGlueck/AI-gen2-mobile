@@ -83,7 +83,7 @@
         android:id="@+id/ResultsGalleryFragment"
         android:name="org.ww.ai.fragment.GalleryFragment"
         android:label="@string/lbl_gallery_title"
-        tools:layout="@layout/results_gallery_fragment">
+        tools:layout="@layout/gallery_fragment">
         <action
             android:id="@+id/action_ResultsGalleryFragment_to_MainFragment"
             app:destination="@id/MainFragment" />
@@ -95,7 +95,7 @@
         android:id="@+id/GalleryFullSizeFragment"
         android:name="org.ww.ai.fragment.GalleryFullSizeFragment"
         android:label="@string/lbl_gallery_title"
-        tools:layout="@layout/results_gallery_fragment">
+        tools:layout="@layout/gallery_fragment">
         <action
             android:id="@+id/action_GalleryFullSizeFragment_to_ResultsGalleryFragment"
             app:destination="@id/ResultsGalleryFragment" />

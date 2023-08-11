@@ -1,5 +1,7 @@
 package org.ww.ai.data;
 
+import androidx.annotation.NonNull;
+
 public class RenderResult {
 
     private String sentence;
@@ -66,6 +68,7 @@ public class RenderResult {
         this.resolution = resolution;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "RenderResult{" +
