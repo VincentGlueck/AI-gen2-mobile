@@ -51,7 +51,7 @@ public class GalleryFragment extends Fragment {
 
     private static final int THUMBS_PER_ROW = 3;
     private static final long FADE_TIME = 280L;
-    private static final float SCALE_SELECTED = 0.85f;
+    private static final float SCALE_SELECTED = 0.82f;
     private static final float SCALE_FULL = 1.0f;
     private static final int STANDARD_THUMB_SIZE = 192;
     private GalleryFragmentBinding mBinding;
