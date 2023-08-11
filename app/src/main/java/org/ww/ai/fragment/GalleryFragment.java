@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +27,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -37,26 +38,29 @@ import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.ui.Animations;
 import org.ww.ai.ui.MetricsUtil;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class GalleryFragment extends Fragment {
 
     private static final int THUMBS_PER_ROW = 3;
-    private static final long FADE_TIME = 300L;
+    private static final long FADE_TIME = 280L;
+    private static final float SCALE_SELECTED = 0.85f;
+    private static final float SCALE_FULL = 1.0f;
+    private static final int STANDARD_THUMB_SIZE = 192;
     private GalleryFragmentBinding mBinding;
     private LinearLayout mLinearLayout;
     private Context mContainerContext;
     private ViewGroup mViewGroup;
     private MetricsUtil.Screen mScreen;
     private List<RenderResultLightWeight> mRenderResults;
-    private boolean deleteMode = false;
+    private final AtomicBoolean deleteMode = new AtomicBoolean();
     private MenuProvider mMenuProvider;
     private Set<String> mSelectedSet = new HashSet<>();
 
@@ -143,16 +147,7 @@ public class GalleryFragment extends Fragment {
                 onImageClickListener(lightWeight.uid);
             }
         });
-        imageView.setOnLongClickListener(l -> {
-            lightWeight.checkBox.setChecked(!lightWeight.checkBox.isChecked());
-            animateOne(lightWeight, lightWeight.checkBox.isChecked());
-            updateToolbar();
-            mSelectedSet = getSelectedSet();
-            if(mSelectedSet != null) {
-                showCheckOnAll(!mSelectedSet.isEmpty());
-            }
-            return true;
-        });
+        setOnLongClickListener(lightWeight, imageView);
         lightWeight.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
             if(!isChecked) {
                 animateOne(lightWeight, false);
@@ -163,9 +158,22 @@ public class GalleryFragment extends Fragment {
         });
     }
 
+    private void setOnLongClickListener(RenderResultLightWeight lightWeight, ImageView imageView) {
+        imageView.setOnLongClickListener(l -> {
+            lightWeight.checkBox.setChecked(!lightWeight.checkBox.isChecked());
+            animateOne(lightWeight, lightWeight.checkBox.isChecked());
+            updateToolbar();
+            mSelectedSet = getSelectedSet();
+            if(mSelectedSet != null) {
+                showCheckOnAll(!mSelectedSet.isEmpty());
+            }
+            return true;
+        });
+    }
+
     private void animateOne(RenderResultLightWeight lightWeight, boolean decreaseSize, int... time) {
-        float from = 0.8f;
-        float to = 1.0f;
+        float from = SCALE_SELECTED;
+        float to = SCALE_FULL;
         if(decreaseSize) {
             float f = from;
             from = to;
@@ -196,7 +204,7 @@ public class GalleryFragment extends Fragment {
             if(rowParent != null) {
                 rowParent.removeView((View) parent);
                 if (rowParent.getChildCount() == 0) {
-                    root.removeView((View) rowParent);
+                    root.removeView(rowParent);
                 }
             }
         });
@@ -205,11 +213,11 @@ public class GalleryFragment extends Fragment {
     private void updateToolbar() {
         if (mRenderResults != null) {
             boolean deleteChecked = mRenderResults.stream().anyMatch(r -> r.checkBox.isChecked());
-            if (!deleteMode && deleteChecked) {
+            if (!deleteMode.get() && deleteChecked) {
                 addMenuToolbar();
-                deleteMode = true;
+                deleteMode.set(true);
             }
-            if(!deleteChecked && deleteMode) {
+            if(!deleteChecked && deleteMode.get()) {
                 removeMenuToolbar();
                 showCheckOnAll(false);
             }
@@ -219,7 +227,7 @@ public class GalleryFragment extends Fragment {
     private void removeMenuToolbar() {
         requireActivity().removeMenuProvider(mMenuProvider);
         mMenuProvider = null;
-        deleteMode = false;
+        deleteMode.set(false);
     }
 
     private void addMenuToolbar() {
@@ -238,17 +246,13 @@ public class GalleryFragment extends Fragment {
                 if (menuItem.getItemId() == R.id.action_delete) {
                     mSelectedSet = getSelectedSet();
                     if(mSelectedSet != null && !mSelectedSet.isEmpty()) {
-                        deleteSelected(mSelectedSet);
+                        performDelete();
                     }
                 }
                 return false;
             }
         };
         menuHost.addMenuProvider(mMenuProvider);
-    }
-
-    private void deleteSelected(Set<String> selectedSet) {
-        performDelete();
     }
 
     private void performDelete() {
@@ -281,11 +285,13 @@ public class GalleryFragment extends Fragment {
     private LinearLayout createImageView(byte[] thumbNail, LinearLayout rowLayout) {
         LinearLayout linearLayout = (LinearLayout) LayoutInflater
                 .from(getActivity()).inflate(R.layout.single_gallery_image, rowLayout, false);
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(32));
         ImageView imageView = linearLayout.findViewById(R.id.single_gallery_image_view);
         Glide.with(mContainerContext)
                 .asBitmap()
                 .load(IMAGE_UTIL.convertBlobToImage(thumbNail))
-                .apply(RequestOptions.centerCropTransform())
+                .apply(requestOptions)
                 .into(imageView);
         linearLayout.setPadding(0, 0, 4, 4);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -296,7 +302,7 @@ public class GalleryFragment extends Fragment {
                 params.height = (mScreen.width - 4 * THUMBS_PER_ROW) / THUMBS_PER_ROW;
             }
         } else {
-            params.width = 192;
+            params.width = STANDARD_THUMB_SIZE;
             params.height = 192;
         }
         rowLayout.addView(linearLayout, params);
