@@ -1,5 +1,6 @@
 package org.ww.ai.fragment;
 
+import static org.ww.ai.ui.Animations.ANIMATIONS;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -35,6 +37,7 @@ import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
+import org.ww.ai.ui.Animations;
 import org.ww.ai.ui.MetricsUtil;
 
 import java.util.HashSet;
@@ -46,6 +49,7 @@ import java.util.stream.Collectors;
 public class GalleryFragment extends Fragment {
 
     private static final int THUMBS_PER_ROW = 3;
+    private static final long FADE_TIME = 300L;
     private GalleryFragmentBinding mBinding;
     private LinearLayout mLinearLayout;
     private Context mContainerContext;
@@ -128,15 +132,47 @@ public class GalleryFragment extends Fragment {
     private void initSingleImageView(RenderResultLightWeight lightWeight, LinearLayout layoutHolder) {
         ImageView imageView = layoutHolder.findViewById(R.id.single_gallery_image_view);
         lightWeight.checkBox = layoutHolder.findViewById(R.id.check_single_entry);
-        imageView.setOnClickListener(v -> onImageClickListener(lightWeight.uid));
+        imageView.setOnClickListener(v -> {
+            if(lightWeight.checkBox.isChecked()) {
+                lightWeight.checkBox.setChecked(false);
+                animateOne(lightWeight, false);
+            } else {
+                onImageClickListener(lightWeight.uid);
+            }
+        });
         imageView.setOnLongClickListener(l -> {
             lightWeight.checkBox.setChecked(!lightWeight.checkBox.isChecked());
+            animateOne(lightWeight, lightWeight.checkBox.isChecked());
             updateToolbar();
             return true;
         });
         lightWeight.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
+            if(!isChecked) {
+                animateOne(lightWeight, false);
+            } else {
+                animateOne(lightWeight, true);
+            }
             updateToolbar();
         });
+    }
+
+    private void animateOne(RenderResultLightWeight lightWeight, boolean decreaseSize, int... time) {
+        float from = 0.8f;
+        float to = 1.0f;
+        if(decreaseSize) {
+            float f = from;
+            from = to;
+            to = f;
+        }
+        long delay = FADE_TIME;
+        if(time.length > 0) {
+            delay = time[0];
+        }
+        final Animation animation = ANIMATIONS.getScaleAnimation(from, to, delay, true);
+        View view = (View)lightWeight.checkBox.getParent();
+        if(view != null) {
+            view.startAnimation(animation);
+        }
     }
 
     private void removeFromView(ViewGroup root, RenderResultLightWeight lightweight) {
@@ -296,6 +332,7 @@ public class GalleryFragment extends Fragment {
             for(String str : set) {
                 if(String.valueOf(renderResult.uid).equals(str)) {
                     renderResult.checkBox.setChecked(true);
+                    animateOne(renderResult, renderResult.checkBox.isChecked(), 0);
                 }
             }
         }
