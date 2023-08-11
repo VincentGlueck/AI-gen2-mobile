@@ -141,8 +141,8 @@ public class GalleryFragment extends Fragment {
             if(lightWeight.checkBox.isChecked()) {
                 lightWeight.checkBox.setChecked(false);
                 animateOne(lightWeight, false);
-//                mSelectedSet = getSelectedSet();
-//                showCheckOnAll(!mSelectedSet.isEmpty());
+                mSelectedSet = getSelectedSet();
+                showCheckOnAll(!mSelectedSet.isEmpty());
             } else {
                 onImageClickListener(lightWeight.uid);
             }
@@ -154,6 +154,8 @@ public class GalleryFragment extends Fragment {
             } else {
                 animateOne(lightWeight, true);
             }
+            mSelectedSet = getSelectedSet();
+            showCheckOnAll(!mSelectedSet.isEmpty());
             updateToolbar();
         });
     }
