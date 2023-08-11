@@ -7,13 +7,18 @@
             android:key="pref_translate"
             android:title="@string/pref_check_translation"
             android:summary="@string/pref_summary_translation"
-            android:defaultValue="false"/>
+            android:defaultValue="false" />
+
+        <CheckBoxPreference
+            android:key="pref_use_trash"
+            android:title="@string/pref_use_trash"
+            android:summary="@string/pref_use_trash_summary"
+            android:defaultValue="true" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/pref_section_any">
-
 
         <EditTextPreference
             android:defaultValue="https://www."

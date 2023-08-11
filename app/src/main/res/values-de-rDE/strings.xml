@@ -90,5 +90,7 @@
     <string name="pref_summary_goto_ai_site">Prüfen, ob die URL geöffnet werden kann</string>
     <string name="btn_delete">Bild löschen</string>
     <string name="history_thumb_content_description">Thumbnail des gerenderten Bilds</string>
+    <string name="pref_use_trash_summary">Gelöschte Bilder können wieder hergestellt werden</string>
+    <string name="pref_use_trash">Papierkorb verwenden</string>
 
 </resources>

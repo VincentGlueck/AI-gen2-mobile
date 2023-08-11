@@ -46,13 +46,15 @@ public class RenderResultLightWeight implements Serializable {
     @ColumnInfo(name = "height", defaultValue = "0")
     public int height;
 
+    @ColumnInfo(name = "deleted", typeAffinity = ColumnInfo.INTEGER, defaultValue = "false")
+    public boolean deleted;
+
     @TypeConverters(EngineUsedNonDaoConverter.class)
     @ColumnInfo(name = "engines_used")
     public List<EngineUsedNonDao> enginesUsed;
 
     @Ignore
     public boolean flagHighLight;
-
 
     @Ignore
     public CheckBox checkBox;
@@ -67,6 +69,7 @@ public class RenderResultLightWeight implements Serializable {
         queryUsed = renderResult.queryUsed;
         width = renderResult.width;
         height = renderResult.height;
+        deleted = renderResult.deleted;
     }
 
     @Ignore

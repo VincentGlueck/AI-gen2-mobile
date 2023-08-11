@@ -51,6 +51,9 @@ public class RenderResult implements Serializable {
     @ColumnInfo(name = "height", defaultValue = "0")
     public int height;
 
+    @ColumnInfo(name = "deleted", typeAffinity = ColumnInfo.INTEGER, defaultValue = "false")
+    public boolean deleted;
+
     @TypeConverters(EngineUsedNonDaoConverter.class)
     @ColumnInfo(name = "engines_used")
     public List<EngineUsedNonDao> enginesUsed;
@@ -67,6 +70,7 @@ public class RenderResult implements Serializable {
                 ", image=" + Arrays.toString(image) +
                 ", renderEngine=" + renderEngine +
                 ", credits=" + credits +
+                ", deleted=" + deleted +
                 '}';
     }
 }
