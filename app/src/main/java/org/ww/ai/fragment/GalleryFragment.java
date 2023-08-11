@@ -141,8 +141,8 @@ public class GalleryFragment extends Fragment {
             if(lightWeight.checkBox.isChecked()) {
                 lightWeight.checkBox.setChecked(false);
                 animateOne(lightWeight, false);
-                mSelectedSet = getSelectedSet();
-                showCheckOnAll(!mSelectedSet.isEmpty());
+//                mSelectedSet = getSelectedSet();
+//                showCheckOnAll(!mSelectedSet.isEmpty());
             } else {
                 onImageClickListener(lightWeight.uid);
             }
@@ -191,6 +191,9 @@ public class GalleryFragment extends Fragment {
     }
 
     private void showCheckOnAll(boolean visible) {
+        if(mRenderResults == null) {
+            return;
+        }
         mRenderResults.forEach(r -> r.checkBox.setVisibility(visible ? View.VISIBLE : View.GONE));
     }
 
@@ -219,7 +222,6 @@ public class GalleryFragment extends Fragment {
             }
             if(!deleteChecked && deleteMode.get()) {
                 removeMenuToolbar();
-                showCheckOnAll(false);
             }
         }
     }
@@ -350,10 +352,11 @@ public class GalleryFragment extends Fragment {
             for(String str : set) {
                 if(String.valueOf(renderResult.uid).equals(str)) {
                     renderResult.checkBox.setChecked(true);
-                    animateOne(renderResult, renderResult.checkBox.isChecked(), 0);
+                    animateOne(renderResult, renderResult.checkBox.isChecked(), 1);
                 }
             }
         }
+        showCheckOnAll(mSelectedSet != null && !mSelectedSet.isEmpty());
     }
 
     private Set<String> getSelectedSet() {
