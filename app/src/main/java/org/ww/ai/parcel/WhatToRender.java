@@ -36,9 +36,6 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
     private static final String PREF_RESOLUTION = "resolution";
     private static final String PREF_QUERY_USED = "queryUsed";
     private static final String PREF_TRANSLATED_QUERY = "translatedQueryUsed";
-    private static final String PREF_USE_TRANSLATION = "useTranslation";
-
-    private static final String PREF_USE_TRASH = "useTrash";
 
     public WhatToRender() {
     }
@@ -74,10 +71,6 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
     private String queryUsed;
     private String englishDescription;
     private boolean instantCopyToClipBoard;
-    private boolean useTranslation;
-
-    private boolean useTrash;
-
 
     @Override
     public String getDescription() {
@@ -120,7 +113,7 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
     }
 
     @Override
-    public void readCommand(String[] args) throws Exception {
+    public void readCommand(String[] args) {
         Log.d("WHATTORENDER", "Method call *not* expected: readCommand(String[] args)");
     }
 
@@ -217,7 +210,6 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
         dest.writeString(Boolean.toString(randomResolution));
         dest.writeString(camera);
         dest.writeString(englishDescription);
-        dest.writeString(Boolean.toString(useTranslation));
     }
 
     @Override
@@ -228,16 +220,6 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
     @Override
     public void setTranslateToEnglishDescription(String englishDescription) {
         this.englishDescription = englishDescription;
-    }
-
-    @Override
-    public boolean isUseTranslation() {
-        return useTranslation;
-    }
-
-    @Override
-    public void setUseTranslation(boolean use) {
-        useTranslation = use;
     }
 
     public void setPhraseCount(int phraseCount) {
@@ -279,8 +261,6 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
             editor.putString(PREF_RESOLUTION, getResolution());
             editor.putString(PREF_QUERY_USED, getQueryUsed());
             editor.putString(PREF_TRANSLATED_QUERY, getTranslateToEnglishDescription());
-            editor.putBoolean(PREF_USE_TRANSLATION, isUseTranslation());
-            editor.putBoolean(PREF_USE_TRASH, isUseTrash());
         } finally {
             editor.apply();
         }
@@ -303,8 +283,6 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
         setRandomResolution(preferences.getBoolean(PREF_RANDOM_RESOLUTION, false));
         setQueryUsed(preferences.getString(PREF_QUERY_USED, "undefined"));
         setTranslateToEnglishDescription(preferences.getString(PREF_TRANSLATED_QUERY, null));
-        setUseTranslation(preferences.getBoolean(PREF_USE_TRANSLATION, false));
-        setUseTrash(preferences.getBoolean(PREF_USE_TRASH, true));
     }
 
     @NonNull
@@ -328,11 +306,4 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
                 '}';
     }
 
-    public boolean isUseTrash() {
-        return useTrash;
-    }
-
-    public void setUseTrash(boolean useTrash) {
-        this.useTrash = useTrash;
-    }
 }
