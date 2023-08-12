@@ -43,7 +43,7 @@ public class TrashBinFragment extends GalleryFragment {
                     R.string.lbl_trash_bin_title,
                     R.string.empty_trash_prompt,
                     R.string.btn_yes,
-                    this::onClick,
+                    (dialog, which) -> emptyTrash(),
                     R.string.btn_no,
                     (dialog, which) -> {
                     },
@@ -59,7 +59,10 @@ public class TrashBinFragment extends GalleryFragment {
                 appDatabase.renderResultDao().emptyTrash();
         AsyncDbFuture<Integer> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(listenableFuture,
-                r -> Log.d("TRASH", "empty trash: " + r), requireContext());
+                r -> {
+                    mLinearLayout.removeAllViews();
+                    showNothingToDisplayImage();
+                }, requireContext());
     }
 
     @Override
