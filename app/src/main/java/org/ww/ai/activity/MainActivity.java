@@ -38,6 +38,7 @@ import org.ww.ai.enumif.MenuEnableIF;
 import org.ww.ai.fragment.LicenseFragment;
 import org.ww.ai.fragment.MainFragment;
 import org.ww.ai.fragment.RenderDetailsFragment;
+import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 
