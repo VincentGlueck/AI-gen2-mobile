@@ -5,6 +5,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RawQuery;
 import androidx.room.Update;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -36,7 +37,8 @@ public interface RenderResultDao {
     @Delete
     ListenableFuture<Integer> deleteRenderResults(List<RenderResult> renderResults);
 
-    @Query("DELETE FROM " + TABLE + " WHERE deleted = 'true'")
+    // **** USE WITH CARE! ****
+    @Query("DELETE FROM " + TABLE + " WHERE deleted = 1")
     ListenableFuture<Integer> emptyTrash();
 
 }
