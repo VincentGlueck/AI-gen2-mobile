@@ -18,14 +18,17 @@
             android:id="@+id/action_MainFragment_to_RenderResultsFragment"
             app:destination="@id/RenderResultsFragment" />
         <action
-            android:id="@+id/action_MainFragment_to_ResultsGalleryFragment"
-            app:destination="@id/ResultsGalleryFragment" />
+            android:id="@+id/action_MainFragment_to_GalleryFragment"
+            app:destination="@id/GalleryFragment" />
         <action
             android:id="@+id/action_MainFragment_to_SettingsFragment"
             app:destination="@id/SettingsFragment" />
         <action
             android:id="@+id/action_MainFragment_to_LicenseFragment"
             app:destination="@id/LicenseFragment" />
+        <action
+            android:id="@+id/action_MainFragment_to_TrashBinFragment"
+            app:destination="@id/TrashBinFragment" />
     </fragment>
     <fragment
         android:id="@+id/ShowSentencesFragment"
@@ -74,13 +77,13 @@
             app:destination="@id/GalleryFullSizeFragment" />
         <action
             android:id="@+id/action_RenderDetailsFragment_to_ResultsGalleryFragment"
-            app:destination="@id/ResultsGalleryFragment" />
+            app:destination="@id/GalleryFragment" />
         <action
             android:id="@+id/action_RenderDetailsFragment_to_GalleryFullSizeFragment2"
             app:destination="@id/GalleryFullSizeFragment" />
     </fragment>
     <fragment
-        android:id="@+id/ResultsGalleryFragment"
+        android:id="@+id/GalleryFragment"
         android:name="org.ww.ai.fragment.GalleryFragment"
         android:label="@string/lbl_gallery_title"
         tools:layout="@layout/gallery_fragment">
@@ -88,7 +91,19 @@
             android:id="@+id/action_ResultsGalleryFragment_to_MainFragment"
             app:destination="@id/MainFragment" />
         <action
-            android:id="@+id/action_ResultsGalleryFragment_to_GalleryFullSizeFragment"
+            android:id="@+id/action_GalleryFragment_to_GalleryFullSizeFragment"
+            app:destination="@id/GalleryFullSizeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/TrashBinFragment"
+        android:name="org.ww.ai.fragment.TrashBinFragment"
+        android:label="@string/lbl_trash_bin_title"
+        tools:layout="@layout/gallery_fragment">
+        <action
+            android:id="@+id/action_TrashBinFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
+        <action
+            android:id="@+id/action_TrashBinFragment_to_GalleryFullSizeFragment"
             app:destination="@id/GalleryFullSizeFragment" />
     </fragment>
     <fragment
@@ -98,7 +113,10 @@
         tools:layout="@layout/gallery_fragment">
         <action
             android:id="@+id/action_GalleryFullSizeFragment_to_ResultsGalleryFragment"
-            app:destination="@id/ResultsGalleryFragment" />
+            app:destination="@id/GalleryFragment" />
+        <action
+            android:id="@+id/action_GalleryFullSizeFragment_to_TrashBinFragment"
+            app:destination="@id/TrashBinFragment" />
     </fragment>
     <fragment
         android:id="@+id/SettingsFragment"

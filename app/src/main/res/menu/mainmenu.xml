@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android" >
-    <group android:id="@+id/main_menu_group">
+
         <item
             android:id="@+id/action_gallery"
             android:icon="@drawable/ic_gallery"
@@ -13,6 +13,11 @@
             android:title="@string/lbl_render_results"
             app:showAsAction="never" />
         <item
+            android:id="@+id/action_trash_bin"
+            android:title="@string/lbl_trash_bin_title"
+            android:icon="@drawable/ic_delete"
+            app:showAsAction="never" />
+        <item
             android:id="@+id/action_settings"
             android:icon="@drawable/ic_settings"
             android:title="@string/settings"
@@ -21,6 +26,7 @@
             android:id="@+id/action_license"
             android:title="@string/show_license"
             app:showAsAction="never" />
-    </group>
+
+
 
 </menu>
