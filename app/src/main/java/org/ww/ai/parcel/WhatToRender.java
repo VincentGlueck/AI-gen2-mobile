@@ -113,11 +113,6 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
     }
 
     @Override
-    public void readCommand(String[] args) {
-        Log.d("WHATTORENDER", "Method call *not* expected: readCommand(String[] args)");
-    }
-
-    @Override
     public void setDescription(String description) {
         this.description = description;
     }
