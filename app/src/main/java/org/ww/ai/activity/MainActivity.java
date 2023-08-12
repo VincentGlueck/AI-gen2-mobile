@@ -38,7 +38,6 @@ import org.ww.ai.enumif.MenuEnableIF;
 import org.ww.ai.fragment.LicenseFragment;
 import org.ww.ai.fragment.MainFragment;
 import org.ww.ai.fragment.RenderDetailsFragment;
-import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.ui.ImageUtil;
 
@@ -91,7 +90,9 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
                     if (R.id.action_so_far == id) {
                         mNavController.navigate(R.id.action_MainFragment_to_RenderResultsFragment);
                     } else if (R.id.action_gallery == id) {
-                        mNavController.navigate(R.id.action_MainFragment_to_ResultsGalleryFragment);
+                        mNavController.navigate(R.id.action_MainFragment_to_GalleryFragment);
+                    } else if (R.id.action_trash_bin == id) {
+                        mNavController.navigate(R.id.action_MainFragment_to_TrashBinFragment);
                     } else if (R.id.action_settings == id) {
                         mNavController.navigate(R.id.action_MainFragment_to_SettingsFragment);
                     } else if (R.id.action_license == id) {
@@ -183,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
             }
         }
         builder.append(getText(R.string.history_entry_created_snackbar)).append("    ");
+        assert bitmap != null;
         builder.setSpan(new ImageSpan(MainActivity.this, bitmap), builder.length() - 1, builder.length(), 0);
         Snackbar snackbar = Snackbar.make(mCoordinatorLayout, builder, Snackbar.LENGTH_LONG);
         snackbar.setActionTextColor(Color.YELLOW);
@@ -197,8 +199,7 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
                     NavController navController = Navigation.findNavController(
                             MainActivity.this, R.id.nav_host_fragment_content_main);
                     Bundle bundle = new Bundle();
-                    bundle.putInt(RenderDetailsFragment.ARG_UID,
-                            renderResult != null ? renderResult.uid : Integer.MIN_VALUE);
+                    bundle.putInt(RenderDetailsFragment.ARG_UID, renderResult.uid);
                     navController.navigate(R.id.action_MainFragment_to_RenderResultsFragment, bundle);
                 }
             }

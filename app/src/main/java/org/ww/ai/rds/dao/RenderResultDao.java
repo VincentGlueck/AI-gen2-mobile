@@ -20,10 +20,11 @@ public interface RenderResultDao {
     String TABLE = "renderresult";
 
     @Query("SELECT uid, createdTime, thumbnail, render_engine, query_string, query_used, width," +
-            " height, engines_used, deleted from " + TABLE + " ORDER BY createdTime DESC")
-    ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights();
+            " height, engines_used, deleted FROM " + TABLE +
+            " WHERE deleted = :flagDeleted ORDER BY createdTime DESC")
+    ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights(boolean flagDeleted);
 
-    @Query("SELECT * from " + TABLE + " WHERE uid = :id")
+    @Query("SELECT * FROM " + TABLE + " WHERE uid = :id")
     ListenableFuture<RenderResult> getById(int id);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
@@ -34,5 +35,8 @@ public interface RenderResultDao {
 
     @Delete
     ListenableFuture<Integer> deleteRenderResults(List<RenderResult> renderResults);
+
+    @Query("DELETE FROM " + TABLE + " WHERE deleted = 'true'")
+    ListenableFuture<Integer> emptyTrash();
 
 }

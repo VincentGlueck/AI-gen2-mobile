@@ -98,7 +98,8 @@ public class RenderHistoryFragment extends Fragment implements RenderResultAdapt
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
 
                 final int position = viewHolder.getAdapterPosition();
-                renderResultLightWeights.put(adapter.itemAt(position).uid, new LightWeightDeleteHolder(position, adapter.itemAt(position)));
+                renderResultLightWeights.put(adapter.itemAt(position).uid,
+                        new LightWeightDeleteHolder(position, adapter.itemAt(position)));
                 adapter.removeResult(position);
 
                 Snackbar snackbar = Snackbar.make(linearLayout, getText(R.string.history_entry_deleted_snackbar), Snackbar.LENGTH_LONG);
@@ -147,7 +148,8 @@ public class RenderHistoryFragment extends Fragment implements RenderResultAdapt
 
     private void getRenderResultsFromDatabase() {
         AppDatabase appDatabase = AppDatabase.getInstance(containerContext);
-        ListenableFuture<List<RenderResultLightWeight>> listenableFuture = appDatabase.renderResultDao().getAllLightWeights();
+        ListenableFuture<List<RenderResultLightWeight>> listenableFuture =
+                appDatabase.renderResultDao().getAllLightWeights(false);
         AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(listenableFuture, renderResults -> {
             adapter.addRenderResults(renderResults);
