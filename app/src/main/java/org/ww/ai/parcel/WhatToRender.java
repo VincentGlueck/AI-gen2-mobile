@@ -38,6 +38,8 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
     private static final String PREF_TRANSLATED_QUERY = "translatedQueryUsed";
     private static final String PREF_USE_TRANSLATION = "useTranslation";
 
+    private static final String PREF_USE_TRASH = "useTrash";
+
     public WhatToRender() {
     }
 
@@ -73,6 +75,8 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
     private String englishDescription;
     private boolean instantCopyToClipBoard;
     private boolean useTranslation;
+
+    private boolean useTrash;
 
 
     @Override
@@ -276,6 +280,7 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
             editor.putString(PREF_QUERY_USED, getQueryUsed());
             editor.putString(PREF_TRANSLATED_QUERY, getTranslateToEnglishDescription());
             editor.putBoolean(PREF_USE_TRANSLATION, isUseTranslation());
+            editor.putBoolean(PREF_USE_TRASH, isUseTrash());
         } finally {
             editor.apply();
         }
@@ -299,6 +304,7 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
         setQueryUsed(preferences.getString(PREF_QUERY_USED, "undefined"));
         setTranslateToEnglishDescription(preferences.getString(PREF_TRANSLATED_QUERY, null));
         setUseTranslation(preferences.getBoolean(PREF_USE_TRANSLATION, false));
+        setUseTrash(preferences.getBoolean(PREF_USE_TRASH, true));
     }
 
     @NonNull
@@ -320,5 +326,13 @@ public class WhatToRender implements WhatToRenderIF, Parcelable {
                 ", resolution='" + resolution + '\'' +
                 ", queryUsed='" + queryUsed + '\'' +
                 '}';
+    }
+
+    public boolean isUseTrash() {
+        return useTrash;
+    }
+
+    public void setUseTrash(boolean useTrash) {
+        this.useTrash = useTrash;
     }
 }

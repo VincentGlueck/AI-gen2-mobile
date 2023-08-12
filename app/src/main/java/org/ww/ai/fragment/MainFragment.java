@@ -1,5 +1,7 @@
 package org.ww.ai.fragment;
 
+import static org.ww.ai.prefs.Preferences.PREF_USE_TRANSLATION;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -38,6 +40,7 @@ import org.ww.ai.databinding.MainFragmentBinding;
 import org.ww.ai.enumif.MenuEnableIF;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
+import org.ww.ai.prefs.Preferences;
 import org.ww.ai.tools.SimpleTranslationUtil;
 import org.ww.ai.tools.TranslationAvailableNotifierIF;
 import org.xml.sax.SAXException;
@@ -134,6 +137,10 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         checkRandomResolution.setChecked(whatToRender.isRandomResolution());
         CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
         checkBoxTranslate.setChecked(whatToRender.isUseTranslation());
+        if(!Preferences.getInstance(requireContext()).getBoolean(PREF_USE_TRANSLATION)) {
+            checkBoxTranslate.setEnabled(false);
+            checkBoxTranslate.setChecked(false);
+        }
 
         selectSpinner(view.findViewById(R.id.spin_layout), whatToRender.getPreset());
         selectSpinner(view.findViewById(R.id.spin_artist_type), whatToRender.getArtistTypeName());
