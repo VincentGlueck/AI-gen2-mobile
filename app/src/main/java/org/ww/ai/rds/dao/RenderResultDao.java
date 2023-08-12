@@ -5,6 +5,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RawQuery;
 import androidx.room.Update;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -20,10 +21,11 @@ public interface RenderResultDao {
     String TABLE = "renderresult";
 
     @Query("SELECT uid, createdTime, thumbnail, render_engine, query_string, query_used, width," +
-            " height, engines_used from " + TABLE + " ORDER BY createdTime DESC")
-    ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights();
+            " height, engines_used, deleted FROM " + TABLE +
+            " WHERE deleted = :flagDeleted ORDER BY createdTime DESC")
+    ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights(boolean flagDeleted);
 
-    @Query("SELECT * from " + TABLE + " WHERE uid = :id")
+    @Query("SELECT * FROM " + TABLE + " WHERE uid = :id")
     ListenableFuture<RenderResult> getById(int id);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
@@ -34,5 +36,9 @@ public interface RenderResultDao {
 
     @Delete
     ListenableFuture<Integer> deleteRenderResults(List<RenderResult> renderResults);
+
+    // **** USE WITH CARE! ****
+    @Query("DELETE FROM " + TABLE + " WHERE deleted = 1")
+    ListenableFuture<Integer> emptyTrash();
 
 }

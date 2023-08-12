@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/results_gallery_fragment"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/results_gallery_linear_layout"
+    <TextView
+        android:id="@+id/empty_trash"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="4dp" />
+        android:layout_height="0dp"
+        android:layout_weight="0.05"
+        android:padding="4dp"
+        android:textColor="@color/link"
+        android:text="@string/empty_trash"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
-</ScrollView>
+    <ScrollView
+        android:id="@+id/results_gallery_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.95"
+        android:orientation="vertical"
+        tools:ignore="SpeakableTextPresentCheck">
+
+        <LinearLayout
+            android:id="@+id/results_gallery_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="4dp" />
+
+    </ScrollView>
+</LinearLayout>

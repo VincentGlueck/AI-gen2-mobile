@@ -34,6 +34,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
 import org.ww.ai.databinding.GalleryFragmentBinding;
+import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
@@ -55,14 +56,15 @@ public class GalleryFragment extends Fragment {
     private static final float SCALE_FULL = 1.0f;
     private static final int STANDARD_THUMB_SIZE = 192;
     private GalleryFragmentBinding mBinding;
-    private LinearLayout mLinearLayout;
+    protected LinearLayout mLinearLayout;
     private Context mContainerContext;
     private ViewGroup mViewGroup;
     private MetricsUtil.Screen mScreen;
-    private List<RenderResultLightWeight> mRenderResults;
+    protected List<RenderResultLightWeight> mRenderResults;
     private final AtomicBoolean deleteMode = new AtomicBoolean();
     private MenuProvider mMenuProvider;
-    private Set<String> mSelectedSet = new HashSet<>();
+    protected Set<String> mSelectedSet = new HashSet<>();
+    protected boolean mShowTrash = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +75,8 @@ public class GalleryFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         this.mViewGroup = container;
         assert container != null;
@@ -85,6 +88,7 @@ public class GalleryFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mLinearLayout = view.findViewById(R.id.results_gallery_linear_layout);
+        view.findViewById(R.id.empty_trash).setVisibility(View.GONE);
         getRenderResultsFromDatabase(mViewGroup);
         if (getActivity() != null && getActivity().getWindowManager() != null) {
             mScreen = MetricsUtil.getScreen(getActivity().getWindowManager());
@@ -93,7 +97,8 @@ public class GalleryFragment extends Fragment {
 
     private void getRenderResultsFromDatabase(final ViewGroup viewGroup) {
         AppDatabase appDatabase = AppDatabase.getInstance(mContainerContext);
-        ListenableFuture<List<RenderResultLightWeight>> listenableFuture = appDatabase.renderResultDao().getAllLightWeights();
+        ListenableFuture<List<RenderResultLightWeight>> listenableFuture =
+                appDatabase.renderResultDao().getAllLightWeights(mShowTrash);
         AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(listenableFuture,
                 r -> createGallery(viewGroup, r), mContainerContext);
@@ -121,12 +126,12 @@ public class GalleryFragment extends Fragment {
         if (renderResults.isEmpty()) {
             showNothingToDisplayImage();
         }
-        if(mSelectedSet != null && !mSelectedSet.isEmpty()) {
+        if (mSelectedSet != null && !mSelectedSet.isEmpty()) {
             markSelected(mSelectedSet);
         }
     }
 
-    private void showNothingToDisplayImage() {
+    protected void showNothingToDisplayImage() {
         View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_result,
                 mLinearLayout, false);
         mLinearLayout.addView(emptyView);
@@ -138,7 +143,7 @@ public class GalleryFragment extends Fragment {
         lightWeight.checkBox = layoutHolder.findViewById(R.id.check_single_entry);
         lightWeight.checkBox.setVisibility(View.GONE);
         imageView.setOnClickListener(v -> {
-            if(lightWeight.checkBox.isChecked()) {
+            if (lightWeight.checkBox.isChecked()) {
                 lightWeight.checkBox.setChecked(false);
                 animateOne(lightWeight, false);
                 mSelectedSet = getSelectedSet();
@@ -149,7 +154,7 @@ public class GalleryFragment extends Fragment {
         });
         setOnLongClickListener(lightWeight, imageView);
         lightWeight.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
-            if(!isChecked) {
+            if (!isChecked) {
                 animateOne(lightWeight, false);
             } else {
                 animateOne(lightWeight, true);
@@ -166,7 +171,7 @@ public class GalleryFragment extends Fragment {
             animateOne(lightWeight, lightWeight.checkBox.isChecked());
             updateToolbar();
             mSelectedSet = getSelectedSet();
-            if(mSelectedSet != null) {
+            if (mSelectedSet != null) {
                 showCheckOnAll(!mSelectedSet.isEmpty());
             }
             return true;
@@ -176,24 +181,24 @@ public class GalleryFragment extends Fragment {
     private void animateOne(RenderResultLightWeight lightWeight, boolean decreaseSize, int... time) {
         float from = SCALE_SELECTED;
         float to = SCALE_FULL;
-        if(decreaseSize) {
+        if (decreaseSize) {
             float f = from;
             from = to;
             to = f;
         }
         long delay = FADE_TIME;
-        if(time.length > 0) {
+        if (time.length > 0) {
             delay = time[0];
         }
         final Animation animation = ANIMATIONS.getScaleAnimation(from, to, delay, true);
-        View view = (View)lightWeight.checkBox.getParent();
-        if(view != null) {
+        View view = (View) lightWeight.checkBox.getParent();
+        if (view != null) {
             view.startAnimation(animation);
         }
     }
 
     private void showCheckOnAll(boolean visible) {
-        if(mRenderResults == null) {
+        if (mRenderResults == null) {
             return;
         }
         mRenderResults.forEach(r -> r.checkBox.setVisibility(visible ? View.VISIBLE : View.GONE));
@@ -206,7 +211,7 @@ public class GalleryFragment extends Fragment {
         mRenderResults.stream().filter(l -> lightweight.uid == l.uid).forEach(r -> {
             ViewParent parent = r.checkBox.getParent();
             ViewGroup rowParent = (ViewGroup) parent.getParent();
-            if(rowParent != null) {
+            if (rowParent != null) {
                 rowParent.removeView((View) parent);
                 if (rowParent.getChildCount() == 0) {
                     root.removeView(rowParent);
@@ -215,62 +220,78 @@ public class GalleryFragment extends Fragment {
         });
     }
 
-    private void updateToolbar() {
+    protected void updateToolbar() {
         if (mRenderResults != null) {
             boolean deleteChecked = mRenderResults.stream().anyMatch(r -> r.checkBox.isChecked());
             if (!deleteMode.get() && deleteChecked) {
                 addMenuToolbar();
                 deleteMode.set(true);
             }
-            if(!deleteChecked && deleteMode.get()) {
+            if (!deleteChecked && deleteMode.get()) {
                 removeMenuToolbar();
             }
         }
     }
 
-    private void removeMenuToolbar() {
+    protected void removeMenuToolbar() {
         requireActivity().removeMenuProvider(mMenuProvider);
         mMenuProvider = null;
         deleteMode.set(false);
     }
 
+    protected int getMenuResourceId() {
+        return R.menu.gallerymenu;
+    }
+
+    protected void handleMenuItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.action_delete) {
+            mSelectedSet = getSelectedSet();
+            if (mSelectedSet != null && !mSelectedSet.isEmpty()) {
+                performDelete();
+            }
+        }
+    }
+
     private void addMenuToolbar() {
-        if(mMenuProvider != null) {
+        if (mMenuProvider != null) {
             requireActivity().removeMenuProvider(mMenuProvider);
         }
         MenuHost menuHost = requireActivity();
         mMenuProvider = new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.gallerymenu, menu);
+                menuInflater.inflate(getMenuResourceId(), menu);
+
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.action_delete) {
-                    mSelectedSet = getSelectedSet();
-                    if(mSelectedSet != null && !mSelectedSet.isEmpty()) {
-                        performDelete();
-                    }
-                }
+                handleMenuItemSelected(menuItem);
                 return false;
             }
         };
         menuHost.addMenuProvider(mMenuProvider);
     }
 
+
     private void performDelete() {
         AppDatabase db = AppDatabase.getInstance(requireContext());
+        final boolean useTrash = Preferences.getInstance(requireContext()).getBoolean(Preferences.PREF_USE_TRASH);
         mSelectedSet.forEach(r -> {
             ListenableFuture<RenderResult> future = db.renderResultDao().getById(Integer.parseInt(r));
-            AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
-            asyncDbFuture.processFuture(future, result -> {
-                ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
-                AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
-                asyncDbFutureDel.processFuture(delFuture, i -> {
-                }, requireContext());
-            }, requireContext());
+            if (useTrash) {
+                softDeleteFuture(db, future, true);
+            } else {
+                hardDeleteFuture(db, future);
+            }
         });
+        removeDeletedViewsFromParent();
+        if (mRenderResults.isEmpty()) {
+            showNothingToDisplayImage();
+        }
+    }
+
+    protected void removeDeletedViewsFromParent() {
         mSelectedSet.forEach(uid -> {
             Optional<RenderResultLightWeight> optional = mRenderResults.stream()
                     .filter(r -> r.uid == Integer.parseInt(uid)).findFirst();
@@ -281,9 +302,29 @@ public class GalleryFragment extends Fragment {
             });
         });
         mSelectedSet.clear();
-        if(mRenderResults.isEmpty()) {
-            showNothingToDisplayImage();
-        }
+    }
+
+    protected void softDeleteFuture(AppDatabase db, ListenableFuture<RenderResult> future,
+                                    boolean setDeleteFlagTo) {
+        AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(future, result -> {
+            result.deleted = setDeleteFlagTo;
+            ListenableFuture<Integer> softDelFuture = db.renderResultDao().updateRenderResults(List.of(result));
+            AsyncDbFuture<Integer> asyncDbFuture1 = new AsyncDbFuture<>();
+            asyncDbFuture1.processFuture(softDelFuture, i -> {
+            }, requireContext());
+        }, requireContext());
+
+    }
+
+    private void hardDeleteFuture(AppDatabase db, ListenableFuture<RenderResult> future) {
+        AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(future, result -> {
+            ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
+            AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
+            asyncDbFutureDel.processFuture(delFuture, i -> {
+            }, requireContext());
+        }, requireContext());
     }
 
     private LinearLayout createImageView(byte[] thumbNail, LinearLayout rowLayout) {
@@ -338,21 +379,21 @@ public class GalleryFragment extends Fragment {
         mSelectedSet = new HashSet<>();
         mSelectedSet = preferences.getStringSet("sel", mSelectedSet);
         markSelected(mSelectedSet);
-        if(mSelectedSet != null && !mSelectedSet.isEmpty()) {
+        if (mSelectedSet != null && !mSelectedSet.isEmpty()) {
             addMenuToolbar();
         }
     }
 
     private void markSelected(Set<String> set) {
-        if(set == null || set.isEmpty()) {
+        if (set == null || set.isEmpty()) {
             return;
         }
-        if(mRenderResults == null) {
+        if (mRenderResults == null) {
             return;
         }
-        for(RenderResultLightWeight renderResult : mRenderResults) {
-            for(String str : set) {
-                if(String.valueOf(renderResult.uid).equals(str)) {
+        for (RenderResultLightWeight renderResult : mRenderResults) {
+            for (String str : set) {
+                if (String.valueOf(renderResult.uid).equals(str)) {
                     renderResult.checkBox.setChecked(true);
                     animateOne(renderResult, renderResult.checkBox.isChecked(), 1);
                 }
@@ -362,7 +403,7 @@ public class GalleryFragment extends Fragment {
         showCheckOnAll(mSelectedSet != null && !mSelectedSet.isEmpty());
     }
 
-    private Set<String> getSelectedSet() {
+    protected Set<String> getSelectedSet() {
         return mRenderResults.stream().filter(r -> r.checkBox.isChecked())
                 .map(m -> String.valueOf(m.uid)).collect(Collectors.toSet());
     }
@@ -371,7 +412,7 @@ public class GalleryFragment extends Fragment {
         NavController navController = NavHostFragment.findNavController(GalleryFragment.this);
         Bundle bundle = new Bundle();
         bundle.putInt(RenderDetailsFragment.ARG_UID, uid);
-        navController.navigate(R.id.action_ResultsGalleryFragment_to_GalleryFullSizeFragment, bundle);
+        navController.navigate(R.id.action_GalleryFragment_to_GalleryFullSizeFragment, bundle);
     }
 
     private LinearLayout createRow(ViewGroup parent) {
