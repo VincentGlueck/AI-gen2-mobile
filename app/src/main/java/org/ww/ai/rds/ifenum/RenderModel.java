@@ -35,7 +35,7 @@ public enum RenderModel {
     @TypeConverter
     public static RenderModel fromName(String name) {
         Optional<RenderModel> optional = Stream.of(RenderModel.values()).filter(rm -> rm.getName().equalsIgnoreCase(name)).findFirst();
-        if(optional.isPresent()) {
+        if (optional.isPresent()) {
             return optional.get();
         }
         throw new IllegalArgumentException("invalid RenderModel: " + name);
