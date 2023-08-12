@@ -31,9 +31,6 @@ public class RenderResultLightWeight implements Serializable {
     @ColumnInfo(name = "thumbnail", typeAffinity = ColumnInfo.BLOB)
     public byte[] thumbNail;
 
-    @ColumnInfo(name = "render_engine")
-    public RenderModel renderEngine;
-
     @ColumnInfo(name = "query_string")
     public String queryString;
 
@@ -64,7 +61,6 @@ public class RenderResultLightWeight implements Serializable {
         uid = renderResult.uid;
         createdTime = renderResult.createdTime;
         thumbNail = renderResult.thumbNail ;
-        renderEngine = renderResult.renderEngine;
         queryString = renderResult.queryString;
         queryUsed = renderResult.queryUsed;
         width = renderResult.width;
