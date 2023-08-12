@@ -11,8 +11,6 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.AutoMigrationSpec;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
 import org.ww.ai.rds.converter.EngineUsedNonDaoConverter;
 import org.ww.ai.rds.dao.EngineUsedNonDao;
 import org.ww.ai.rds.dao.RenderResultDao;
@@ -23,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Database(entities = {RenderResult.class}, version = 6,
+@Database(entities = {RenderResult.class}, version = 9,
         autoMigrations = {
                 @AutoMigration(from = 1, to = 2, spec = AppDatabase.MigrateRenderResult_1_2.class),
                 @AutoMigration(from = 3, to = 4, spec = AppDatabase.MigrateRenderResult_3_4.class),
@@ -34,12 +32,13 @@ public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase instance;
 
     public static synchronized AppDatabase getInstance(Context context) {
-        if(instance == null) {
+        if (instance == null) {
             instance = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, DB_NAME)
                     .fallbackToDestructiveMigration().allowMainThreadQueries().build();
         }
         return instance;
     }
+
     public abstract RenderResultDao renderResultDao();
 
 
@@ -48,9 +47,9 @@ public abstract class AppDatabase extends RoomDatabase {
         public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
             AutoMigrationSpec.super.onPostMigrate(db);
             db.beginTransaction();
-            db.execSQL("ALTER TABLE renderresult "
+            db.execSQL("ALTER TABLE " + RenderResultDao.TABLE
                     + " ADD COLUMN width INTEGER");
-            db.execSQL("ALTER TABLE renderresult "
+            db.execSQL("ALTER TABLE " + RenderResultDao.TABLE
                     + " ADD COLUMN height INTEGER");
             db.endTransaction();
         }
@@ -63,9 +62,10 @@ public abstract class AppDatabase extends RoomDatabase {
             Map<Integer, String> updateMap = new HashMap<>();
             EngineUsedNonDaoConverter converter = new EngineUsedNonDaoConverter();
             db.beginTransaction();
-            Cursor cursor = db.query("SELECT uid, render_engine, credits FROM renderresult");
+            Cursor cursor = db.query("SELECT uid, render_engine, credits FROM "
+                    + RenderResultDao.TABLE);
             cursor.moveToFirst();
-            while(!cursor.isAfterLast()) {
+            while (!cursor.isAfterLast()) {
                 int uid = cursor.getInt(0);
                 String renderEngine = cursor.getString(1);
                 int renderCosts = cursor.getInt(2);
@@ -76,11 +76,12 @@ public abstract class AppDatabase extends RoomDatabase {
                 String json = converter.fromEngineUsedNonDaoList(list);
                 updateMap.put(uid, json);
             }
-            for(Integer idx : updateMap.keySet()) {
-                String sqlString = "UPDATE renderresult SET engines_used = '" +
+            for (Integer idx : updateMap.keySet()) {
+                String sqlString = "UPDATE " + RenderResultDao.TABLE + " SET engines_used = '" +
                         updateMap.get(idx) + "' WHERE uid = " + idx;
                 db.execSQL(sqlString);
-            };
+            }
+            ;
             db.endTransaction();
         }
     }
@@ -90,7 +91,7 @@ public abstract class AppDatabase extends RoomDatabase {
         public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
             AutoMigrationSpec.super.onPostMigrate(db);
             db.beginTransaction();
-            db.execSQL("ALTER TABLE renderresult "
+            db.execSQL("ALTER TABLE " + RenderResultDao.TABLE
                     + " ADD COLUMN deleted BOOLEAN");
             db.endTransaction();
         }

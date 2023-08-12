@@ -18,9 +18,9 @@ import java.util.List;
 @Dao
 public interface RenderResultDao {
 
-    String TABLE = "renderresult";
+    public static final String TABLE = "renderresult";
 
-    @Query("SELECT uid, createdTime, thumbnail, render_engine, query_string, query_used, width," +
+    @Query("SELECT uid, createdTime, thumbnail, query_string, query_used, width," +
             " height, engines_used, deleted FROM " + TABLE +
             " WHERE deleted = :flagDeleted ORDER BY createdTime DESC")
     ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights(boolean flagDeleted);

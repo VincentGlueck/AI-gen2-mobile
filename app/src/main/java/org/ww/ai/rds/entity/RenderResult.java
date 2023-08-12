@@ -39,12 +39,6 @@ public class RenderResult implements Serializable {
     @ColumnInfo(name = "image", typeAffinity = ColumnInfo.BLOB)
     public byte[] image;
 
-    @ColumnInfo(name = "render_engine")
-    public RenderModel renderEngine;
-
-    @ColumnInfo(name = "credits", typeAffinity = ColumnInfo.INTEGER)
-    public int credits;
-
     @ColumnInfo(name = "width", defaultValue = "0")
     public int width;
 
@@ -68,8 +62,6 @@ public class RenderResult implements Serializable {
                 ", queryUsed='" + queryUsed + '\'' +
                 ", thumbNail=" + Arrays.toString(thumbNail) +
                 ", image=" + Arrays.toString(image) +
-                ", renderEngine=" + renderEngine +
-                ", credits=" + credits +
                 ", deleted=" + deleted +
                 '}';
     }
