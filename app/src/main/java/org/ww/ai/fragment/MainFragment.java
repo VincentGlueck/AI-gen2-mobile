@@ -136,12 +136,14 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         CheckBox checkRandomResolution = view.findViewById(R.id.chk_random_resolution);
         checkRandomResolution.setChecked(whatToRender.isRandomResolution());
         CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
-        checkBoxTranslate.setChecked(whatToRender.isUseTranslation());
+        checkBoxTranslate.setChecked(Preferences.getInstance(requireContext()).getBoolean(PREF_USE_TRANSLATION));
         if(!Preferences.getInstance(requireContext()).getBoolean(PREF_USE_TRANSLATION)) {
-            checkBoxTranslate.setEnabled(false);
+            checkBoxTranslate.setVisibility(View.GONE);
             checkBoxTranslate.setChecked(false);
+        } else {
+            checkBoxTranslate.setVisibility(View.VISIBLE);
+            checkBoxTranslate.setEnabled(true);
         }
-
         selectSpinner(view.findViewById(R.id.spin_layout), whatToRender.getPreset());
         selectSpinner(view.findViewById(R.id.spin_artist_type), whatToRender.getArtistTypeName());
         selectSpinner(view.findViewById(R.id.spin_num_artists), String.valueOf(whatToRender.getNumOfArtists()));
@@ -149,7 +151,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         selectSpinner(view.findViewById(R.id.spin_resolution), String.valueOf(whatToRender.getResolution()));
 
         if (whatToRender.getRandomCount() < 5) {
-            whatToRender.setRandomCount(50);
+            whatToRender.setRandomCount(5);
         }
         Slider sliderRandomWords = view.findViewById(R.id.slider_random_words);
         sliderRandomWords.setValue((float) whatToRender.getRandomCount());
@@ -179,8 +181,10 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
     @Override
     public void onPause() {
         super.onPause();
-        SharedPreferences preferences = containerContext.getSharedPreferences(WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
+        SharedPreferences preferences = containerContext.getSharedPreferences(
+                WhatToRender.class.getCanonicalName(), Context.MODE_PRIVATE);
         whatToRender.writeToSharedPreferences(preferences);
+        writeCommonSharedPreferences();
     }
 
     @Override
@@ -188,6 +192,14 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         super.onAttach(context);
         initEngine(context);
     }
+
+    private void writeCommonSharedPreferences() {
+        SharedPreferences.Editor editor = Preferences.getInstance(requireContext()).getEditor();
+        CheckBox checkBoxTranslate = view.findViewById(R.id.check_translate);
+        editor.putBoolean(PREF_USE_TRANSLATION, checkBoxTranslate.isChecked());
+        editor.apply();
+    }
+
 
     private void initEngine(Context context) {
         Parser parser = new Parser();
@@ -346,7 +358,7 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
                 whatToRender.setTranslateToEnglishDescription(str);
                 Button btn = view.findViewById(R.id.btn_next);
                 btn.setEnabled(s.length() > 0);
-                if (whatToRender.isUseTranslation()) {
+                if (Preferences.getInstance(requireContext()).getBoolean(PREF_USE_TRANSLATION)) {
                     translateEditText(whatToRender.getDescription());
                 }
                 clearBtnImageView.setVisibility(str.isEmpty() ? View.GONE : View.VISIBLE);
@@ -394,8 +406,6 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
             whatToRender.setRandomResolution(checked);
             resolutionSpinner.setEnabled(!checked);
         });
-        CheckBox checkUseTranslation = view.findViewById(R.id.check_translate);
-        checkUseTranslation.setOnCheckedChangeListener((v, checked) -> whatToRender.setUseTranslation(checked));
     }
 
     private void initRandomWordsSlider(View view) {

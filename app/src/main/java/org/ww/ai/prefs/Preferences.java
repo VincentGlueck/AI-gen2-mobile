@@ -2,8 +2,6 @@ package org.ww.ai.prefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class Preferences {
@@ -73,6 +71,10 @@ public class Preferences {
             }
         }
         return value;
+    }
+
+    public SharedPreferences.Editor getEditor() {
+        return mPreferences.edit();
     }
 
 }
