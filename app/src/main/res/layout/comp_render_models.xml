@@ -14,30 +14,31 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:paddingStart="4dp"
+            android:paddingEnd="0dp"
+            android:text="@string/lbl_what_was_rendered_engine" />
+
         <Spinner
             android:id="@+id/spinner_render_model"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="2dp"
-            android:paddingBottom="0dp" />
+            android:paddingBottom="0dp"
+            style="@style/spinner_style" />
 
-        <EditText
-            android:id="@+id/render_costs"
-            android:layout_width="32dp"
+        <Spinner
+            android:id="@+id/spinner_render_costs"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/small_edit_rounded"
-            android:textSize="14sp"
-            android:paddingStart="2dp"
+            android:paddingStart="4dp"
             android:paddingTop="2dp"
-            android:paddingBottom="2dp"
             android:paddingEnd="0dp"
-            android:letterSpacing="0.15"
-            android:text="3"
-            android:inputType="number"
-            android:maxLength="3"
-            android:maxLines="1"
-            tools:ignore="Autofill,HardcodedText"
-            android:hint="@string/app_name"/>
+            android:paddingBottom="0dp"
+            style="@style/spinner_style" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -47,19 +48,6 @@
             android:paddingEnd="0dp"
             android:text="credits"
             tools:ignore="HardcodedText" />
-
-        <ImageView
-            android:id="@+id/imageview_btn_plus"
-            android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:padding="0dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="8dp"
-
-            android:src="@drawable/plus_btn"
-            android:scaleX="0.6"
-            android:scaleY="0.6"
-            tools:ignore="ContentDescription" />
 
     </LinearLayout>
 
