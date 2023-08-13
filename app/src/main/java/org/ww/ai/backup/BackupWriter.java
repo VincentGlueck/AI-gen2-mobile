@@ -10,4 +10,6 @@ public interface BackupWriter<T> {
 
     boolean init();
 
+    boolean finish();
+
 }

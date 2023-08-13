@@ -106,7 +106,8 @@ public class GalleryFragment extends Fragment {
         asyncDbFuture.processFuture(listenableFuture,
                 r -> {
                     createGallery(viewGroup, r);
-                    BackupWriter<RenderResultLightWeight> backupWriter = new LocalStorageBackupWriter();
+                    BackupWriter<RenderResultLightWeight> backupWriter =
+                            new LocalStorageBackupWriter(requireContext());
                     try {
                         backupWriter.writeBackup(r);
                     } catch (JsonProcessingException e) {
