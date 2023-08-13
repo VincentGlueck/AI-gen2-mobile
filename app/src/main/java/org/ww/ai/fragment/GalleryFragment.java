@@ -30,9 +30,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
+import org.ww.ai.backup.BackupWriter;
+import org.ww.ai.backup.LocalStorageBackupWriter;
 import org.ww.ai.databinding.GalleryFragmentBinding;
 import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.AppDatabase;
@@ -101,7 +104,15 @@ public class GalleryFragment extends Fragment {
                 appDatabase.renderResultDao().getAllLightWeights(mShowTrash);
         AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(listenableFuture,
-                r -> createGallery(viewGroup, r), mContainerContext);
+                r -> {
+                    createGallery(viewGroup, r);
+                    BackupWriter<RenderResultLightWeight> backupWriter = new LocalStorageBackupWriter();
+                    try {
+                        backupWriter.writeBackup(r);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }, mContainerContext);
     }
 
     private void createGallery(@NonNull ViewGroup parent,
