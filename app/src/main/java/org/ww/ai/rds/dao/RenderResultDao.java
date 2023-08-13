@@ -18,7 +18,7 @@ import java.util.List;
 @Dao
 public interface RenderResultDao {
 
-    public static final String TABLE = "renderresult";
+    String TABLE = "renderresult";
 
     @Query("SELECT uid, createdTime, thumbnail, query_string, query_used, width," +
             " height, engines_used, deleted FROM " + TABLE +

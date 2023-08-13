@@ -81,7 +81,6 @@ public abstract class AppDatabase extends RoomDatabase {
                         updateMap.get(idx) + "' WHERE uid = " + idx;
                 db.execSQL(sqlString);
             }
-            ;
             db.endTransaction();
         }
     }
