@@ -1,7 +1,6 @@
 package org.ww.ai.fragment;
 
 import static org.ww.ai.prefs.Preferences.PREF_RENDER_ENGINE_URL;
-import static org.ww.ai.tools.FileUtil.FILE_UTIL;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.preference.CheckBoxPreference;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -43,6 +43,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Backup
     private static final String PREF_USE_TRASH = "pref_use_trash";
     private static final String PREF_CREATE_BACKUP = "pref_create_backup";
     private static final String PREF_RESTORE_BACKUP = "pref_restore_backup";
+    private static final String PREF_REMOVE_OBSOLETE_BACKUPS = "pref_remove_obsolete_backups";
     private final AtomicReference<String> mAiRenderUrl = new AtomicReference<>();
     private final AtomicBoolean mUseTranslation = new AtomicBoolean();
     private final AtomicBoolean mUseTrash = new AtomicBoolean();
@@ -153,9 +154,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Backup
 
     @Override
     public BackupHolder onBackupCreated(File file, int count) {
-        Toast.makeText(requireContext(), "Backup created, size: " +
-                FILE_UTIL.readableFileSize(file.length()), Toast.LENGTH_LONG).show();
-        return BackupHolder.create(file, count);
+        if(file == null || count == 0) {
+            Log.e("BACKUP", "Failed to create backup (file == null or count == 0)");
+            return null;
+        }
+        BackupHolder holder = BackupHolder.create(file, count);
+        CheckBoxPreference checkBoxPreference = mPreferenceScreen.findPreference(PREF_REMOVE_OBSOLETE_BACKUPS);
+        assert checkBoxPreference != null;
+        if(checkBoxPreference.isChecked()) {
+            removeObsoleteBackups();
+        }
+        initRestoreBackupPreference(List.of(holder), new AtomicReference<>(file.getName()));
+        return holder;
     }
 
     @Override
@@ -164,6 +174,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Backup
         if(backupHolderList != null && !backupHolderList.isEmpty()) {
             fullName.set(backupHolderList.get(0).file.getAbsolutePath());
         }
+        assert backupHolderList != null;
+        initRestoreBackupPreference(backupHolderList, fullName);
+    }
+
+    private void initRestoreBackupPreference(List<BackupHolder> backupHolderList, AtomicReference<String> fullName) {
         Preference preferenceRestoreBackup = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
         assert preferenceRestoreBackup != null;
         preferenceRestoreBackup.setOnPreferenceClickListener(preference -> {
@@ -173,6 +188,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Backup
         });
         assert backupHolderList != null;
         preferenceRestoreBackup.setSummary(backupHolderList.get(0).toReadableForm(requireContext()));
+    }
+
+    @Override
+    public void removeObsoleteBackups() {
+        mBackupWriter.removeObsoleteBackups();
+    }
+
+    @Override
+    public void onRemoveBackupsDone(int count) {
+        String str = getString(R.string.pref_remove_obsolete_result, count);
+        Toast.makeText(requireContext(), str, Toast.LENGTH_LONG).show();
     }
 }
 

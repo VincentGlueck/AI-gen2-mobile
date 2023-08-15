@@ -34,7 +34,6 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
     private final BackupCallbackIF mBackupCallback;
     private File mZipFile;
 
-
     public LocalStorageBackupWriter(Context context, BackupCallbackIF callback) {
         super(context);
         mBackupCallback = callback;
@@ -77,7 +76,8 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
                     }
                 });
                 mZipOutputStream.close();
-                mBackupCallback.onBackupCreated(mZipFile, count.get());
+                BackupHolder holder = mBackupCallback.onBackupCreated(mZipFile, count.get());
+                Log.i("HOLDER", "" + holder);
             }, mContext);
     }
 
@@ -148,4 +148,27 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
         return count;
     }
 
+    @Override
+    public void removeObsoleteBackups() {
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File[] files = storageDir.listFiles();
+        if (files == null || files.length == 0) {
+            return;
+        }
+        List<BackupHolder> backups = new ArrayList<>();
+        for (File file : files) {
+            if (file.getName().startsWith(FILE_NAME_PREFIX) && file.getName().endsWith(FILE_NAME_SUFFIX)) {
+                backups.add(BackupHolder.create(file, getBackupFilesCount(file.getName())));
+            }
+        }
+        backups.sort(Collections.reverseOrder());
+        if(backups.size() > 1) {
+            for(int n=1; n<backups.size(); n++) {
+                if(!backups.get(0).file.delete()) {
+                    backups.get(0).file.deleteOnExit();
+                }
+            }
+        }
+        mBackupCallback.onRemoveBackupsDone(backups.size() - 1);
+    }
 }
