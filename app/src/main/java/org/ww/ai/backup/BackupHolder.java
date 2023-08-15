@@ -77,4 +77,14 @@ public class BackupHolder implements Comparable<BackupHolder> {
         }
         return file.getName().compareTo(holder.file.getName());
     }
+
+    @Override
+    public String toString() {
+        return "BackupHolder{" +
+                "file=" + file +
+                ", date=" + date +
+                ", count=" + count +
+                ", size=" + size +
+                '}';
+    }
 }
