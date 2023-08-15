@@ -5,7 +5,6 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.RawQuery;
 import androidx.room.Update;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -27,6 +26,9 @@ public interface RenderResultDao {
 
     @Query("SELECT * FROM " + TABLE + " WHERE uid = :id")
     ListenableFuture<RenderResult> getById(int id);
+
+    @Query("SELECT * FROM " + TABLE + " WHERE deleted = 0")
+    ListenableFuture<List<RenderResult>> getByAll();
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);

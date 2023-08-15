@@ -11,6 +11,17 @@ import java.util.List;
 
 public abstract class AbstractBackupWriter implements BackupWriter<RenderResultLightWeight> {
 
+    protected final Context mContext;
+    protected BackupCallbackIF mBackupCallback;
+
+    public AbstractBackupWriter(Context context) {
+        mContext = context;
+    }
+
+    public void setBackupCallback(BackupCallbackIF backupCallback) {
+        mBackupCallback = backupCallback;
+    }
+
     protected ListenableFuture<List<RenderResultLightWeight>> getRenderResultsFuture(Context context) {
         AppDatabase appDatabase = AppDatabase.getInstance(context);
         return appDatabase.renderResultDao().getAllLightWeights(false);

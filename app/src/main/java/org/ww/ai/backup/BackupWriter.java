@@ -6,10 +6,8 @@ import java.util.List;
 
 public interface BackupWriter<T> {
 
-    boolean writeBackup(List<T> renderResults) throws  JsonProcessingException;
+    void writeBackup(List<T> renderResults) throws  JsonProcessingException;
 
-    boolean init();
-
-    boolean finish();
+    void getBackupFiles();
 
 }

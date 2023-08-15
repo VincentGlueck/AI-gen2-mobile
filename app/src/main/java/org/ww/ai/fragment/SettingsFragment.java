@@ -1,6 +1,7 @@
 package org.ww.ai.fragment;
 
 import static org.ww.ai.prefs.Preferences.PREF_RENDER_ENGINE_URL;
+import static org.ww.ai.tools.FileUtil.FILE_UTIL;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.preference.EditTextPreference;
@@ -16,27 +18,42 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
-import org.ww.ai.R;
-import org.ww.ai.prefs.Preferences;
+import com.google.common.util.concurrent.ListenableFuture;
 
+import org.ww.ai.R;
+import org.ww.ai.backup.AbstractBackupWriter;
+import org.ww.ai.backup.BackupCallbackIF;
+import org.ww.ai.backup.BackupHolder;
+import org.ww.ai.backup.LocalStorageBackupWriter;
+import org.ww.ai.prefs.Preferences;
+import org.ww.ai.rds.AppDatabase;
+import org.ww.ai.rds.AsyncDbFuture;
+import org.ww.ai.rds.entity.RenderResultLightWeight;
+
+import java.io.File;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SettingsFragment extends PreferenceFragmentCompat {
+public class SettingsFragment extends PreferenceFragmentCompat implements BackupCallbackIF {
 
     private static final String PREF_AI_RENDER_URL = "pref_ai_site_url";
     private static final String PREF_AI_TEST_URL = "pref_ai_test_url";
     private static final String PREF_USE_TRANSLATION = "pref_translate";
     private static final String PREF_USE_TRASH = "pref_use_trash";
+    private static final String PREF_CREATE_BACKUP = "pref_create_backup";
+    private static final String PREF_RESTORE_BACKUP = "pref_restore_backup";
     private final AtomicReference<String> mAiRenderUrl = new AtomicReference<>();
     private final AtomicBoolean mUseTranslation = new AtomicBoolean();
     private final AtomicBoolean mUseTrash = new AtomicBoolean();
-
     private PreferenceScreen mPreferenceScreen;
+    private AbstractBackupWriter mBackupWriter;
 
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+        mBackupWriter = new LocalStorageBackupWriter(requireContext(), this);
+        mBackupWriter.setBackupCallback(this);
         setPreferencesFromResource(R.xml.preferences, rootKey);
         initPreferences();
     }
@@ -52,6 +69,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         addBooleanListener(mUseTranslation, PREF_USE_TRANSLATION);
         addBooleanListener(mUseTrash, PREF_USE_TRASH);
         initRenderingUrlSection();
+        initBackupSection();
     }
 
     private void addBooleanListener(final AtomicBoolean atomicBoolean, final String prefKey) {
@@ -95,6 +113,25 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
     }
 
+    private void initBackupSection() {
+        Preference preferenceCreateBackup = mPreferenceScreen.findPreference(PREF_CREATE_BACKUP);
+        assert preferenceCreateBackup != null;
+        preferenceCreateBackup.setOnPreferenceClickListener(preference -> {
+            writeBackup();
+            return false;
+        });
+        mBackupWriter.getBackupFiles();
+    }
+
+    private void writeBackup() {
+        AppDatabase appDatabase = AppDatabase.getInstance(requireContext());
+        ListenableFuture<List<RenderResultLightWeight>> listenableFuture =
+                appDatabase.renderResultDao().getAllLightWeights(false);
+        AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(listenableFuture,
+                r -> mBackupWriter.writeBackup(r), requireContext());
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -109,10 +146,33 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             editor.putString(PREF_RENDER_ENGINE_URL, mAiRenderUrl.get());
             editor.putBoolean(PREF_USE_TRANSLATION, mUseTranslation.get());
             editor.putBoolean(Preferences.PREF_USE_TRASH, mUseTrash.get());
-            Log.w("PREFS", "********* wrote a lot *******************");
         } finally {
             editor.apply();
         }
+    }
+
+    @Override
+    public BackupHolder onBackupCreated(File file, int count) {
+        Toast.makeText(requireContext(), "Backup created, size: " +
+                FILE_UTIL.readableFileSize(file.length()), Toast.LENGTH_LONG).show();
+        return BackupHolder.create(file, count);
+    }
+
+    @Override
+    public void onGotAvailableBackups(List<BackupHolder> backupHolderList) {
+        AtomicReference<String> fullName = new AtomicReference<>("");
+        if(backupHolderList != null && !backupHolderList.isEmpty()) {
+            fullName.set(backupHolderList.get(0).file.getAbsolutePath());
+        }
+        Preference preferenceRestoreBackup = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
+        assert preferenceRestoreBackup != null;
+        preferenceRestoreBackup.setOnPreferenceClickListener(preference -> {
+            Toast.makeText(requireContext(), "Not implemented yet, but would read " +
+                    fullName.get(), Toast.LENGTH_LONG).show();
+            return false;
+        });
+        assert backupHolderList != null;
+        preferenceRestoreBackup.setSummary(backupHolderList.get(0).toReadableForm(requireContext()));
     }
 }
 
