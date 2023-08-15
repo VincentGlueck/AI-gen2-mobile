@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -15,13 +14,14 @@ import org.ww.ai.rds.entity.RenderResultLightWeight;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 
@@ -30,107 +30,122 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
     private final static String FILE_NAME_PREFIX = "AI-2-gen_";
     private final static String FILE_NAME_SUFFIX = ".zip";
 
-    private Context mContext;
     private ZipOutputStream mZipOutputStream;
-    private final Map<Integer, String> xmlMap = new HashMap<>();
+    private final BackupCallbackIF mBackupCallback;
+    private File mZipFile;
 
-    public LocalStorageBackupWriter(Context context) {
-        mContext = context;
+
+    public LocalStorageBackupWriter(Context context, BackupCallbackIF callback) {
+        super(context);
+        mBackupCallback = callback;
     }
 
     @Override
-    public boolean writeBackup(List<RenderResultLightWeight> renderResults) throws JsonProcessingException {
-        AtomicBoolean success = new AtomicBoolean(true);
+    public void writeBackup(List<RenderResultLightWeight> renderResults) {
         try {
-            mZipOutputStream = prepareZipFile(FILE_NAME_PREFIX);
+            mZipOutputStream = prepareZipFile();
+            writeImages();
         } catch (IOException e) {
-            Log.e("ERROR", Objects.requireNonNull(e.getMessage()));
-            success.set(false);
-        }
-        if (success.get()) {
-            prepareXmlMap(renderResults);
-            if (!prepareImages()) {
-                success.set(false);
-            } else {
-                try {
-                    mZipOutputStream.close();
-                } catch (IOException e) {
-                    Log.e("FAILURE", "zipOutputStream failed.");
-                    success.set(false);
-                }
-            }
-        }
-        return success.get();
-    }
-
-    private void showCouldNotCreateBackupMessage() {
-        Log.w("WARN", "Backup has not been created.");
-    }
-
-    private void prepareXmlMap(List<RenderResultLightWeight> renderResults) throws JsonProcessingException {
-        XmlMapper xmlMapper = new XmlMapper();
-        for (RenderResultLightWeight renderResultLw : renderResults) {
-            String xml = xmlMapper.writeValueAsString(renderResultLw);
-            Log.d("XML", "" + xml);
-            xmlMap.put(renderResultLw.uid, xml);
+            Log.e("ERROR", "" + e.getMessage());
         }
     }
 
-    private boolean prepareImages() {
-        final AtomicBoolean success = new AtomicBoolean(true);
-        AppDatabase appDatabase = AppDatabase.getInstance(mContext);
-        for (Integer uid : xmlMap.keySet()) {
-            ListenableFuture<RenderResult> listenableFuture = appDatabase.renderResultDao().getById(uid);
-            AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
-            asyncDbFuture.processFuture(listenableFuture,
-                    result -> {
-                        byte[] thumbNail = result.thumbNail;
-                        byte[] image = result.image;
-                        try {
-                            addToZip(uid, thumbNail, image);
-                        } catch (IOException e) {
-                            Log.e("CREATE_ZIP", "failed: " + e.getMessage());
-                            success.set(false);
-                        }
-
-                    }, mContext);
-        }
-        return success.get();
+    private void writeImages() {
+        final AppDatabase appDatabase = AppDatabase.getInstance(mContext);
+        final ListenableFuture<List<RenderResult>> listenableFuture =
+                appDatabase.renderResultDao().getByAll();
+        final AsyncDbFuture<List<RenderResult>> asyncDbFuture = new AsyncDbFuture<>();
+        final XmlMapper xmlMapper = new XmlMapper();
+        final AtomicInteger count = new AtomicInteger();
+        asyncDbFuture.processFuture(listenableFuture,
+            result -> {
+                count.set(result.size());
+                result.forEach(r -> {
+                    String xml;
+                    try {
+                        xml = xmlMapper.writeValueAsString(RenderResultLightWeight.fromRenderResult(r));
+                        addXmlToZip(r.uid, xml);
+                    } catch (IOException e) {
+                        Log.e("JSON", "said, no: " + e.getMessage());
+                    }
+                    byte[] thumbNail = r.thumbNail;
+                    byte[] image = r.image;
+                    try {
+                        addImagesToZip(r.uid, thumbNail, image);
+                    } catch (IOException e) {
+                        Log.e("CREATE_ZIP", "failed: " + e.getMessage());
+                    }
+                });
+                mZipOutputStream.close();
+                mBackupCallback.onBackupCreated(mZipFile, count.get());
+            }, mContext);
     }
 
-    private void addToZip(Integer uid, byte[] thumbNail, byte[] image) throws IOException {
-        ZipEntry zipEntry = new ZipEntry(uid + ".image.data");
+    private void addXmlToZip(int uid, String xml) throws IOException {
+        ZipEntry zipEntry = new ZipEntry(uid + ".result.xml");
+        byte[] stringAsBytes = xml.getBytes(StandardCharsets.UTF_8);
+        zipEntry.setSize(stringAsBytes.length);
+        mZipOutputStream.putNextEntry(zipEntry);
+        mZipOutputStream.write(stringAsBytes);
+        mZipOutputStream.closeEntry();
+    }
+
+    private void addImagesToZip(Integer uid, byte[] thumbNail, byte[] image) throws IOException {
+        ZipEntry zipEntry = new ZipEntry(uid + "thumb.image.data");
         zipEntry.setSize(thumbNail.length);
         mZipOutputStream.putNextEntry(zipEntry);
         mZipOutputStream.write(thumbNail);
         mZipOutputStream.closeEntry();
-
-        // TODO: add image
+        zipEntry = new ZipEntry(uid + "image.image.data");
+        mZipOutputStream.putNextEntry(zipEntry);
+        mZipOutputStream.write(image);
+        mZipOutputStream.closeEntry();
     }
 
-    private ZipOutputStream prepareZipFile(String name) throws IOException {
-        String realName = name + System.currentTimeMillis() + FILE_NAME_SUFFIX;
+    private ZipOutputStream prepareZipFile() throws IOException {
+        String realName = FILE_NAME_PREFIX + System.currentTimeMillis() + FILE_NAME_SUFFIX;
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File zipFile = new File(storageDir, realName);
-        return new ZipOutputStream(Files.newOutputStream(zipFile.toPath()));
-    }
-
-
-    @Override
-    public boolean init() {
-        // we do not need any init
-        return true;
+        mZipFile = new File(storageDir, realName);
+        ZipOutputStream outputStream = new ZipOutputStream(Files.newOutputStream(mZipFile.toPath()));
+        outputStream.setComment("AI2-gen-mobile generated backup file");
+        return outputStream;
     }
 
     @Override
-    public boolean finish() {
-        if (mZipOutputStream != null) {
-            try {
-                mZipOutputStream.close();
-            } catch (IOException e) {
-                Log.w("ZIP", "Ignore - cannot close mZipOutputStream");
+    public void getBackupFiles() {
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File[] files = storageDir.listFiles();
+        if (files == null || files.length == 0) {
+            return;
+        }
+        List<BackupHolder> result = new ArrayList<>();
+        for (File file : files) {
+            if (file.getName().startsWith(FILE_NAME_PREFIX) && file.getName().endsWith(FILE_NAME_SUFFIX)) {
+                result.add(BackupHolder.create(file, getBackupFilesCount(file.getName())));
             }
         }
-        return false;
+        result.sort(Collections.reverseOrder());
+        mBackupCallback.onGotAvailableBackups(result);
     }
+
+    private int getBackupFilesCount(String name) {
+        File zipFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS
+            + File.separator + name);
+        ZipInputStream zipInputStream;
+        int count = 0;
+        try {
+            zipInputStream = new ZipInputStream(Files.newInputStream(zipFile.toPath()));
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                if(entry.getName().endsWith(".xml")) {
+                    count++;
+                }
+            }
+        } catch (IOException e) {
+            Log.e("ZIP", "error: " + e.getMessage());
+            return -1;
+        }
+        return count;
+    }
+
 }

@@ -37,4 +37,19 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/pref_section_backup">
+
+        <Preference
+            android:key="pref_create_backup"
+            android:summary="@string/pref_create_backup_summary"
+            android:title="@string/pref_create_backup" />
+
+        <Preference
+            android:key="pref_restore_backup"
+            android:summary="@string/pref_restore_backup_summary"
+            android:title="@string/pref_restore_backup" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
