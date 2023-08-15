@@ -1,18 +1,17 @@
 package org.ww.ai.rds.entity;
 
-import android.util.Pair;
 import android.widget.CheckBox;
 
-import androidx.annotation.Dimension;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import org.checkerframework.checker.units.qual.C;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import org.ww.ai.rds.converter.EngineUsedNonDaoConverter;
 import org.ww.ai.rds.dao.EngineUsedNonDao;
-import org.ww.ai.rds.ifenum.RenderModel;
 
 import java.io.Serializable;
 import java.util.List;
@@ -29,6 +28,7 @@ public class RenderResultLightWeight implements Serializable {
     public Long createdTime;
 
     @ColumnInfo(name = "thumbnail", typeAffinity = ColumnInfo.BLOB)
+    @JsonIgnore
     public byte[] thumbNail;
 
     @ColumnInfo(name = "query_string")
@@ -48,15 +48,19 @@ public class RenderResultLightWeight implements Serializable {
 
     @TypeConverters(EngineUsedNonDaoConverter.class)
     @ColumnInfo(name = "engines_used")
+    @JsonIgnore
     public List<EngineUsedNonDao> enginesUsed;
 
     @Ignore
+    @JsonIgnore
     public boolean flagHighLight;
 
     @Ignore
+    @JsonIgnore
     public CheckBox checkBox;
 
     @Ignore
+    @JsonIgnore
     public RenderResultLightWeight (RenderResult renderResult) {
         uid = renderResult.uid;
         createdTime = renderResult.createdTime;
@@ -69,6 +73,7 @@ public class RenderResultLightWeight implements Serializable {
     }
 
     @Ignore
+    @JsonIgnore
     public static RenderResultLightWeight fromRenderResult(RenderResult renderResult) {
         return new RenderResultLightWeight(renderResult);
     }

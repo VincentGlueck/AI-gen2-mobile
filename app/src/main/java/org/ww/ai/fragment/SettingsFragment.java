@@ -9,34 +9,52 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.preference.CheckBoxPreference;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
-import org.ww.ai.R;
-import org.ww.ai.prefs.Preferences;
+import com.google.common.util.concurrent.ListenableFuture;
 
+import org.ww.ai.R;
+import org.ww.ai.backup.AbstractBackupWriter;
+import org.ww.ai.backup.BackupCallbackIF;
+import org.ww.ai.backup.BackupHolder;
+import org.ww.ai.backup.LocalStorageBackupWriter;
+import org.ww.ai.prefs.Preferences;
+import org.ww.ai.rds.AppDatabase;
+import org.ww.ai.rds.AsyncDbFuture;
+import org.ww.ai.rds.entity.RenderResultLightWeight;
+
+import java.io.File;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SettingsFragment extends PreferenceFragmentCompat {
+public class SettingsFragment extends PreferenceFragmentCompat implements BackupCallbackIF {
 
     private static final String PREF_AI_RENDER_URL = "pref_ai_site_url";
     private static final String PREF_AI_TEST_URL = "pref_ai_test_url";
     private static final String PREF_USE_TRANSLATION = "pref_translate";
     private static final String PREF_USE_TRASH = "pref_use_trash";
+    private static final String PREF_CREATE_BACKUP = "pref_create_backup";
+    private static final String PREF_RESTORE_BACKUP = "pref_restore_backup";
+    private static final String PREF_REMOVE_OBSOLETE_BACKUPS = "pref_remove_obsolete_backups";
     private final AtomicReference<String> mAiRenderUrl = new AtomicReference<>();
     private final AtomicBoolean mUseTranslation = new AtomicBoolean();
     private final AtomicBoolean mUseTrash = new AtomicBoolean();
-
     private PreferenceScreen mPreferenceScreen;
+    private AbstractBackupWriter mBackupWriter;
 
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+        mBackupWriter = new LocalStorageBackupWriter(requireContext(), this);
+        mBackupWriter.setBackupCallback(this);
         setPreferencesFromResource(R.xml.preferences, rootKey);
         initPreferences();
     }
@@ -52,6 +70,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         addBooleanListener(mUseTranslation, PREF_USE_TRANSLATION);
         addBooleanListener(mUseTrash, PREF_USE_TRASH);
         initRenderingUrlSection();
+        initBackupSection();
     }
 
     private void addBooleanListener(final AtomicBoolean atomicBoolean, final String prefKey) {
@@ -95,6 +114,25 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
     }
 
+    private void initBackupSection() {
+        Preference preferenceCreateBackup = mPreferenceScreen.findPreference(PREF_CREATE_BACKUP);
+        assert preferenceCreateBackup != null;
+        preferenceCreateBackup.setOnPreferenceClickListener(preference -> {
+            writeBackup();
+            return false;
+        });
+        mBackupWriter.getBackupFiles();
+    }
+
+    private void writeBackup() {
+        AppDatabase appDatabase = AppDatabase.getInstance(requireContext());
+        ListenableFuture<List<RenderResultLightWeight>> listenableFuture =
+                appDatabase.renderResultDao().getAllLightWeights(false);
+        AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(listenableFuture,
+                r -> mBackupWriter.writeBackup(r), requireContext());
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -109,10 +147,58 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             editor.putString(PREF_RENDER_ENGINE_URL, mAiRenderUrl.get());
             editor.putBoolean(PREF_USE_TRANSLATION, mUseTranslation.get());
             editor.putBoolean(Preferences.PREF_USE_TRASH, mUseTrash.get());
-            Log.w("PREFS", "********* wrote a lot *******************");
         } finally {
             editor.apply();
         }
+    }
+
+    @Override
+    public BackupHolder onBackupCreated(File file, int count) {
+        if(file == null || count == 0) {
+            Log.e("BACKUP", "Failed to create backup (file == null or count == 0)");
+            return null;
+        }
+        BackupHolder holder = BackupHolder.create(file, count);
+        CheckBoxPreference checkBoxPreference = mPreferenceScreen.findPreference(PREF_REMOVE_OBSOLETE_BACKUPS);
+        assert checkBoxPreference != null;
+        if(checkBoxPreference.isChecked()) {
+            removeObsoleteBackups();
+        }
+        initRestoreBackupPreference(List.of(holder), new AtomicReference<>(file.getName()));
+        return holder;
+    }
+
+    @Override
+    public void onGotAvailableBackups(List<BackupHolder> backupHolderList) {
+        AtomicReference<String> fullName = new AtomicReference<>("");
+        if(backupHolderList != null && !backupHolderList.isEmpty()) {
+            fullName.set(backupHolderList.get(0).file.getAbsolutePath());
+        }
+        assert backupHolderList != null;
+        initRestoreBackupPreference(backupHolderList, fullName);
+    }
+
+    private void initRestoreBackupPreference(List<BackupHolder> backupHolderList, AtomicReference<String> fullName) {
+        Preference preferenceRestoreBackup = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
+        assert preferenceRestoreBackup != null;
+        preferenceRestoreBackup.setOnPreferenceClickListener(preference -> {
+            Toast.makeText(requireContext(), "Not implemented yet, but would read " +
+                    fullName.get(), Toast.LENGTH_LONG).show();
+            return false;
+        });
+        assert backupHolderList != null;
+        preferenceRestoreBackup.setSummary(backupHolderList.get(0).toReadableForm(requireContext()));
+    }
+
+    @Override
+    public void removeObsoleteBackups() {
+        mBackupWriter.removeObsoleteBackups();
+    }
+
+    @Override
+    public void onRemoveBackupsDone(int count) {
+        String str = getString(R.string.pref_remove_obsolete_result, count);
+        Toast.makeText(requireContext(), str, Toast.LENGTH_LONG).show();
     }
 }
 

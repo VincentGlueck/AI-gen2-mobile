@@ -58,7 +58,7 @@ public class SimpleTranslationUtil implements TranslationAvailableNotifierIF {
     @Override
     public void notifyTranslationAvailable(View view, Translator translator) {
         if (CheckBox.class.isAssignableFrom(view.getClass())) {
-            ((CheckBox) view).setEnabled(true);
+            view.setEnabled(true);
         } else {
             Toast.makeText(view.getContext(), "Sorry, not implemented, but nice to hear", Toast.LENGTH_LONG).show();
         }
