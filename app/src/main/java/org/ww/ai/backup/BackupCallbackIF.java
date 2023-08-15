@@ -9,4 +9,8 @@ public interface BackupCallbackIF {
 
     void onGotAvailableBackups(List<BackupHolder> backupHolderList);
 
+    void removeObsoleteBackups();
+
+    void onRemoveBackupsDone(int count);
+
 }
