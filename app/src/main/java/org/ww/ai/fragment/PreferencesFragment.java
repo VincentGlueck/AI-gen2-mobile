@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.ww.ai.R;
 import org.ww.ai.backup.AbstractBackupWriter;
 import org.ww.ai.backup.BackupHolder;
+import org.ww.ai.backup.LocalStorageBackupReader;
 import org.ww.ai.backup.LocalStorageBackupWriter;
 import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.AppDatabase;
@@ -48,6 +49,8 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     private final AtomicBoolean mUseTrash = new AtomicBoolean();
     private PreferenceScreen mPreferenceScreen;
     private AbstractBackupWriter mBackupWriter;
+
+    private BackupHolder mLatestBackupHolder;
 
 
     @Override
@@ -170,12 +173,15 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         AtomicReference<String> fullName = new AtomicReference<>("");
         if(backupFiles != null && !backupFiles.isEmpty()) {
             fullName.set(backupFiles.get(0).file.getAbsolutePath());
+        } else {
+            mLatestBackupHolder = null;
+            return;
         }
-        assert backupFiles != null;
         String str = initRestoreBackupPreference(backupFiles, fullName);
         Preference preference = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
         assert preference != null;
         preference.setSummary(str);
+        mLatestBackupHolder = backupFiles.get(0);
     }
 
     private BackupHolder writeBackup() throws JsonProcessingException {
@@ -194,8 +200,12 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         Preference preferenceRestoreBackup = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
         assert preferenceRestoreBackup != null;
         preferenceRestoreBackup.setOnPreferenceClickListener(preference -> {
-            Toast.makeText(requireContext(), "Not implemented yet, but would read " +
-                    fullName.get(), Toast.LENGTH_LONG).show();
+            if(mLatestBackupHolder == null) {
+                Log.e("LOCAL", "mLatestBackupHolder is null");
+            } else {
+                LocalStorageBackupReader localStorageBackupReader = new LocalStorageBackupReader(getContext());
+                localStorageBackupReader.restoreBackup(mLatestBackupHolder);
+            }
             return false;
         });
         assert backupHolderList != null;
