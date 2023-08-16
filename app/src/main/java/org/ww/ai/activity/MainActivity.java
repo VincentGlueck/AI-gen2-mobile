@@ -1,8 +1,10 @@
 package org.ww.ai.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -21,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
     public final static String KEY_BITMAP = "bitmap";
     public static final String KEY_WHAT_TO_RENDER = "whatToRender";
     private static final int SIZE_SNACK_THUMB_MAX = 96;
+    private static final int REQUEST_WRITE_PERMISSION = 0x8000;
     private AppBarConfiguration mAppBarConfiguration;
     private WhatToRenderIF mLastRender;
     private CoordinatorLayout mCoordinatorLayout;
@@ -71,7 +76,16 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
         mAppBarConfiguration = new AppBarConfiguration.Builder(mNavController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
         mCoordinatorLayout = findViewById(R.id.main_activity_coordinator_layout);
+        requestPermissions();
         checkIntentPurpose();
+    }
+
+    private void requestPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission
+                    .WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_PERMISSION);
+        }
     }
 
     private void addMenu() {
