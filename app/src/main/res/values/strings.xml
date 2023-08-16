@@ -109,5 +109,6 @@
     <string name="pref_check_remove_obsolete_backups">Keep only one backup</string>
     <string name="pref_check_remove_obsolete_backups_summary">Former backups will be deleted</string>
     <string name="pref_remove_obsolete_result">%d backups removed</string>
+    <string name="pref_backup_created_toast">Backup has been created</string>
 
 </resources>

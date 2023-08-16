@@ -30,6 +30,9 @@ public interface RenderResultDao {
     @Query("SELECT * FROM " + TABLE + " WHERE deleted = 0")
     ListenableFuture<List<RenderResult>> getByAll();
 
+    @Query("SELECT * FROM " + TABLE + " WHERE deleted = 0")
+    List<RenderResult> getAllOnThread();
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
 

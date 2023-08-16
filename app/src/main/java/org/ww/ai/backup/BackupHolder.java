@@ -1,6 +1,7 @@
 package org.ww.ai.backup;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,8 +10,6 @@ import org.ww.ai.R;
 import org.ww.ai.tools.FileUtil;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
@@ -41,7 +40,7 @@ public class BackupHolder implements Comparable<BackupHolder> {
     }
 
     public String toReadableForm(Context context) {
-        DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance();
+        java.text.DateFormat dateFormat = DateFormat.getLongDateFormat(context.getApplicationContext());
         return context.getResources().getString(R.string.pref_backup_date,
                 dateFormat.format(Objects.requireNonNull(getDateFromFileName(file))),
                 count,
@@ -78,6 +77,7 @@ public class BackupHolder implements Comparable<BackupHolder> {
         return file.getName().compareTo(holder.file.getName());
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "BackupHolder{" +

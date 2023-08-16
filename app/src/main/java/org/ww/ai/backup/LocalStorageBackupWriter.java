@@ -30,23 +30,23 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
     private final static String FILE_NAME_PREFIX = "AI-2-gen_";
     private final static String FILE_NAME_SUFFIX = ".zip";
 
-    private ZipOutputStream mZipOutputStream;
-    private final BackupCallbackIF mBackupCallback;
     private File mZipFile;
 
-    public LocalStorageBackupWriter(Context context, BackupCallbackIF callback) {
+    private ZipOutputStream mZipOutputStream;
+
+    public LocalStorageBackupWriter(Context context) {
         super(context);
-        mBackupCallback = callback;
     }
 
     @Override
-    public void writeBackup(List<RenderResultLightWeight> renderResults) {
+    public BackupHolder writeBackup(List<RenderResult> renderResults) {
         try {
             mZipOutputStream = prepareZipFile();
             writeImages();
         } catch (IOException e) {
             Log.e("ERROR", "" + e.getMessage());
         }
+        return BackupHolder.create(mZipFile, 0);
     }
 
     private void writeImages() {
@@ -57,28 +57,26 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
         final XmlMapper xmlMapper = new XmlMapper();
         final AtomicInteger count = new AtomicInteger();
         asyncDbFuture.processFuture(listenableFuture,
-            result -> {
-                count.set(result.size());
-                result.forEach(r -> {
-                    String xml;
-                    try {
-                        xml = xmlMapper.writeValueAsString(RenderResultLightWeight.fromRenderResult(r));
-                        addXmlToZip(r.uid, xml);
-                    } catch (IOException e) {
-                        Log.e("JSON", "said, no: " + e.getMessage());
-                    }
-                    byte[] thumbNail = r.thumbNail;
-                    byte[] image = r.image;
-                    try {
-                        addImagesToZip(r.uid, thumbNail, image);
-                    } catch (IOException e) {
-                        Log.e("CREATE_ZIP", "failed: " + e.getMessage());
-                    }
-                });
-                mZipOutputStream.close();
-                BackupHolder holder = mBackupCallback.onBackupCreated(mZipFile, count.get());
-                Log.i("HOLDER", "" + holder);
-            }, mContext);
+                result -> {
+                    count.set(result.size());
+                    result.forEach(r -> {
+                        String xml;
+                        try {
+                            xml = xmlMapper.writeValueAsString(RenderResultLightWeight.fromRenderResult(r));
+                            addXmlToZip(r.uid, xml);
+                        } catch (IOException e) {
+                            Log.e("JSON", "said, no: " + e.getMessage());
+                        }
+                        byte[] thumbNail = r.thumbNail;
+                        byte[] image = r.image;
+                        try {
+                            addImagesToZip(r.uid, thumbNail, image);
+                        } catch (IOException e) {
+                            Log.e("CREATE_ZIP", "failed: " + e.getMessage());
+                        }
+                    });
+                    mZipOutputStream.close();
+                }, mContext);
     }
 
     private void addXmlToZip(int uid, String xml) throws IOException {
@@ -112,11 +110,11 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
     }
 
     @Override
-    public void getBackupFiles() {
+    public List<BackupHolder> getBackupFiles() {
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File[] files = storageDir.listFiles();
         if (files == null || files.length == 0) {
-            return;
+            return null;
         }
         List<BackupHolder> result = new ArrayList<>();
         for (File file : files) {
@@ -125,19 +123,43 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
             }
         }
         result.sort(Collections.reverseOrder());
-        mBackupCallback.onGotAvailableBackups(result);
+        return result;
+    }
+
+    @Override
+    public int removeObsoleteBackups() {
+        File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File[] files = downloadsDir.listFiles();
+        if (files == null || files.length == 0) {
+            return -1;
+        }
+        List<BackupHolder> backups = new ArrayList<>();
+        for (File file : files) {
+            if (file.getName().startsWith(FILE_NAME_PREFIX) && file.getName().endsWith(FILE_NAME_SUFFIX)) {
+                backups.add(BackupHolder.create(file, getBackupFilesCount(file.getName())));
+            }
+        }
+        backups.sort(Collections.reverseOrder());
+        if (backups.size() > 1) {
+            for (int n = 1; n < backups.size(); n++) {
+                if (!backups.get(n).file.delete()) {
+                    Log.e("DELETE", "this was not successful: " + backups.get(0).file.getAbsolutePath());
+                }
+            }
+        }
+        return backups.size() - 1;
     }
 
     private int getBackupFilesCount(String name) {
         File zipFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS
-            + File.separator + name);
+                + File.separator + name);
         ZipInputStream zipInputStream;
         int count = 0;
         try {
             zipInputStream = new ZipInputStream(Files.newInputStream(zipFile.toPath()));
             ZipEntry entry;
             while ((entry = zipInputStream.getNextEntry()) != null) {
-                if(entry.getName().endsWith(".xml")) {
+                if (entry.getName().endsWith(".xml")) {
                     count++;
                 }
             }
@@ -148,27 +170,4 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
         return count;
     }
 
-    @Override
-    public void removeObsoleteBackups() {
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File[] files = storageDir.listFiles();
-        if (files == null || files.length == 0) {
-            return;
-        }
-        List<BackupHolder> backups = new ArrayList<>();
-        for (File file : files) {
-            if (file.getName().startsWith(FILE_NAME_PREFIX) && file.getName().endsWith(FILE_NAME_SUFFIX)) {
-                backups.add(BackupHolder.create(file, getBackupFilesCount(file.getName())));
-            }
-        }
-        backups.sort(Collections.reverseOrder());
-        if(backups.size() > 1) {
-            for(int n=1; n<backups.size(); n++) {
-                if(!backups.get(0).file.delete()) {
-                    backups.get(0).file.deleteOnExit();
-                }
-            }
-        }
-        mBackupCallback.onRemoveBackupsDone(backups.size() - 1);
-    }
 }
