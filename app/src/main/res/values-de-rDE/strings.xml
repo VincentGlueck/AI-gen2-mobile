@@ -113,5 +113,6 @@
     <string name="pref_backup_restored">Es wurden %d Bilder aus dem Backup wiederhergestellt.</string>
     <string name="pref_backup_restored_with_failures">Es wurden %d Bilder wiederhergestellt, aber es existieren %d Warnungen bzw. Fehlermeldungen.\\n\\nMöchtest du dir diese ansehen?</string>
     <string name="dialog_title_log">Log-Datei</string>
+    <string name="include_description">Beschreibung inkl.</string>
 
 </resources>
