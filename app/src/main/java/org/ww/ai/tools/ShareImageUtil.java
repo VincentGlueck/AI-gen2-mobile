@@ -7,9 +7,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -41,7 +39,7 @@ public class ShareImageUtil {
         this.activity = activity;
     }
 
-    private void shareImage(Bitmap bitmap, RenderResult renderResult) {
+    private void shareImage(Bitmap bitmap, RenderResult renderResult, boolean includeText) {
         Uri contentUri;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             contentUri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
@@ -54,9 +52,11 @@ public class ShareImageUtil {
         String name = "image_" + System.currentTimeMillis() + ".jpg";
         contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, name);
         Uri imageContentUri = contentResolver.insert(contentUri, contentValues);
+        assert imageContentUri != null;
 
         try (ParcelFileDescriptor fileDescriptor =
                      contentResolver.openFileDescriptor(imageContentUri, "w", null)) {
+            assert fileDescriptor != null;
             FileDescriptor fd = fileDescriptor.getFileDescriptor();
             OutputStream outputStream = new FileOutputStream(fd);
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
@@ -67,12 +67,12 @@ public class ShareImageUtil {
             Log.e("ERROR", "Error saving bitmap", e);
         }
 
-
-
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_STREAM, imageContentUri);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, renderResult.queryString);
+        if(includeText) {
+            sendIntent.putExtra(Intent.EXTRA_TEXT, renderResult.queryString);
+        }
         sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         sendIntent.setType("image/jpeg");
 
@@ -94,7 +94,7 @@ public class ShareImageUtil {
         activity.startActivity(chooserIntent);
     }
 
-    public void startShare(int uid) {
+    public void startShare(int uid, boolean includeText) {
         AppDatabase db = AppDatabase.getInstance(activity);
         ListenableFuture<RenderResult> future = db.renderResultDao().getById(uid);
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
@@ -102,7 +102,7 @@ public class ShareImageUtil {
             if (result != null) {
                 Bitmap bitmap = IMAGE_UTIL.convertBlobToImage(result.image);
                 if (bitmap != null) {
-                    shareImage(bitmap, result);
+                    shareImage(bitmap, result, includeText);
                 }
             }
         }, activity);
