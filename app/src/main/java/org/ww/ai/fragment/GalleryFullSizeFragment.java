@@ -1,5 +1,7 @@
 package org.ww.ai.fragment;
 
+import static org.ww.ai.event.EventBroker.EVENT_BROKER;
+import static org.ww.ai.tools.ExecutorUtil.EXECUTOR_UTIL;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
@@ -19,10 +21,14 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
 import org.ww.ai.databinding.GalleryFullSizeFragmentBinding;
+import org.ww.ai.enumif.EventTypes;
+import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.tools.ShareImageUtil;
+
+import java.util.List;
 
 public class GalleryFullSizeFragment extends Fragment {
 
@@ -74,8 +80,45 @@ public class GalleryFullSizeFragment extends Fragment {
                 imageViewShare.setVisibility(View.VISIBLE);
                 imageViewShare.setOnClickListener(v -> new ShareImageUtil(getActivity())
                         .startShare(result.uid, checkIncludeText.isChecked()));
+                ImageView imageViewDelete = view.findViewById(R.id.gallery_full_size_delete);
+                imageViewDelete.setOnClickListener(l -> deleteImage(uid));
             }
         }, containerContext);
+    }
+
+    private void softDeleteFuture(AppDatabase db, ListenableFuture<RenderResult> future) {
+        AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(future, result -> {
+            result.deleted = true;
+            ListenableFuture<Integer> softDelFuture = db.renderResultDao().updateRenderResults(List.of(result));
+            AsyncDbFuture<Integer> asyncDbFuture1 = new AsyncDbFuture<>();
+            asyncDbFuture1.processFuture(softDelFuture, i -> {
+            }, containerContext);
+        }, containerContext);
+
+    }
+
+    private void hardDeleteFuture(AppDatabase db, ListenableFuture<RenderResult> future) {
+        AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(future, result -> {
+            ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
+            AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
+            asyncDbFutureDel.processFuture(delFuture, i -> {
+            }, containerContext);
+        }, containerContext);
+    }
+
+    private void deleteImage(final int uid) {
+        AppDatabase db = AppDatabase.getInstance(containerContext);
+        final boolean useTrash = Preferences.getInstance(containerContext).getBoolean(Preferences.PREF_USE_TRASH);
+        ListenableFuture<RenderResult> future = db.renderResultDao().getById(uid);
+        if (useTrash) {
+            softDeleteFuture(db, future);
+        } else {
+            hardDeleteFuture(db, future);
+        }
+        getParentFragmentManager().popBackStackImmediate();
+        EXECUTOR_UTIL.execute(() -> EVENT_BROKER.notifyReceivers(EventTypes.SINGLE_IMAGE_DELETED, uid));
     }
 
 

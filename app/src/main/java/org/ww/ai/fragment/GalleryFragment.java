@@ -1,5 +1,6 @@
 package org.ww.ai.fragment;
 
+import static org.ww.ai.event.EventBroker.EVENT_BROKER;
 import static org.ww.ai.ui.Animations.ANIMATIONS;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
@@ -34,6 +35,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
 import org.ww.ai.databinding.GalleryFragmentBinding;
+import org.ww.ai.enumif.EventTypes;
+import org.ww.ai.enumif.ReceiveEventIF;
 import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
@@ -48,7 +51,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-public class GalleryFragment extends Fragment {
+public class GalleryFragment extends Fragment implements ReceiveEventIF {
 
     private static final int THUMBS_PER_ROW = 3;
     private static final long FADE_TIME = 280L;
@@ -71,6 +74,7 @@ public class GalleryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mSelectedSet.clear();
         writeSelectedToPreferences();
+        EVENT_BROKER.registerReceiver(this, EventTypes.SINGLE_IMAGE_DELETED);
     }
 
     @Nullable
@@ -435,5 +439,24 @@ public class GalleryFragment extends Fragment {
         mSelectedSet = new HashSet<>();
         writeSelectedToPreferences();
         super.onDetach();
+    }
+
+    @Override
+    public void receiveEvent(Object... eventObject) {
+        if (eventObject.length > 0) {
+            int removeThumbUid = Integer.parseInt(eventObject[0].toString());
+            getRenderResultFromCollection(removeThumbUid);
+        }
+    }
+
+    private void getRenderResultFromCollection(int uid) {
+        AppDatabase appDatabase = AppDatabase.getInstance(mContainerContext);
+        ListenableFuture<RenderResult> future = appDatabase.renderResultDao().getById(uid);
+        AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(future, result -> {
+            mSelectedSet.clear();
+            mSelectedSet.add(String.valueOf(result.uid));
+            removeDeletedViewsFromParent();
+        }, mContainerContext);
     }
 }
