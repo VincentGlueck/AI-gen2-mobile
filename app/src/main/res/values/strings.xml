@@ -110,5 +110,8 @@
     <string name="pref_check_remove_obsolete_backups_summary">Former backups will be deleted</string>
     <string name="pref_remove_obsolete_result">%d backups removed</string>
     <string name="pref_backup_created_toast">Backup has been created</string>
+    <string name="pref_backup_restored">%d images restored from backup.</string>
+    <string name="pref_backup_restored_with_failures">%d images restored, but %d warnings/failures occurred\n\nDo you want to have a look at these?</string>
+    <string name="dialog_title_log">Log file</string>
 
 </resources>

@@ -33,6 +33,12 @@ public interface RenderResultDao {
     @Query("SELECT * FROM " + TABLE + " WHERE deleted = 0")
     List<RenderResult> getAllOnThread();
 
+    @Query("SELECT * FROM " + TABLE + " WHERE uid = :id")
+    RenderResult getByIdOnThread(int id);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertRenderResultOnThread(RenderResult renderResults);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
 

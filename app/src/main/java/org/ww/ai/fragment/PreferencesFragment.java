@@ -24,12 +24,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.ww.ai.R;
 import org.ww.ai.backup.AbstractBackupWriter;
 import org.ww.ai.backup.BackupHolder;
+import org.ww.ai.backup.BackupReaderResultHolder;
 import org.ww.ai.backup.LocalStorageBackupReader;
 import org.ww.ai.backup.LocalStorageBackupWriter;
 import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.tools.ExecutorUtil;
+import org.ww.ai.ui.DialogUtil;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -76,9 +78,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
     private void addBooleanListener(final AtomicBoolean atomicBoolean, final String prefKey) {
         Preference preference = mPreferenceScreen.findPreference(prefKey);
-        if(preference != null) {
+        if (preference != null) {
             preference.setOnPreferenceChangeListener((p, v) -> {
-                if(!Boolean.class.isAssignableFrom(v.getClass())) {
+                if (!Boolean.class.isAssignableFrom(v.getClass())) {
                     Log.e("PREF", "Attempt to use " + v.getClass() + " as " + Boolean.class.getCanonicalName());
                 } else {
                     atomicBoolean.set((Boolean) v);
@@ -122,6 +124,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             EXECUTOR_UTIL.execute(new ExecutorUtil.ExecutionIF() {
                 BackupHolder backupHolder = null;
                 Exception exception = null;
+
                 @Override
                 public void runInBackground() {
                     try {
@@ -133,7 +136,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
                 @Override
                 public void onExecutionFinished() {
-                    if(backupHolder != null) {
+                    if (backupHolder != null) {
                         getBackupFilesAsync();
                         Toast.makeText(getContext(), R.string.pref_backup_created_toast,
                                 Toast.LENGTH_LONG).show();
@@ -161,7 +164,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
             @Override
             public void onExecutionFinished() {
-                if(backupFiles != null) {
+                if (backupFiles != null) {
                     setPreferenceSummary(backupFiles);
                 }
             }
@@ -171,13 +174,13 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
     private void setPreferenceSummary(List<BackupHolder> backupFiles) {
         AtomicReference<String> fullName = new AtomicReference<>("");
-        if(backupFiles != null && !backupFiles.isEmpty()) {
+        if (backupFiles != null && !backupFiles.isEmpty()) {
             fullName.set(backupFiles.get(0).file.getAbsolutePath());
         } else {
             mLatestBackupHolder = null;
             return;
         }
-        String str = initRestoreBackupPreference(backupFiles, fullName);
+        String str = initRestoreBackupPreference(backupFiles);
         Preference preference = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
         assert preference != null;
         preference.setSummary(str);
@@ -196,15 +199,15 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         initPreferences();
     }
 
-    private String initRestoreBackupPreference(List<BackupHolder> backupHolderList, AtomicReference<String> fullName) {
+    private String initRestoreBackupPreference(List<BackupHolder> backupHolderList) {
         Preference preferenceRestoreBackup = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
         assert preferenceRestoreBackup != null;
         preferenceRestoreBackup.setOnPreferenceClickListener(preference -> {
-            if(mLatestBackupHolder == null) {
+            if (mLatestBackupHolder == null) {
                 Log.e("LOCAL", "mLatestBackupHolder is null");
             } else {
-                LocalStorageBackupReader localStorageBackupReader = new LocalStorageBackupReader(getContext());
-                localStorageBackupReader.restoreBackup(mLatestBackupHolder);
+                doRestoreBackupAsync();
+
             }
             return false;
         });
@@ -212,10 +215,63 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         return backupHolderList.get(0).toReadableForm(requireContext());
     }
 
+    private void doRestoreBackupAsync() {
+        EXECUTOR_UTIL.execute(new ExecutorUtil.ExecutionIF() {
+
+            BackupReaderResultHolder holder;
+            @Override
+            public void runInBackground() {
+                LocalStorageBackupReader localStorageBackupReader = new LocalStorageBackupReader(getContext());
+                holder = localStorageBackupReader.restoreBackup(mLatestBackupHolder);
+            }
+
+            @Override
+            public void onExecutionFinished() {
+                if(holder == null) {
+                    Toast.makeText(getContext(), "Fatal: no holder returned", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if(holder.messages.isEmpty()) {
+                    String str = getResources().getString(R.string.pref_backup_restored, holder.restored);
+                    DialogUtil.DIALOG_UTIL.showMessage(getContext(), R.string.pref_section_backup, str, R.drawable.info);
+                } else {
+                    showDetailedResultMessage(holder);
+                }
+            }
+        });
+    }
+
+    private void showDetailedResultMessage(BackupReaderResultHolder holder) {
+        String title = getResources().getString(R.string.pref_section_backup);
+        String str = getResources().getString(R.string.pref_backup_restored_with_failures,
+                holder.restored, (holder.failures + holder.skipped));
+        DialogUtil.DIALOG_UTIL.showPrompt(
+                getContext(),
+                title,
+                str,
+                R.string.btn_yes,
+                (dialog, which) -> showMessageDetails(holder),
+                R.string.btn_no,
+                (dialog, which) -> {
+                },
+                R.drawable.warning
+        );
+    }
+
+    private void showMessageDetails(BackupReaderResultHolder holder) {
+        StringBuilder sb = new StringBuilder();
+        holder.messages.forEach(m -> sb.append(sb.length() > 0 ? "\n" : "").append(m));
+        DialogUtil.DIALOG_UTIL.showLargeTextDialog(
+                getContext(),
+                R.string.dialog_title_log,
+                sb.toString()
+        );
+    }
+
     public void removeObsoleteBackups() {
         CheckBoxPreference checkBoxPreference = mPreferenceScreen.findPreference(PREF_REMOVE_OBSOLETE_BACKUPS);
         assert checkBoxPreference != null;
-        if(checkBoxPreference.isChecked()) {
+        if (checkBoxPreference.isChecked()) {
             EXECUTOR_UTIL.execute(() -> mBackupWriter.removeObsoleteBackups());
         }
     }

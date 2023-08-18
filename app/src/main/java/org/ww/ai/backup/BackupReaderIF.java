@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 public interface BackupReaderIF {
 
-    int restoreBackup(@NonNull BackupHolder backupHolder);
+    BackupReaderResultHolder restoreBackup(@NonNull BackupHolder backupHolder);
+
 
 }
