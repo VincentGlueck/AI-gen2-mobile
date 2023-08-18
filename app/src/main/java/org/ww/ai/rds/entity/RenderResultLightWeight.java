@@ -2,18 +2,19 @@ package org.ww.ai.rds.entity;
 
 import android.widget.CheckBox;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import org.ww.ai.rds.converter.EngineUsedNonDaoConverter;
 import org.ww.ai.rds.dao.EngineUsedNonDao;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 public class RenderResultLightWeight implements Serializable {
@@ -78,4 +79,18 @@ public class RenderResultLightWeight implements Serializable {
         return new RenderResultLightWeight(renderResult);
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return "RenderResultLightWeight{" +
+                "uid=" + uid +
+                ", createdTime=" + createdTime +
+                ", thumbNail=" + Arrays.toString(thumbNail) +
+                ", queryString='" + queryString + '\'' +
+                ", queryUsed='" + queryUsed + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                ", deleted=" + deleted +
+                '}';
+    }
 }

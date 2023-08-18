@@ -4,19 +4,12 @@ import android.content.Context;
 
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 
-public abstract class AbstractBackupWriter implements BackupWriter<RenderResultLightWeight> {
+public abstract class AbstractBackupWriter implements BackupWriterIF<RenderResultLightWeight> {
 
     protected final Context mContext;
-    protected BackupCallbackIF mBackupCallback;
-
     public AbstractBackupWriter(Context context) {
         mContext = context;
     }
-
-    public void setBackupCallback(BackupCallbackIF backupCallback) {
-        mBackupCallback = backupCallback;
-    }
-
-    public abstract void removeObsoleteBackups();
+    public abstract int removeObsoleteBackups();
 
 }

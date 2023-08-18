@@ -120,7 +120,7 @@
     </fragment>
     <fragment
         android:id="@+id/SettingsFragment"
-        android:name="org.ww.ai.fragment.SettingsFragment"
+        android:name="org.ww.ai.fragment.PreferencesFragment"
         android:label="@string/lbl_settings_fragment" >
         <action
             android:id="@+id/action_SettingsFragment_to_MainFragment"
