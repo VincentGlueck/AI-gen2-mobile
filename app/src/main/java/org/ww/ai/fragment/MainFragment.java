@@ -41,6 +41,7 @@ import org.ww.ai.enumif.MenuEnableIF;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.prefs.Preferences;
+import org.ww.ai.rds.HeavyLoadTest;
 import org.ww.ai.tools.SimpleTranslationUtil;
 import org.ww.ai.tools.TranslationAvailableNotifierIF;
 import org.xml.sax.SAXException;
@@ -54,14 +55,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class MainFragment extends Fragment implements TranslationAvailableNotifierIF {
 
-    public static final String GENERATOR_RULES = "generator.xml";
+    public static final String GENERATOR_RULES = "generator";
+    private static final boolean TEST_MODE = false;
     private static final String KEY_ARTIST_TYPE = "artisttype";
     private MainFragmentBinding binding;
     private SettingsCollection settingsCollection;
     private WhatToRenderIF whatToRender;
     private Context containerContext;
     private View view;
-
     private ImageView clearBtnImageView;
 
     @Override
@@ -70,6 +71,10 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
         assert container != null;
         this.containerContext = container.getContext();
         binding = MainFragmentBinding.inflate(inflater, container, false);
+        if(TEST_MODE) {
+            HeavyLoadTest test = new HeavyLoadTest(getContext());
+            test.createSomeImages();
+        }
         return binding.getRoot();
     }
 

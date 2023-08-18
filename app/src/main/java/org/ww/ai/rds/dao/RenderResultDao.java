@@ -28,7 +28,7 @@ public interface RenderResultDao {
     ListenableFuture<RenderResult> getById(int id);
 
     @Query("SELECT * FROM " + TABLE + " WHERE deleted = 0")
-    ListenableFuture<List<RenderResult>> getByAll();
+    ListenableFuture<List<RenderResult>> getAll();
 
     @Query("SELECT * FROM " + TABLE + " WHERE deleted = 0")
     List<RenderResult> getAllOnThread();
@@ -43,7 +43,10 @@ public interface RenderResultDao {
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    ListenableFuture<Long> insertRenderResult(RenderResult renderResults);
+    ListenableFuture<Long> insertRenderResult(RenderResult renderResult);
+
+    @Insert(onConflict =  OnConflictStrategy.IGNORE)
+    ListenableFuture<List<Long>> insertRenderResults(List<RenderResult> renderResults);
 
     @Delete
     ListenableFuture<Integer> deleteRenderResults(List<RenderResult> renderResults);

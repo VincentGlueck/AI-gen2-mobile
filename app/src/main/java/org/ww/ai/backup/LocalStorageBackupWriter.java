@@ -52,7 +52,7 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
     private void writeImages() {
         final AppDatabase appDatabase = AppDatabase.getInstance(mContext);
         final ListenableFuture<List<RenderResult>> listenableFuture =
-                appDatabase.renderResultDao().getByAll();
+                appDatabase.renderResultDao().getAll();
         final AsyncDbFuture<List<RenderResult>> asyncDbFuture = new AsyncDbFuture<>();
         final XmlMapper xmlMapper = new XmlMapper();
         final AtomicInteger count = new AtomicInteger();
