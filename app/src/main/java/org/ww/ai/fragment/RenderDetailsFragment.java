@@ -147,7 +147,7 @@ public class RenderDetailsFragment extends Fragment {
         TextView titleTextView = view.findViewById(R.id.history_title);
         titleTextView.setText(result.queryString);
         Button btnShare = view.findViewById(R.id.btn_share_render_results);
-        btnShare.setOnClickListener(v -> new ShareImageUtil(getActivity()).startShare(result.uid));
+        btnShare.setOnClickListener(v -> new ShareImageUtil(getActivity()).startShare(result.uid, true));
 
         Button btnReplace = view.findViewById(R.id.btn_replace_render_results);
         btnReplace.setOnClickListener(v -> replaceImage());
