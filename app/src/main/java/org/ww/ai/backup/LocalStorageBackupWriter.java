@@ -89,12 +89,12 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
     }
 
     private void addImagesToZip(Integer uid, byte[] thumbNail, byte[] image) throws IOException {
-        ZipEntry zipEntry = new ZipEntry(uid + "thumb.image.data");
+        ZipEntry zipEntry = new ZipEntry(uid + "|thumb.image.data");
         zipEntry.setSize(thumbNail.length);
         mZipOutputStream.putNextEntry(zipEntry);
         mZipOutputStream.write(thumbNail);
         mZipOutputStream.closeEntry();
-        zipEntry = new ZipEntry(uid + "image.image.data");
+        zipEntry = new ZipEntry(uid + "|image.image.data");
         mZipOutputStream.putNextEntry(zipEntry);
         mZipOutputStream.write(image);
         mZipOutputStream.closeEntry();

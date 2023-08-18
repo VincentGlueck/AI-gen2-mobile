@@ -3,13 +3,15 @@ package org.ww.ai.rds.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.ww.ai.rds.converter.EngineUsedNonDaoConverter;
 import org.ww.ai.rds.dao.EngineUsedNonDao;
 import org.ww.ai.rds.dao.RenderResultDao;
-import org.ww.ai.rds.ifenum.RenderModel;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -51,6 +53,25 @@ public class RenderResult implements Serializable {
     @TypeConverters(EngineUsedNonDaoConverter.class)
     @ColumnInfo(name = "engines_used")
     public List<EngineUsedNonDao> enginesUsed;
+
+    @Ignore
+    @JsonIgnore
+    public RenderResult (RenderResultLightWeight lightWeight) {
+        uid = lightWeight.uid;
+        createdTime = lightWeight.createdTime;
+        thumbNail = lightWeight.thumbNail ;
+        queryString = lightWeight.queryString;
+        queryUsed = lightWeight.queryUsed;
+        width = lightWeight.width;
+        height = lightWeight.height;
+        deleted = lightWeight.deleted;
+    }
+
+    @Ignore
+    @JsonIgnore
+    public static RenderResult fromRenderResultLightWeight(RenderResultLightWeight lightWeight) {
+        return new RenderResult(lightWeight);
+    }
 
     @NonNull
     @Override

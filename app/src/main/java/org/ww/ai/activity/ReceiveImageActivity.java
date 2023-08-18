@@ -90,7 +90,6 @@ public class ReceiveImageActivity extends AppCompatActivity implements ReceiveEv
         }
 
         EVENT_BROKER.registerReceiver(this, MODEL_ADDED, MODEL_REMOVED);
-
     }
 
 
