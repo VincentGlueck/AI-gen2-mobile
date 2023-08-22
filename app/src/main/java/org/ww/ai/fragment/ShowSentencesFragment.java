@@ -1,9 +1,14 @@
 package org.ww.ai.fragment;
 
+import static org.ww.ai.prefs.Preferences.PREF_AI_SITE_START_IMMEDIATE;
+import static org.ww.ai.prefs.Preferences.PREF_RENDER_ENGINE_URL;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.LayoutInflater;
@@ -28,8 +33,9 @@ import org.ww.ai.databinding.ShowSentencesFragmentBinding;
 import org.ww.ai.parcel.WhatToRender;
 import org.ww.ai.parser.Parser;
 import org.ww.ai.phrase.PhraseGenerator;
-import org.ww.ai.phrase.PhraseGeneratorException;
 import org.ww.ai.phrase.PhraseGeneratorErrorHandlerIF;
+import org.ww.ai.phrase.PhraseGeneratorException;
+import org.ww.ai.prefs.Preferences;
 import org.ww.ai.ui.DialogUtil;
 import org.xml.sax.SAXException;
 
@@ -127,6 +133,9 @@ public class ShowSentencesFragment extends Fragment implements PhraseGeneratorEr
             editText.setOnFocusChangeListener((v, hasFocus) -> {
                 if (hasFocus && whatToRender.isInstantCopyToClipBoard()) {
                     copyToClipBoard(editText.getText());
+                    if(Preferences.getInstance(requireContext()).getBoolean(PREF_AI_SITE_START_IMMEDIATE)) {
+                        openRenderUrl(Preferences.getInstance(requireContext()).getString(PREF_RENDER_ENGINE_URL));
+                    }
                 }
             });
             ImageView imageView = frameLayout.findViewById(R.id.btn_show_stats);
@@ -134,6 +143,13 @@ public class ShowSentencesFragment extends Fragment implements PhraseGeneratorEr
                     renderResult.toReadableForm(), R.drawable.info));
             linearLayout.addView(frameLayout);
         }
+    }
+
+    private void openRenderUrl(@NonNull String urlStr) {
+        if(!urlStr.startsWith("https://") && !urlStr.startsWith("http://")) {
+            urlStr = "https://" + urlStr;
+        }
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(urlStr)));
     }
 
     private void reRenderResults() {
