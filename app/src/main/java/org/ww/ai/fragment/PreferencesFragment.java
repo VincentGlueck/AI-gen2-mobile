@@ -4,9 +4,7 @@ import static org.ww.ai.prefs.Preferences.PREF_RENDER_ENGINE_URL;
 import static org.ww.ai.tools.ExecutorUtil.EXECUTOR_UTIL;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -40,7 +38,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PreferencesFragment extends PreferenceFragmentCompat {
 
     private static final String PREF_AI_RENDER_URL = "pref_ai_site_url";
-    private static final String PREF_AI_TEST_URL = "pref_ai_test_url";
     private static final String PREF_USE_TRANSLATION = "pref_translate";
     private static final String PREF_USE_TRASH = "pref_use_trash";
     private static final String PREF_CREATE_BACKUP = "pref_create_backup";
@@ -94,25 +91,14 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
     private void initRenderingUrlSection() {
         EditTextPreference editRenderUrl = getPreferenceManager().findPreference(PREF_AI_RENDER_URL);
-        Preference preferenceSiteUrl = mPreferenceScreen.findPreference(PREF_AI_TEST_URL);
         assert editRenderUrl != null;
-        assert preferenceSiteUrl != null;
         if (mAiRenderUrl.get() != null) {
             editRenderUrl.setSummary(mAiRenderUrl.get());
-            preferenceSiteUrl.setSummary(mAiRenderUrl.get());
         }
         editRenderUrl.setOnBindEditTextListener(t -> t.setInputType(InputType.TYPE_TEXT_VARIATION_URI));
         editRenderUrl.setOnPreferenceChangeListener((p, newVal) -> {
             mAiRenderUrl.set((String) newVal);
             editRenderUrl.setSummary(mAiRenderUrl.get());
-            preferenceSiteUrl.setSummary(mAiRenderUrl.get());
-            return false;
-        });
-        preferenceSiteUrl.setOnPreferenceClickListener(preference -> {
-            Intent intent = new Intent();
-            intent.setData(Uri.parse(mAiRenderUrl.get()));
-            intent.setAction(Intent.ACTION_VIEW);
-            startActivity(intent);
             return false;
         });
     }

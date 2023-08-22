@@ -7,8 +7,8 @@ import android.util.Log;
 public class Preferences {
     public static final String PREF_USE_TRANSLATION = "pref_translate";
     public static final String PREF_USE_TRASH = "pref_use_trash";
-
     public static final String PREF_RENDER_ENGINE_URL = "pref_render_engine_url";
+    public static final String PREF_AI_SITE_START_IMMEDIATE = "pref_ai_site_start_immediate";
 
     private static Preferences instance;
     private static final String TAG = Preferences.class.getSimpleName();
@@ -23,11 +23,6 @@ public class Preferences {
             instance = new Preferences();
         }
         return instance;
-    }
-
-
-    public SharedPreferences getPreferences() {
-        return mPreferences;
     }
 
     public boolean getBoolean(final String name) {

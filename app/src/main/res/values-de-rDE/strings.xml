@@ -114,5 +114,7 @@
     <string name="pref_backup_restored_with_failures">Es wurden %d Bilder wiederhergestellt, aber es existieren %d Warnungen bzw. Fehlermeldungen.\\n\\nMöchtest du dir diese ansehen?</string>
     <string name="dialog_title_log">Log-Datei</string>
     <string name="include_description">Beschreibung inkl.</string>
+    <string name="pref_ai_site_start_immediate">Seite sofort öffnen</string>
+    <string name="pref_ai_site_start_immediate_summary">Auswahl eines Satzes öffnet die URL</string>
 
 </resources>

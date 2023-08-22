@@ -114,5 +114,7 @@
     <string name="pref_backup_restored_with_failures">%d images restored, but %d warnings/failures occurred\n\nDo you want to have a look at these?</string>
     <string name="dialog_title_log">Log file</string>
     <string name="include_description">Include description</string>
+    <string name="pref_ai_site_start_immediate">Start immediately</string>
+    <string name="pref_ai_site_start_immediate_summary">URL opens on result selection</string>
 
 </resources>
