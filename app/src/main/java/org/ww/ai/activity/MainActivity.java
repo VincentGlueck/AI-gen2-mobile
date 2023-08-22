@@ -161,8 +161,6 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
 
-
-
     @Override
     public void addMenuIfRequired() {
         Fragment fragment = mNavHostFragment.getChildFragmentManager().getFragments().get(0);
