@@ -162,16 +162,18 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     }
 
     private void setPreferenceSummary(List<BackupHolder> backupFiles) {
+        Preference preference = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
+        assert preference != null;
         AtomicReference<String> fullName = new AtomicReference<>("");
         if (backupFiles != null && !backupFiles.isEmpty()) {
             fullName.set(backupFiles.get(0).file.getAbsolutePath());
         } else {
+            preference.setEnabled(false);
             mLatestBackupHolder = null;
             return;
         }
+        preference.setEnabled(true);
         String str = initRestoreBackupPreference(backupFiles);
-        Preference preference = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
-        assert preference != null;
         preference.setSummary(str);
         mLatestBackupHolder = backupFiles.get(0);
     }

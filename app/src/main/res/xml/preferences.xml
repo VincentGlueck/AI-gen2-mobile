@@ -54,6 +54,7 @@
 
         <Preference
             android:key="pref_restore_backup"
+            android:enabled="false"
             android:summary="@string/pref_restore_backup_summary"
             android:title="@string/pref_restore_backup" />
 

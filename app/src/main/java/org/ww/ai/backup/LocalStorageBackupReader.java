@@ -114,7 +114,6 @@ public class LocalStorageBackupReader extends AbstractBackupReader {
             result.image = getImageDataFromZipEntry(zipFile, imageEntry);
             result.thumbNail = getImageDataFromZipEntry(zipFile, thumbEntry);
             mAppDatabase.renderResultDao().insertRenderResultOnThread(result);
-            mAppDatabase.close();
             tempRenderResults.remove(uid);
             mResultHolder.restored++;
         } catch (IOException e) {
