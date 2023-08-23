@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
     public static final String KEY_WHAT_TO_RENDER = "whatToRender";
     private static final int SIZE_SNACK_THUMB_MAX = 96;
     private static final int REQUEST_WRITE_PERMISSION = 0x8000;
+    private static final int REQUEST_READ_PERMISSION = 0x8001;
     private AppBarConfiguration mAppBarConfiguration;
     private WhatToRenderIF mLastRender;
     private CoordinatorLayout mCoordinatorLayout;
@@ -81,10 +82,14 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
     }
 
     private void requestPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission
-                    .WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_PERMISSION);
+        requestSinglePermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_READ_PERMISSION);
+        requestSinglePermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_PERMISSION);
+    }
+
+    private void requestSinglePermission(String permission, int requestCode) {
+        if (ContextCompat.checkSelfPermission(this,
+                permission) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
         }
     }
 
