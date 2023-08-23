@@ -10,10 +10,8 @@ android {
     defaultConfig {
         applicationId "org.ww.ai"
         minSdk 28
-        //noinspection OldTargetApi
-        targetSdk 33
         versionCode 1
-        versionName "0.0.4"
+        versionName "0.0.5"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -63,19 +61,12 @@ dependencies {
 
     implementation 'androidx.preference:preference:1.2.1'
     def room_version = "2.5.2"
-    def paging_version = "3.2.0"
-    def kotlin_co_routines_version = "1.7.3"
-
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_co_routines_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_co_routines_version"
 
     implementation(platform('org.jetbrains.kotlin:kotlin-bom:1.9.0'))
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    //noinspection GradleDependency
     implementation 'androidx.navigation:navigation-fragment:2.6.0'
-    //noinspection GradleDependency
     implementation 'androidx.navigation:navigation-ui:2.6.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -101,8 +92,5 @@ dependencies {
 
     implementation "javax.xml.stream:stax-api:1.0-2"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.1"
-    implementation "androidx.paging:paging-runtime:$paging_version"
-    implementation "androidx.paging:paging-guava:$paging_version"
-
 
 }
