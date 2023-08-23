@@ -67,6 +67,7 @@ public class HeavyLoadTest {
         result.height = renderResult.height;
         result.queryUsed = renderResult.queryUsed;
         result.queryString = RANDOM_SENTENCES.getRandomSentence();
+        result.createdTime = System.currentTimeMillis();
         return result;
     }
 }
