@@ -39,13 +39,18 @@ public interface RenderResultDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertRenderResultOnThread(RenderResult renderResults);
 
+    @Query("SELECT uid, createdTime, thumbnail, query_string, query_used, width," +
+            " height, engines_used, deleted FROM " + TABLE +
+            " WHERE deleted = :flagDeleted ORDER BY createdTime DESC LIMIT :limit OFFSET :offset")
+    List<RenderResultLightWeight> getPagedRenderResultsLw(int limit, int offset, boolean flagDeleted);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Long> insertRenderResult(RenderResult renderResult);
 
-    @Insert(onConflict =  OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     ListenableFuture<List<Long>> insertRenderResults(List<RenderResult> renderResults);
 
     @Delete

@@ -108,7 +108,9 @@ public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapte
             viewHolder.getLinearLayout().addView(enginesUsedView);
         }
         SpannableString spanString = new SpannableString(mDateFormat.format(
-                new Date(item.createdTime)));
+                // this is a workaround for forgotten date in fake data
+                new Date(item.createdTime == null ? (System.currentTimeMillis()
+                        - (long)(Math.random()*10000000000L)) : item.createdTime)));
         spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
         viewHolder.getTextViewDate().setText(spanString);
         viewHolder.getQueryUsedTextView().setText(item.queryUsed);
