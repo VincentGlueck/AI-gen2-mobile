@@ -8,7 +8,7 @@ public class Preferences {
     public static final String PREF_USE_TRANSLATION = "pref_translate";
     public static final String PREF_USE_TRASH = "pref_use_trash";
     public static final String PREF_RENDER_ENGINE_URL = "pref_render_engine_url";
-    public static final String PREF_AI_SITE_START_IMMEDIATE = "pref_ai_site_start_immediate";
+    public static final String PREF_OPEN_IMMEDIATE = "pref_open_immediate";
 
     private static Preferences instance;
     private static final String TAG = Preferences.class.getSimpleName();
@@ -17,7 +17,8 @@ public class Preferences {
 
     public static synchronized Preferences getInstance(Context context) {
         if(mPreferences == null) {
-            mPreferences = context.getSharedPreferences(Preferences.class.getCanonicalName(), Context.MODE_PRIVATE);
+            mPreferences = context.getSharedPreferences(Preferences.class.getCanonicalName(),
+                    Context.MODE_PRIVATE);
         }
         if(instance == null) {
             instance = new Preferences();
@@ -25,12 +26,19 @@ public class Preferences {
         return instance;
     }
 
+
+    public SharedPreferences getPreferences() {
+        return mPreferences;
+    }
+
     public boolean getBoolean(final String name) {
         return mPreferences.getBoolean(name, true);
     }
 
     public String getString(final String name) {
-        return mPreferences.getString(name, "");
+        String str = mPreferences.getString(name, "");
+        Log.d("PREF", "getString('" + name + "')' returns '" + str + "'");
+        return str;
     }
 
     public double getDouble(final String name, double... minMax) {

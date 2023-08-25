@@ -1,6 +1,6 @@
 package org.ww.ai.fragment;
 
-import static org.ww.ai.prefs.Preferences.PREF_AI_SITE_START_IMMEDIATE;
+import static org.ww.ai.prefs.Preferences.PREF_OPEN_IMMEDIATE;
 import static org.ww.ai.prefs.Preferences.PREF_RENDER_ENGINE_URL;
 
 import android.content.ClipData;
@@ -133,7 +133,7 @@ public class ShowSentencesFragment extends Fragment implements PhraseGeneratorEr
             editText.setOnFocusChangeListener((v, hasFocus) -> {
                 if (hasFocus && whatToRender.isInstantCopyToClipBoard()) {
                     copyToClipBoard(editText.getText());
-                    if(Preferences.getInstance(requireContext()).getBoolean(PREF_AI_SITE_START_IMMEDIATE)) {
+                    if(Preferences.getInstance(requireContext()).getBoolean(PREF_OPEN_IMMEDIATE)) {
                         openRenderUrl(Preferences.getInstance(requireContext()).getString(PREF_RENDER_ENGINE_URL));
                     }
                 }

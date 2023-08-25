@@ -21,8 +21,7 @@
         android:title="@string/pref_section_any">
 
         <EditTextPreference
-            android:defaultValue="https://www."
-            android:key="pref_ai_site_url"
+            android:key="pref_render_engine_url"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/pref_title_ai_site_url"
@@ -32,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:defaultValue="false"
-            android:key="pref_ai_site_start_immediate"
+            android:key="pref_start_immediate"
             android:summary="@string/pref_ai_site_start_immediate_summary"
             android:title="@string/pref_ai_site_start_immediate" />
 
