@@ -32,8 +32,8 @@
             android:layout_height="wrap_content"
             android:defaultValue="false"
             android:key="pref_start_immediate"
-            android:summary="@string/pref_ai_site_start_immediate_summary"
-            android:title="@string/pref_ai_site_start_immediate" />
+            android:summary="@string/pref_check_open_immediate_summary"
+            android:title="@string/pref_check_open_immediate" />
 
     </PreferenceCategory>
 
