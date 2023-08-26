@@ -86,7 +86,7 @@ public class TrashBinFragment extends GalleryFragment {
             ListenableFuture<RenderResult> future = db.renderResultDao().getById(Integer.parseInt(r));
             softDeleteFuture(db, future, false);
         });
-        removeDeletedViewsFromParent();
+       //  removeDeletedViewsFromParent();
         if (mRenderResults.isEmpty()) {
             showNothingToDisplayImage();
         } else {

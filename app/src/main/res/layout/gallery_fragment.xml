@@ -19,7 +19,7 @@
         android:textStyle="bold" />
 
     <ScrollView
-        android:id="@+id/results_gallery_fragment"
+        android:id="@+id/results_gallery_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.95"

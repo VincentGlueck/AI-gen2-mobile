@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
+import org.ww.ai.rds.entity.RenderResultSkeleton;
 
 import java.util.List;
 
@@ -23,6 +24,15 @@ public interface RenderResultDao {
             " height, engines_used, deleted FROM " + TABLE +
             " WHERE deleted = :flagDeleted ORDER BY createdTime DESC")
     ListenableFuture<List<RenderResultLightWeight>> getAllLightWeights(boolean flagDeleted);
+
+    @Query("SELECT uid, createdTime, thumbnail, query_string, query_used, width," +
+            " height, engines_used, deleted FROM " + TABLE +
+            " WHERE uid IN (:ids)")
+    ListenableFuture<List<RenderResultLightWeight>> getLightWeightByIds(List<String> ids);
+
+    @Query("SELECT uid, createdTime, deleted FROM " + TABLE +
+            " WHERE deleted = :flagDeleted ORDER BY createdTime DESC")
+    ListenableFuture<List<RenderResultSkeleton>> getAllSkeletons(boolean flagDeleted);
 
     @Query("SELECT * FROM " + TABLE + " WHERE uid = :id")
     ListenableFuture<RenderResult> getById(int id);
@@ -41,8 +51,8 @@ public interface RenderResultDao {
 
     @Query("SELECT uid, createdTime, thumbnail, query_string, query_used, width," +
             " height, engines_used, deleted FROM " + TABLE +
-            " WHERE deleted = :flagDeleted ORDER BY createdTime DESC LIMIT :limit OFFSET :offset")
-    List<RenderResultLightWeight> getPagedRenderResultsLw(int limit, int offset, boolean flagDeleted);
+            " WHERE uid >= :minUid AND deleted = :flagDeleted ORDER BY createdTime DESC LIMIT :limit OFFSET :offset")
+    ListenableFuture<List<RenderResultLightWeight>> getPagedRenderResultsLw(int minUid, int limit, int offset, boolean flagDeleted);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
