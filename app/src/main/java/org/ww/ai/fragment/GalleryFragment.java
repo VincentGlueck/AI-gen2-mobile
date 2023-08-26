@@ -241,25 +241,6 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
         }
     }
 
-    private void removeFromView(ViewGroup root, RenderResultLightWeight lightweight) {
-        if (root == null) {
-            return;
-        }
-        mRenderResults.stream().filter(l -> lightweight.uid == l.uid).forEach(r -> {
-            /*
-            ViewParent parent = r.checkBox.getParent();
-            ViewGroup rowParent = (ViewGroup) parent.getParent();
-            if (rowParent != null) {
-                rowParent.removeView((View) parent);
-                if (rowParent.getChildCount() == 0) {
-                    root.removeView(rowParent);
-                }
-            }
-
-             */
-        });
-    }
-
     protected void updateToolbar() {
         if (mRenderResults != null) {
             boolean deleteChecked = mThumbnailCallback.isAnyCheckBoxChecked();
@@ -324,34 +305,19 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
                 hardDeleteFuture(db, future);
             }
         });
-        // removeDeletedViewsFromParent();
         if (mRenderResults.isEmpty()) {
             showNothingToDisplayImage();
         }
     }
 
-    /*
-    protected void removeDeletedViewsFromParent() {
-        mSelectedSet.forEach(uid -> {
-            Optional<RenderResultSkeleton> optional = mRenderResults.stream()
-                    .filter(r -> r.uid == Integer.parseInt(uid)).findFirst();
-            optional.ifPresent(skeleton -> {
-                ListenableFuture<List<RenderResultLightWeight>> future = PAGING_CACHE.getById(skeleton.uid);
-                AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
-                asyncDbFuture.processFuture(future, result -> {
-                    Optional<RenderResultLightWeight> optional1 = result.stream().parallel().filter(f -> f.uid == optional.get().uid).findFirst();
-                    if (optional1.isPresent()) {
-                        removeFromView(mLinearLayout, optional1.get());
-                        optional1.get().checkBox.setChecked(false);
-                    }
-                }, mContainerContext);
-                mRenderResults.remove(skeleton);
-            });
-        });
-        mSelectedSet.clear();
+    private void reRenderGallery(int scrollY) {
+        // TODO: check this, might not work
+        mRenderCount.set(0);
+        mIdxRender = new AtomicInteger(0);
+        mLinearLayout.removeAllViews();
+        getRenderResultsFromDatabase(mViewGroup);
+        mScrollView.scrollTo(0, scrollY);
     }
-
-     */
 
     protected void softDeleteFuture(AppDatabase db, ListenableFuture<RenderResult> future,
                                     boolean setDeleteFlagTo) {
@@ -361,9 +327,9 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
             ListenableFuture<Integer> softDelFuture = db.renderResultDao().updateRenderResults(List.of(result));
             AsyncDbFuture<Integer> asyncDbFuture1 = new AsyncDbFuture<>();
             asyncDbFuture1.processFuture(softDelFuture, i -> {
+                reRenderGallery(mScrollView.getScrollY());
             }, requireContext());
         }, requireContext());
-
     }
 
     private void hardDeleteFuture(AppDatabase db, ListenableFuture<RenderResult> future) {

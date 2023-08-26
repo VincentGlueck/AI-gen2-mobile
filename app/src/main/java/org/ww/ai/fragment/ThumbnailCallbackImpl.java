@@ -175,9 +175,7 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
 
     @Override
     public void setCheckBoxesVisibilty(boolean visible) {
-        List<RowHolder> list = mRowHolderList.stream().filter(h -> h.avail)
-                .collect(Collectors.toList());
-        list.forEach(l -> l.imageViewHolders.forEach(h -> {
+        mRowHolderList.forEach(l -> l.imageViewHolders.forEach(h -> {
             h.imgLinearLayout
                     .findViewById(R.id.check_single_entry)
                     .setVisibility(visible ? View.VISIBLE : View.GONE);
