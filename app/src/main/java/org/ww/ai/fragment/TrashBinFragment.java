@@ -73,7 +73,6 @@ public class TrashBinFragment extends GalleryFragment {
     @Override
     protected void handleMenuItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.action_restore) {
-            mSelectedSet = getSelectedSet();
             if (mSelectedSet != null && !mSelectedSet.isEmpty()) {
                 performRestore();
             }
