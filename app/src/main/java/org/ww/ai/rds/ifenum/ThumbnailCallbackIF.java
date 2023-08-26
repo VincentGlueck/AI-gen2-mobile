@@ -24,4 +24,5 @@ public interface ThumbnailCallbackIF {
     void setCheckBoxesVisibilty(boolean visible);
 
     boolean isAnyCheckBoxChecked();
+
 }
