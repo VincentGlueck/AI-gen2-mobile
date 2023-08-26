@@ -1,8 +1,8 @@
 package org.ww.ai.fragment;
 
 import static org.ww.ai.event.EventBroker.EVENT_BROKER;
+import static org.ww.ai.rds.PagingCache.PAGING_CACHE;
 import static org.ww.ai.ui.Animations.ANIMATIONS;
-import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,10 +14,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,10 +27,6 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.R;
@@ -42,32 +38,45 @@ import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
+import org.ww.ai.rds.entity.RenderResultSkeleton;
+import org.ww.ai.rds.ifenum.PagingCacheCallbackIF;
+import org.ww.ai.rds.ifenum.ThumbnailCallbackIF;
 import org.ww.ai.ui.MetricsUtil;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
-public class GalleryFragment extends Fragment implements ReceiveEventIF {
+public class GalleryFragment extends Fragment implements ReceiveEventIF, ThumbnailSelectionCallbackIF, PagingCacheCallbackIF {
 
-    private static final int THUMBS_PER_ROW = 3;
     private static final long FADE_TIME = 280L;
     private static final float SCALE_SELECTED = 0.82f;
     private static final float SCALE_FULL = 1.0f;
-    private static final int STANDARD_THUMB_SIZE = 192;
     private GalleryFragmentBinding mBinding;
     protected LinearLayout mLinearLayout;
     private Context mContainerContext;
     private ViewGroup mViewGroup;
     private MetricsUtil.Screen mScreen;
-    protected List<RenderResultLightWeight> mRenderResults;
+    protected List<RenderResultSkeleton> mRenderResults;
     private final AtomicBoolean deleteMode = new AtomicBoolean();
     private MenuProvider mMenuProvider;
     protected Set<String> mSelectedSet = new HashSet<>();
     protected boolean mShowTrash = false;
+
+    private AtomicInteger mIdxRender;
+
+    private AtomicInteger mRenderCount;
+
+    private ScrollView mScrollView;
+
+    private AtomicLong mCounter = new AtomicLong(System.currentTimeMillis());
+
+    private ThumbnailCallbackIF mThumbnailCallback;
+    private int mInitialLayoutHeight = -1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,46 +101,62 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mLinearLayout = view.findViewById(R.id.results_gallery_linear_layout);
+        mScrollView = view.findViewById(R.id.results_gallery_scroll_view);
         view.findViewById(R.id.empty_trash).setVisibility(View.GONE);
         getRenderResultsFromDatabase(mViewGroup);
         if (getActivity() != null && getActivity().getWindowManager() != null) {
             mScreen = MetricsUtil.getScreen(getActivity().getWindowManager());
         }
+        PAGING_CACHE.init(mContainerContext);
+        mScrollView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            long time = System.currentTimeMillis();
+            if ((mCounter.get() + 200L) < time) {
+                mThumbnailCallback.onScrollPositionChanged(scrollY, oldScrollY);
+            }
+        });
+        mLinearLayout.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
+            @Override
+            public void onChildViewAdded(View parent, View child) {
+                if (parent.getHeight() > mScrollView.getMeasuredHeight()
+                        && !mThumbnailCallback.isUseDummyImages()) {
+                    int rowHeight = ((ViewGroup)parent).getChildAt(0).getHeight();
+                    mThumbnailCallback.notifyRowHeight(rowHeight);
+                    mThumbnailCallback.setUseDummyImages(true);
+                    PAGING_CACHE.setUseDummies(true);
+                } else if (mInitialLayoutHeight == -1) {
+                    mInitialLayoutHeight = parent.getHeight();
+                }
+            }
+
+            @Override
+            public void onChildViewRemoved(View parent, View child) {
+
+            }
+        });
     }
 
     private void getRenderResultsFromDatabase(final ViewGroup viewGroup) {
         AppDatabase appDatabase = AppDatabase.getInstance(mContainerContext);
-        ListenableFuture<List<RenderResultLightWeight>> listenableFuture =
-                appDatabase.renderResultDao().getAllLightWeights(mShowTrash);
-        AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
+        ListenableFuture<List<RenderResultSkeleton>> listenableFuture =
+                appDatabase.renderResultDao().getAllSkeletons(mShowTrash);
+        AsyncDbFuture<List<RenderResultSkeleton>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(listenableFuture,
                 r -> createGallery(viewGroup, r), mContainerContext);
     }
 
     private void createGallery(@NonNull ViewGroup parent,
-                               @NonNull List<RenderResultLightWeight> renderResults) {
+                               @NonNull List<RenderResultSkeleton> renderResults) {
         mRenderResults = renderResults;
-        LinearLayout rowLayout = null;
-        int count = 0;
-        for (RenderResultLightWeight lightWeight : renderResults) {
-            rowLayout = rowLayout == null ? createRow(parent) : rowLayout;
-            LinearLayout layoutHolder = createImageView(lightWeight.thumbNail, rowLayout);
-            count++;
-            initSingleImageView(lightWeight, layoutHolder);
-            if (count >= THUMBS_PER_ROW) {
-                mLinearLayout.addView(rowLayout);
-                count = 0;
-                rowLayout = null;
-            }
-        }
-        if (rowLayout != null) {
-            mLinearLayout.addView(rowLayout);
-        }
-        if (renderResults.isEmpty()) {
-            showNothingToDisplayImage();
-        }
-        if (mSelectedSet != null && !mSelectedSet.isEmpty()) {
-            markSelected(mSelectedSet);
+        mRenderCount = new AtomicInteger(0);
+        mThumbnailCallback = new ThumbnailCallbackImpl(mContainerContext,
+                parent,
+                mLinearLayout,
+                mSelectedSet,
+                this,
+                mScreen);
+        if (!mRenderResults.isEmpty()) {
+            mIdxRender = new AtomicInteger(0);
+            PAGING_CACHE.displayThumbnail(mRenderResults.get(0).uid, this, mThumbnailCallback);
         }
     }
 
@@ -142,7 +167,17 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
         mLinearLayout.setBackgroundColor(Color.BLACK);
     }
 
-    private void initSingleImageView(RenderResultLightWeight lightWeight, LinearLayout layoutHolder) {
+    @Override
+    public void finishedRender(RenderResultLightWeight lightWeight, LinearLayout singleImageLayout) {
+        // TODO: add more magic
+        mRenderCount.set(mRenderCount.incrementAndGet());
+        if (mRenderCount.get() >= mRenderResults.size()) {
+            mThumbnailCallback.processCleanup();
+        }
+    }
+
+    @Override
+    public void initSingleImageView(RenderResultLightWeight lightWeight, LinearLayout layoutHolder) {
         ImageView imageView = layoutHolder.findViewById(R.id.single_gallery_image_view);
         lightWeight.checkBox = layoutHolder.findViewById(R.id.check_single_entry);
         lightWeight.checkBox.setVisibility(View.GONE);
@@ -205,7 +240,7 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
         if (mRenderResults == null) {
             return;
         }
-        mRenderResults.forEach(r -> r.checkBox.setVisibility(visible ? View.VISIBLE : View.GONE));
+        // mRenderResults.forEach(r -> r.checkBox.setVisibility(visible ? View.VISIBLE : View.GONE));
     }
 
     private void removeFromView(ViewGroup root, RenderResultLightWeight lightweight) {
@@ -213,6 +248,7 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
             return;
         }
         mRenderResults.stream().filter(l -> lightweight.uid == l.uid).forEach(r -> {
+            /*
             ViewParent parent = r.checkBox.getParent();
             ViewGroup rowParent = (ViewGroup) parent.getParent();
             if (rowParent != null) {
@@ -221,11 +257,14 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
                     root.removeView(rowParent);
                 }
             }
+
+             */
         });
     }
 
     protected void updateToolbar() {
         if (mRenderResults != null) {
+            /*
             boolean deleteChecked = mRenderResults.stream().anyMatch(r -> r.checkBox.isChecked());
             if (!deleteMode.get() && deleteChecked) {
                 addMenuToolbar();
@@ -234,6 +273,8 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
             if (!deleteChecked && deleteMode.get()) {
                 removeMenuToolbar();
             }
+
+             */
         }
     }
 
@@ -289,24 +330,34 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
                 hardDeleteFuture(db, future);
             }
         });
-        removeDeletedViewsFromParent();
+        // removeDeletedViewsFromParent();
         if (mRenderResults.isEmpty()) {
             showNothingToDisplayImage();
         }
     }
 
+    /*
     protected void removeDeletedViewsFromParent() {
         mSelectedSet.forEach(uid -> {
-            Optional<RenderResultLightWeight> optional = mRenderResults.stream()
+            Optional<RenderResultSkeleton> optional = mRenderResults.stream()
                     .filter(r -> r.uid == Integer.parseInt(uid)).findFirst();
-            optional.ifPresent(lw -> {
-                lw.checkBox.setChecked(false);
-                removeFromView(mLinearLayout, lw);
-                mRenderResults.remove(lw);
+            optional.ifPresent(skeleton -> {
+                ListenableFuture<List<RenderResultLightWeight>> future = PAGING_CACHE.getById(skeleton.uid);
+                AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
+                asyncDbFuture.processFuture(future, result -> {
+                    Optional<RenderResultLightWeight> optional1 = result.stream().parallel().filter(f -> f.uid == optional.get().uid).findFirst();
+                    if (optional1.isPresent()) {
+                        removeFromView(mLinearLayout, optional1.get());
+                        optional1.get().checkBox.setChecked(false);
+                    }
+                }, mContainerContext);
+                mRenderResults.remove(skeleton);
             });
         });
         mSelectedSet.clear();
     }
+
+     */
 
     protected void softDeleteFuture(AppDatabase db, ListenableFuture<RenderResult> future,
                                     boolean setDeleteFlagTo) {
@@ -331,34 +382,6 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
         }, requireContext());
     }
 
-    private LinearLayout createImageView(byte[] thumbNail, LinearLayout rowLayout) {
-        LinearLayout linearLayout = (LinearLayout) LayoutInflater
-                .from(getActivity()).inflate(R.layout.single_gallery_image, rowLayout, false);
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(32));
-        ImageView imageView = linearLayout.findViewById(R.id.single_gallery_image_view);
-        Glide.with(mContainerContext)
-                .asBitmap()
-                .load(IMAGE_UTIL.convertBlobToImage(thumbNail))
-                .apply(requestOptions)
-                .into(imageView);
-        linearLayout.setPadding(0, 0, 4, 4);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        if (mScreen != null) {
-            params.width = (mScreen.width - 4 * THUMBS_PER_ROW) / THUMBS_PER_ROW;
-            if (IMAGE_UTIL.getImageBounds(imageView).height() < params.width) {
-                params.height = (mScreen.width - 4 * THUMBS_PER_ROW) / THUMBS_PER_ROW;
-            }
-        } else {
-            params.width = STANDARD_THUMB_SIZE;
-            params.height = 192;
-        }
-        rowLayout.addView(linearLayout, params);
-        linearLayout.setClickable(true);
-        linearLayout.setLongClickable(true);
-        return linearLayout;
-    }
 
     @Override
     public void onPause() {
@@ -382,12 +405,13 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
                 GalleryFragment.class.getCanonicalName(), Context.MODE_PRIVATE);
         mSelectedSet = new HashSet<>();
         mSelectedSet = preferences.getStringSet("sel", mSelectedSet);
-        markSelected(mSelectedSet);
-        if (mSelectedSet != null && !mSelectedSet.isEmpty()) {
+        // markSelected(mSelectedSet);
+        if (!mSelectedSet.isEmpty()) {
             addMenuToolbar();
         }
     }
 
+    /*
     private void markSelected(Set<String> set) {
         if (set == null || set.isEmpty()) {
             return;
@@ -395,11 +419,17 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
         if (mRenderResults == null) {
             return;
         }
-        for (RenderResultLightWeight renderResult : mRenderResults) {
+        for (RenderResultSkeleton renderResult : mRenderResults) {
             for (String str : set) {
                 if (String.valueOf(renderResult.uid).equals(str)) {
                     renderResult.checkBox.setChecked(true);
-                    animateOne(renderResult, renderResult.checkBox.isChecked(), 1);
+                    ListenableFuture<List<RenderResultLightWeight>> future = PAGING_CACHE.getById(renderResult.uid);
+                    AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
+                    asyncDbFuture.processFuture(future, result -> {
+                        RenderResultLightWeight lw = PAGING_CACHE.getFromResult(renderResult.uid, result);
+                        animateOne(lw, renderResult.checkBox.isChecked(), 1);
+                    }, mContainerContext);
+
                 }
             }
         }
@@ -407,9 +437,15 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
         showCheckOnAll(mSelectedSet != null && !mSelectedSet.isEmpty());
     }
 
+     */
+
     protected Set<String> getSelectedSet() {
+        return Collections.emptySet();
+        /*
         return mRenderResults.stream().filter(r -> r.checkBox.isChecked())
                 .map(m -> String.valueOf(m.uid)).collect(Collectors.toSet());
+
+         */
     }
 
     private void onImageClickListener(int uid) {
@@ -420,7 +456,7 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
     }
 
     private LinearLayout createRow(ViewGroup parent) {
-        return (LinearLayout) LayoutInflater.from(getActivity())
+        return (LinearLayout) LayoutInflater.from(requireContext())
                 .inflate(R.layout.single_gallery_row, parent, false);
     }
 
@@ -456,7 +492,15 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF {
         asyncDbFuture.processFuture(future, result -> {
             mSelectedSet.clear();
             mSelectedSet.add(String.valueOf(result.uid));
-            removeDeletedViewsFromParent();
+            // removeDeletedViewsFromParent();
         }, mContainerContext);
+    }
+
+    @Override
+    public void cachingDone() {
+        mIdxRender.set(mIdxRender.incrementAndGet());
+        if (mIdxRender.get() < mRenderResults.size()) { //  && !mScreenSizeReached.get()
+            PAGING_CACHE.displayThumbnail(mRenderResults.get(mIdxRender.get()).uid, this, mThumbnailCallback);
+        }
     }
 }
