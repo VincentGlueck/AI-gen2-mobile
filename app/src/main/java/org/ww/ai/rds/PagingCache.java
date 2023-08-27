@@ -18,8 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public enum PagingCache {
-    PAGING_CACHE;
+public class PagingCache {
+
+    private static PagingCache mInstance;
     private static final int CAPACITY = 100;
     private static final int MAX_CAPACITY = 1000;
     private static final int MIN_CAPACITY = 1;
@@ -28,10 +29,8 @@ public enum PagingCache {
     private AppDatabase mAppDatabase;
     private List<PagingEntry> entries;
     private int mCapacity = CAPACITY;
-    private Context mContext;
 
-    public void init(Context context, int... capacity) {
-        mContext = context;
+    private PagingCache(Context context, int... capacity) {
         mAppDatabase = AppDatabase.getInstance(context);
         if (capacity.length > 0) {
             if (capacity[0] > MAX_CAPACITY) {
@@ -43,10 +42,18 @@ public enum PagingCache {
         entries = new ArrayList<>(mCapacity);
     }
 
-    void testInit(int capacity) {
+    protected PagingCache(int capacity) {
+        // for tests only!
         mCapacity = capacity;
-        entries = new ArrayList<>(mCapacity);
     }
+
+    public static PagingCache getInstance(Context context) {
+        if(mInstance == null) {
+            mInstance = new PagingCache(context);
+        }
+        return mInstance;
+    }
+
 
     public synchronized void addAll(List<RenderResultLightWeight> lightWeights, long... fakeTime) {
         if (lightWeights == null || lightWeights.isEmpty()) {
@@ -72,8 +79,8 @@ public enum PagingCache {
 
     private void removeOldEntries(int count) {
         entries.sort(Collections.reverseOrder());
-        for (int n = 0; n < count; n++) {
-            entries.remove(0);
+        if (count > 0) {
+            entries.subList(0, count).clear();
         }
     }
 
@@ -91,19 +98,8 @@ public enum PagingCache {
         return entries.stream().parallel().anyMatch(f -> f.renderResultLightWeight.uid == uid);
     }
 
-    public void removeId(int uid) {
-        Optional<PagingEntry> optional = entries.stream().parallel()
-                .filter(f -> f.renderResultLightWeight.uid == uid).findFirst();
-        optional.ifPresent(pagingEntry -> entries.remove(pagingEntry));
-    }
-
-    public RenderResultLightWeight getFromResult(int uid, List<RenderResultLightWeight> renderResultLightWeights) {
-        Optional<RenderResultLightWeight> optional = renderResultLightWeights.stream().parallel()
-                .filter(f -> f.uid == uid).findFirst();
-        return optional.orElse(null);
-    }
-
-    public void displayThumbnail(int uid, PagingCacheCallbackIF pagingCacheCallback, ThumbnailCallbackIF callback) {
+    public void displayThumbnail(Context context, int uid, PagingCacheCallbackIF pagingCacheCallback,
+                                 ThumbnailCallbackIF callback, boolean showTrash) {
         if(mUseDummies.get()) {
             RenderResultLightWeight lightWeight = new RenderResultLightWeight();
             lightWeight.uid = uid;
@@ -115,18 +111,21 @@ public enum PagingCache {
                 .filter(f -> f.renderResultLightWeight.uid == uid).map(
                         r -> r.renderResultLightWeight).findFirst().orElse(null);
         if (lightWeight == null) {
-            Log.e("CACHE", "******** NOT in cache: " + uid + ", reading " + PAGE_SIZE + " entries ***********");
             ListenableFuture<List<RenderResultLightWeight>> future = mAppDatabase.renderResultDao()
-                    .getPagedRenderResultsLw(uid, PAGE_SIZE, 0, false);
+                    .getPagedRenderResultsLw(uid, PAGE_SIZE, 0, showTrash);
             AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
             asyncDbFuture.processFuture(future, result -> {
                 addAll(result);
                 RenderResultLightWeight lw = entries.stream().parallel()
                         .filter(f -> f.renderResultLightWeight.uid == uid).map(
                                 r -> r.renderResultLightWeight).findFirst().orElse(null);
-                callback.setThumbnail(lw);
+                if(lw != null) {
+                    callback.setThumbnail(lw);
+                } else {
+                    Log.e("DISPLAY", "Got a null lightweight after db query for uid " + uid);
+                }
                 pagingCacheCallback.cachingDone();
-            }, mContext);
+            }, context);
         } else {
             callback.setThumbnail(lightWeight);
             pagingCacheCallback.cachingDone();
@@ -141,13 +140,15 @@ public enum PagingCache {
         mUseDummies.set(useDummies);
     }
 
-    public AppDatabase getAppDatabase() {
-        return mAppDatabase;
+    public void remove(int uid) {
+        int size = entries.size();
+        Optional<PagingEntry> optional = entries.stream()
+                .filter(e -> e.renderResultLightWeight.uid == uid).findFirst();
+        optional.ifPresent(pagingEntry -> entries.remove(pagingEntry));
     }
 
-    public void destroy() {
-        mContext = null;
-        mAppDatabase = null;
+    public AppDatabase getAppDatabase() {
+        return mAppDatabase;
     }
 
     public static class PagingEntry implements Comparable<PagingEntry> {

@@ -1,7 +1,6 @@
 package org.ww.ai.fragment;
 
 import static org.ww.ai.event.EventBroker.EVENT_BROKER;
-import static org.ww.ai.rds.PagingCache.PAGING_CACHE;
 import static org.ww.ai.ui.Animations.ANIMATIONS;
 
 import android.content.Context;
@@ -37,6 +36,7 @@ import org.ww.ai.enumif.ReceiveEventIF;
 import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
+import org.ww.ai.rds.PagingCache;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.rds.entity.RenderResultSkeleton;
@@ -78,12 +78,16 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
     private ThumbnailCallbackIF mThumbnailCallback;
     private int mInitialLayoutHeight = -1;
 
+    private PagingCache mPagingCache;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSelectedSet.clear();
         writeSelectedToPreferences();
         EVENT_BROKER.registerReceiver(this, EventTypes.SINGLE_IMAGE_DELETED);
+        mPagingCache = PagingCache.getInstance(requireContext());
+        mPagingCache.setUseDummies(false);
     }
 
     @Nullable
@@ -103,11 +107,10 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
         mLinearLayout = view.findViewById(R.id.results_gallery_linear_layout);
         mScrollView = view.findViewById(R.id.results_gallery_scroll_view);
         view.findViewById(R.id.empty_trash).setVisibility(View.GONE);
-        getRenderResultsFromDatabase(mViewGroup);
+        createRenderResultsGallery(mViewGroup);
         if (getActivity() != null && getActivity().getWindowManager() != null) {
             mScreen = MetricsUtil.getScreen(getActivity().getWindowManager());
         }
-        PAGING_CACHE.init(mContainerContext);
         mScrollView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
             long time = System.currentTimeMillis();
             if ((mCounter.get() + 200L) < time) {
@@ -118,11 +121,11 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
             @Override
             public void onChildViewAdded(View parent, View child) {
                 if (parent.getHeight() > mScrollView.getMeasuredHeight()
-                        && !mThumbnailCallback.isUseDummyImages()) {
+                        && !mThumbnailCallback.isUseDummies()) {
                     int rowHeight = ((ViewGroup) parent).getChildAt(0).getHeight();
                     mThumbnailCallback.notifyRowHeight(rowHeight);
-                    mThumbnailCallback.setUseDummyImages(true);
-                    PAGING_CACHE.setUseDummies(true);
+                    mThumbnailCallback.setUseDummies(true);
+                    mPagingCache.setUseDummies(true);
                 } else if (mInitialLayoutHeight == -1) {
                     mInitialLayoutHeight = parent.getHeight();
                 }
@@ -133,7 +136,7 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
         });
     }
 
-    private void getRenderResultsFromDatabase(final ViewGroup viewGroup) {
+    private void createRenderResultsGallery(final ViewGroup viewGroup) {
         AppDatabase appDatabase = AppDatabase.getInstance(mContainerContext);
         ListenableFuture<List<RenderResultSkeleton>> listenableFuture =
                 appDatabase.renderResultDao().getAllSkeletons(mShowTrash);
@@ -149,12 +152,12 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
         mThumbnailCallback = new ThumbnailCallbackImpl(mContainerContext,
                 parent,
                 mLinearLayout,
-                mSelectedSet,
                 this,
                 mScreen);
         if (!mRenderResults.isEmpty()) {
             mIdxRender = new AtomicInteger(0);
-            PAGING_CACHE.displayThumbnail(mRenderResults.get(0).uid, this, mThumbnailCallback);
+            mPagingCache.displayThumbnail(requireContext(), mRenderResults.get(0).uid,
+                    this, mThumbnailCallback, mShowTrash);
         }
     }
 
@@ -315,7 +318,8 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
         mRenderCount.set(0);
         mIdxRender = new AtomicInteger(0);
         mLinearLayout.removeAllViews();
-        getRenderResultsFromDatabase(mViewGroup);
+        mPagingCache.setUseDummies(false);
+        createRenderResultsGallery(mViewGroup);
         mScrollView.scrollTo(0, scrollY);
     }
 
@@ -324,7 +328,9 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             result.deleted = setDeleteFlagTo;
-            ListenableFuture<Integer> softDelFuture = db.renderResultDao().updateRenderResults(List.of(result));
+            mPagingCache.remove(result.uid);
+            ListenableFuture<Integer> softDelFuture = db.renderResultDao()
+                    .updateRenderResults(List.of(result));
             AsyncDbFuture<Integer> asyncDbFuture1 = new AsyncDbFuture<>();
             asyncDbFuture1.processFuture(softDelFuture, i -> {
                 reRenderGallery(mScrollView.getScrollY());
@@ -335,9 +341,12 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
     private void hardDeleteFuture(AppDatabase db, ListenableFuture<RenderResult> future) {
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
-            ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
+            mPagingCache.remove(result.uid);
+            ListenableFuture<Integer> delFuture = db.renderResultDao()
+                    .deleteRenderResults(List.of(result));
             AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
             asyncDbFutureDel.processFuture(delFuture, i -> {
+                reRenderGallery(mScrollView.getScrollY());
             }, requireContext());
         }, requireContext());
     }
@@ -434,8 +443,9 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, Thumbna
     @Override
     public void cachingDone() {
         mIdxRender.set(mIdxRender.incrementAndGet());
-        if (mIdxRender.get() < mRenderResults.size()) { //  && !mScreenSizeReached.get()
-            PAGING_CACHE.displayThumbnail(mRenderResults.get(mIdxRender.get()).uid, this, mThumbnailCallback);
+        if (mIdxRender.get() < mRenderResults.size()) {
+            mPagingCache.displayThumbnail(requireContext(), mRenderResults.get(mIdxRender.get()).uid,
+                    this, mThumbnailCallback, mShowTrash);
         }
     }
 }
