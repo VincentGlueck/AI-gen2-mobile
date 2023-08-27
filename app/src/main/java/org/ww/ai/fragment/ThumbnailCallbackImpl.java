@@ -1,6 +1,5 @@
 package org.ww.ai.fragment;
 
-import static org.ww.ai.rds.PagingCache.PAGING_CACHE;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
@@ -23,6 +22,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import org.ww.ai.R;
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
+import org.ww.ai.rds.PagingCache;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.rds.ifenum.ThumbnailCallbackIF;
 import org.ww.ai.ui.MetricsUtil;
@@ -30,7 +30,6 @@ import org.ww.ai.ui.MetricsUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -41,24 +40,24 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
     private final MetricsUtil.Screen mScreen;
     private final Context mContext;
     private final LinearLayout mRootLayout;
-    private final Set<String> mSelectedSet;
     private final AtomicBoolean mUseDummies = new AtomicBoolean(false);
     private final ThumbnailSelectionCallbackIF mThumbnailSelectionCallback;
     private final List<RowHolder> mRowHolderList;
     private int count = 0;
     private LinearLayout mRowLayout;
     private int mRowHeight;
+    private final PagingCache mPagingCache;
 
     public ThumbnailCallbackImpl(@NonNull Context context, @NonNull ViewGroup parent,
-                                 @NonNull LinearLayout rootLayout, @NonNull Set<String> selectedSet,
+                                 @NonNull LinearLayout rootLayout,
                                  @NonNull ThumbnailSelectionCallbackIF thumbnailSelectionCallbackIF,
                                  @NonNull MetricsUtil.Screen screen) {
         mContext = context;
         mParent = parent;
         mRootLayout = rootLayout;
-        mSelectedSet = selectedSet;
         mThumbnailSelectionCallback = thumbnailSelectionCallbackIF;
         mScreen = screen;
+        mPagingCache = PagingCache.getInstance(context);
         mRowHolderList = new ArrayList<>();
     }
 
@@ -72,8 +71,6 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
         LinearLayout singleImageLayout = createImageView(lightWeight.thumbNail != null
                 ? lightWeight.thumbNail : null);
         count++;
-        // TODO: initSingleImageView
-
         ImageViewHolder imageViewHolder = new ImageViewHolder(lightWeight.uid,
                 singleImageLayout);
         mRowHolderList.get(mRowHolderList.size() - 1).imageViewHolders.add(imageViewHolder);
@@ -96,12 +93,12 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
     }
 
     @Override
-    public boolean isUseDummyImages() {
+    public boolean isUseDummies() {
         return mUseDummies.get();
     }
 
     @Override
-    public void setUseDummyImages(boolean flagUseDummies) {
+    public void setUseDummies(boolean flagUseDummies) {
         mUseDummies.set(flagUseDummies);
     }
 
@@ -127,17 +124,17 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
         if (rowHolder.imageViewHolders.isEmpty()) {
             return;
         }
-        PAGING_CACHE.setUseDummies(false);
+        mPagingCache.setUseDummies(false);
         final AtomicInteger idx = new AtomicInteger(0);
         idx.set(rowHolder.imageViewHolders.size() - 1);
-        AppDatabase appDatabase = PAGING_CACHE.getAppDatabase();
+        AppDatabase appDatabase = mPagingCache.getAppDatabase();
         List<String> idList = rowHolder.imageViewHolders.stream()
                 .map(h -> String.valueOf(h.uid)).collect(Collectors.toList());
         ListenableFuture<List<RenderResultLightWeight>> future = appDatabase
                 .renderResultDao().getLightWeightByIds(idList);
         AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
-            PAGING_CACHE.addAll(result);
+            mPagingCache.addAll(result);
             result.forEach(r -> {
                 for (int n = 0; n < rowHolder.imageViewHolders.size(); n++) {
                     ImageView imageView = rowHolder.imageViewHolders.get(n)
@@ -165,7 +162,8 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
     @Override
     public LinearLayout getLinearLayoutByUid(int uid) {
         for (RowHolder h : mRowHolderList) {
-            Optional<ImageViewHolder> optional = h.imageViewHolders.stream().filter(ih -> ih.uid == uid).findAny();
+            Optional<ImageViewHolder> optional = h.imageViewHolders.stream()
+                    .filter(ih -> ih.uid == uid).findAny();
             if (optional.isPresent()) {
                 return optional.get().imgLinearLayout;
             }
@@ -175,11 +173,9 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
 
     @Override
     public void setCheckBoxesVisibilty(boolean visible) {
-        mRowHolderList.forEach(l -> l.imageViewHolders.forEach(h -> {
-            h.imgLinearLayout
-                    .findViewById(R.id.check_single_entry)
-                    .setVisibility(visible ? View.VISIBLE : View.GONE);
-        }));
+        mRowHolderList.forEach(l -> l.imageViewHolders.forEach(h -> h.imgLinearLayout
+                .findViewById(R.id.check_single_entry)
+                .setVisibility(visible ? View.VISIBLE : View.GONE)));
     }
 
     @Override
@@ -188,7 +184,9 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
         List<RowHolder> list = mRowHolderList.stream().filter(h -> h.avail)
                 .collect(Collectors.toList());
         list.forEach(l -> {
-            boolean anyChecked = l.imageViewHolders.stream().map(h -> (CheckBox) h.imgLinearLayout.findViewById(R.id.check_single_entry)).anyMatch(CompoundButton::isChecked);
+            boolean anyChecked = l.imageViewHolders.stream()
+                    .map(h -> (CheckBox) h.imgLinearLayout.findViewById(R.id.check_single_entry))
+                    .anyMatch(CompoundButton::isChecked);
             if(anyChecked) {
                 result.set(true);
             }
@@ -228,7 +226,6 @@ public class ThumbnailCallbackImpl implements ThumbnailCallbackIF {
         linearLayout.setLongClickable(!mUseDummies.get());
         return linearLayout;
     }
-
 
     private static class RowHolder {
         public List<ImageViewHolder> imageViewHolders = new ArrayList<>();

@@ -11,9 +11,9 @@ public interface ThumbnailCallbackIF {
 
     void processCleanup();
 
-    boolean isUseDummyImages();
+    boolean isUseDummies();
 
-    void setUseDummyImages(boolean flagUseDummies);
+    void setUseDummies(boolean flagUseDummies);
 
     void onScrollPositionChanged(int scrollY, int oldScrollY);
 

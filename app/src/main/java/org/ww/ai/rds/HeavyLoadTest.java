@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class HeavyLoadTest {
 
-    private static final int HOW_MANY_TO_CREATE = 50;
+    private static final int HOW_MANY_TO_CREATE = 450;
     private final Context mContext;
     private final List<RenderResult> mExistingRenderResults = new ArrayList<>();
 

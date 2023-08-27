@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
     }
 
     private void addMenu() {
-
         mMenuProvider = new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
