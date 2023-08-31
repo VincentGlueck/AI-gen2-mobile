@@ -11,7 +11,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.rds.entity.RenderResultSkeleton;
 
 import java.util.List;
 
@@ -30,10 +29,6 @@ public interface RenderResultDao {
             " WHERE uid IN (:ids)")
     ListenableFuture<List<RenderResultLightWeight>> getLightWeightByIds(List<String> ids);
 
-    @Query("SELECT uid, createdTime, deleted FROM " + TABLE +
-            " WHERE deleted = :flagDeleted ORDER BY uid")
-    ListenableFuture<List<RenderResultSkeleton>> getAllSkeletons(boolean flagDeleted);
-
     @Query("SELECT * FROM " + TABLE + " WHERE uid = :id")
     ListenableFuture<RenderResult> getById(int id);
 
@@ -51,8 +46,11 @@ public interface RenderResultDao {
 
     @Query("SELECT uid, createdTime, thumbnail, query_string, query_used, width," +
             " height, engines_used, deleted FROM " + TABLE +
-            " WHERE uid >= :minUid AND deleted = :flagDeleted ORDER BY uid LIMIT :limit OFFSET :offset")
-    ListenableFuture<List<RenderResultLightWeight>> getPagedRenderResultsLw(int minUid, int limit, int offset, boolean flagDeleted);
+            " WHERE deleted = :flagDeleted ORDER BY createdTime LIMIT 1 OFFSET :offset")
+    ListenableFuture<List<RenderResultLightWeight>> getPagedRenderResultsLw(int offset, boolean flagDeleted);
+
+    @Query("SELECT COUNT(1) FROM " + TABLE)
+    int getCount();
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
