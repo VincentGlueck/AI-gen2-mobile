@@ -46,11 +46,12 @@ public interface RenderResultDao {
 
     @Query("SELECT uid, createdTime, thumbnail, query_string, query_used, width," +
             " height, engines_used, deleted FROM " + TABLE +
-            " WHERE deleted = :flagDeleted ORDER BY createdTime LIMIT 1 OFFSET :offset")
-    ListenableFuture<List<RenderResultLightWeight>> getPagedRenderResultsLw(int offset, boolean flagDeleted);
+            " WHERE deleted = :flagDeleted ORDER BY createdTime LIMIT :limit OFFSET :offset")
+    ListenableFuture<List<RenderResultLightWeight>> getPagedRenderResultsLw(int offset, int limit,
+                                                                            boolean flagDeleted);
 
-    @Query("SELECT COUNT(1) FROM " + TABLE)
-    int getCount();
+    @Query("SELECT COUNT(1) FROM " + TABLE + " WHERE deleted = :deleted")
+    int getCount(boolean deleted);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);

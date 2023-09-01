@@ -15,7 +15,6 @@ public class RenderResultViewHolder extends RecyclerView.ViewHolder {
     public CheckBox checkBox;
     public boolean checked;
     public int position = -1;
-
     public int requestedPosition;
 
     public RenderResultViewHolder(@NonNull View itemView) {
