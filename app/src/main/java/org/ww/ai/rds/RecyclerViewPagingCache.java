@@ -16,14 +16,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RecyclerViewPagingCache {
 
-    private static final int CAPACITY = 100;
+    public static int PAGE_SIZE = 3;
+    private static final int CAPACITY = 8 * PAGE_SIZE;
+
     private static RecyclerViewPagingCache mInstance;
     private final AppDatabase mAppDatabase;
-    private final List<PagingEntry> entries;
+    private final List<PagingEntry> mPagingEntries;
 
     private RecyclerViewPagingCache(Context context) {
         mAppDatabase = AppDatabase.getInstance(context);
-        entries = new ArrayList<>(CAPACITY);
+        mPagingEntries = new ArrayList<>(CAPACITY);
     }
 
     public static RecyclerViewPagingCache getInstance(Context context) {
@@ -33,63 +35,70 @@ public class RecyclerViewPagingCache {
         return mInstance;
     }
 
-    public synchronized void addAll(int startIdx, List<RenderResultLightWeight> lightWeights) {
-        if (lightWeights == null || lightWeights.isEmpty()) {
-            throw new IllegalArgumentException("Invalid use of add(lightWeights): lightweights: " + lightWeights);
+    public synchronized void addAll(int startIdx, List<PagingEntry> pagingEntries) {
+        if (pagingEntries == null || pagingEntries.isEmpty()) {
+            throw new IllegalArgumentException("Invalid use of add(lightWeights): lightweights: " + pagingEntries);
         }
         int available = getAvailableCapacity();
-        if ((available - lightWeights.size()) < 0) {
-            removeOldEntries(lightWeights.size() - available);
+        if ((available - pagingEntries.size()) < 0) {
+            removeOldEntries(pagingEntries.size() - available);
         }
         AtomicInteger idx = new AtomicInteger(startIdx);
-        lightWeights.forEach(l -> entries.add(new PagingEntry(idx.getAndIncrement(), l)));
+        pagingEntries.forEach(p -> mPagingEntries
+                .add(new PagingEntry(idx.getAndIncrement(),
+                        p.renderResultLightWeight, p.requestPosition)));
     }
 
     private void removeOldEntries(int count) {
-        entries.sort(Collections.reverseOrder());
+        mPagingEntries.sort(Collections.reverseOrder());
         if (count > 0) {
-            entries.subList(0, count).clear();
+            mPagingEntries.subList(0, count).clear();
         }
     }
 
     int getAvailableCapacity() {
-        if (entries.size() < CAPACITY) {
-            return CAPACITY - entries.size();
+        if (mPagingEntries.size() < CAPACITY) {
+            return CAPACITY - mPagingEntries.size();
         }
         AtomicInteger atomicInteger = new AtomicInteger(0);
-        entries.parallelStream().filter(Objects::isNull).forEach(
+        mPagingEntries.parallelStream().filter(Objects::isNull).forEach(
                 entry -> atomicInteger.set(atomicInteger.incrementAndGet()));
         return atomicInteger.get();
     }
 
-    public void displayThumbnail(final Context context,
-                                 final int idx,
-                                 final GalleryAdapterCallbackIF pagingCacheCallback,
-                                 final boolean showTrash) {
-        RenderResultLightWeight lightWeight = entries.stream().parallel()
-                .filter(f -> f.idx == idx).map(
-                        r -> r.renderResultLightWeight).findFirst().orElse(null);
-        if (lightWeight == null) {
-            ListenableFuture<List<RenderResultLightWeight>> future = mAppDatabase.renderResultDao()
-                    .getPagedRenderResultsLw(idx, showTrash);
-            AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
-            asyncDbFuture.processFuture(future, result -> {
-                addAll(idx, result);
-                RenderResultLightWeight lw = entries.stream().parallel()
-                        .filter(f -> f.idx == idx).map(
-                                r -> r.renderResultLightWeight).findFirst().orElse(null);
-                pagingCacheCallback.cachingDone(idx, lw);
-            }, context);
-        } else {
-            pagingCacheCallback.cachingDone(idx, lightWeight);
-        }
+    public void fillCache(final Context context,
+                          final int idx,
+                          final int requestedPosition,
+                          final GalleryAdapterCallbackIF pagingCacheCallback,
+                          final boolean showTrash,
+                          final boolean backwards) {
+        ListenableFuture<List<RenderResultLightWeight>> future = mAppDatabase.renderResultDao()
+                .getPagedRenderResultsLw(idx, RecyclerViewPagingCache.PAGE_SIZE, showTrash);
+        AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
+        asyncDbFuture.processFuture(future, result -> {
+            AtomicInteger counter = new AtomicInteger(idx);
+            AtomicInteger realRequestPosition = new AtomicInteger(requestedPosition);
+            List<PagingEntry> pagingEntries = new ArrayList<>();
+            result.forEach(lightweight -> pagingEntries.add(new PagingEntry(backwards ?
+                    counter.getAndDecrement() :
+                    counter.getAndIncrement(),
+                    lightweight, backwards ?
+                    realRequestPosition.getAndDecrement() :
+                    realRequestPosition.getAndIncrement())));
+            addAll(idx, pagingEntries);
+            pagingCacheCallback.onCachingDone(pagingEntries);
+        }, context);
     }
 
     public void remove(int idx) {
-        int size = entries.size();
-        Optional<PagingEntry> optional = entries.stream()
+        int size = mPagingEntries.size();
+        Optional<PagingEntry> optional = mPagingEntries.stream()
                 .filter(e -> e.idx == idx).findFirst();
-        optional.ifPresent(entries::remove);
+        optional.ifPresent(mPagingEntries::remove);
+    }
+
+    public List<PagingEntry> getPagingEntries() {
+        return mPagingEntries;
     }
 
     public static class PagingEntry implements Comparable<PagingEntry> {
@@ -97,9 +106,17 @@ public class RecyclerViewPagingCache {
         public long timeAdded;
         public int idx;
 
-        public PagingEntry(int idx, RenderResultLightWeight renderResultLightWeight) {
+        public int requestPosition;
+
+        public PagingEntry(int idx, RenderResultLightWeight renderResultLightWeight,
+                           int requestPosition) {
+            this();
             this.idx = idx;
             this.renderResultLightWeight = renderResultLightWeight;
+            this.requestPosition = requestPosition;
+        }
+
+        public PagingEntry() {
             this.timeAdded = System.currentTimeMillis();
         }
 
