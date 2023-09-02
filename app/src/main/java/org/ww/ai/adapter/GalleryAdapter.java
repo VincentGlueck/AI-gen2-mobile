@@ -147,7 +147,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RenderResultViewHolder>
         }
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout
-                .LayoutParams(mDisplayWidth / 3, LinearLayout.LayoutParams.WRAP_CONTENT);
+                .LayoutParams(mDisplayWidth / 3, mDisplayWidth / 3);
         holder.thumbNail.setLayoutParams(layoutParams);
 
         holder.thumbNail.startAnimation(
