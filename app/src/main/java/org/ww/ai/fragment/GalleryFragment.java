@@ -25,9 +25,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.ww.ai.R;
+import org.ww.ai.adapter.AbstractRenderResultViewHolder;
 import org.ww.ai.adapter.GalleryAdapter;
 import org.ww.ai.adapter.OnGalleryThumbSelectionIF;
-import org.ww.ai.adapter.RenderResultViewHolder;
 import org.ww.ai.databinding.GalleryFragmentBinding;
 import org.ww.ai.enumif.ReceiveEventIF;
 import org.ww.ai.prefs.Preferences;
@@ -165,7 +165,7 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
     }
 
     @Override
-    public void thumbSelected(boolean selected, RenderResultViewHolder holder, int position) {
+    public void thumbSelected(boolean selected, AbstractRenderResultViewHolder holder, int position) {
         LinearLayoutManager linearLayoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         assert linearLayoutManager != null;
         int first = linearLayoutManager.findFirstVisibleItemPosition();

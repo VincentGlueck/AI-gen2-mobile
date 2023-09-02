@@ -2,7 +2,7 @@ package org.ww.ai.adapter;
 
 public interface OnGalleryThumbSelectionIF {
 
-    void thumbSelected(boolean selected, RenderResultViewHolder holder, int position);
+    void thumbSelected(boolean selected, AbstractRenderResultViewHolder holder, int position);
 
 
 }

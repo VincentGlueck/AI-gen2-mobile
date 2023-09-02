@@ -1,6 +1,7 @@
 package org.ww.ai.rds;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -79,12 +80,16 @@ public class RecyclerViewPagingCache {
             AtomicInteger counter = new AtomicInteger(idx);
             AtomicInteger realRequestPosition = new AtomicInteger(requestedPosition);
             List<PagingEntry> pagingEntries = new ArrayList<>();
-            result.forEach(lightweight -> pagingEntries.add(new PagingEntry(backwards ?
-                    counter.getAndDecrement() :
-                    counter.getAndIncrement(),
-                    lightweight, backwards ?
-                    realRequestPosition.getAndDecrement() :
-                    realRequestPosition.getAndIncrement())));
+            result.forEach(lightweight -> {
+                pagingEntries.add(new PagingEntry(backwards ?
+                        counter.getAndDecrement() :
+                        counter.getAndIncrement(),
+                        lightweight, backwards ?
+                        realRequestPosition.getAndDecrement() :
+                        realRequestPosition.getAndIncrement())
+                );
+                Log.e("LIGHTWEIGHT", "uid: " + lightweight.uid + ", realRequestPosition:" + realRequestPosition.get());
+            });
             addAll(idx, pagingEntries);
             pagingCacheCallback.onCachingDone(pagingEntries);
         }, context);
