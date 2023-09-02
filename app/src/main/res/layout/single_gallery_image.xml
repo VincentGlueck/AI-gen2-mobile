@@ -9,8 +9,8 @@
     <ImageView
         android:id="@+id/single_gallery_image_view"
         android:clickable="true"
-        android:layout_width="172dp"
-        android:layout_height="172dp"
+        android:layout_width="164dp"
+        android:layout_height="176dp"
         android:layout_margin="0dp"
         app:shapeAppearance="@style/gallery_rounded_style"
         app:srcCompat="@drawable/gallery"

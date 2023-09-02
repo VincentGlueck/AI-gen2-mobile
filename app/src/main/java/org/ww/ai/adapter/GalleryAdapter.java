@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 public class GalleryAdapter extends RecyclerView.Adapter<RenderResultViewHolder>
         implements GalleryThumbSelectionIF, GalleryAdapterCallbackIF {
 
-    private static final long FADE_TIME = 250L;
+    private static final long FADE_TIME = 200L;
     private final RecyclerViewPagingCache mPagingCache;
     private final Context mContext;
     private final boolean mUseTrash;
@@ -52,6 +53,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RenderResultViewHolder>
     private final List<ThumbLoadRequest> mThumbRequests = Collections.synchronizedList(new ArrayList<>());
     private final Map<Integer, RenderResultViewHolder> mHolderMap = new HashMap<>();
     private final Map<Integer, Integer> mPosToUidMapping = new HashMap<>();
+    private int mDisplayWidth = -1;
 
     public GalleryAdapter(Context context, OnGalleryThumbSelectionIF onGalleryThumbSelection,
                           int count, boolean useTrash) {
@@ -96,13 +98,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<RenderResultViewHolder>
             CheckBox checkBox = (CheckBox) v;
             holder.checked = checkBox.isChecked();
             thumbSelected(position, holder, holder.checked);
-            updateVisibles(position, holder);
         });
         holder.thumbNail.setOnLongClickListener(v -> {
             holder.checkBox.setChecked(!holder.checkBox.isChecked());
             holder.checked = holder.checkBox.isChecked();
             thumbSelected(position, holder, holder.checked);
-            updateVisibles(position, holder);
             return false;
         });
         holder.requestedPosition = holder.getAbsoluteAdapterPosition();
@@ -135,14 +135,23 @@ public class GalleryAdapter extends RecyclerView.Adapter<RenderResultViewHolder>
             Log.w("SKIP", "it's " + pagingEntry.idx + ", but I need " + holder.requestedPosition);
             return;
         }
+        if(mDisplayWidth == -1) {
+            mDisplayWidth = ((View) holder.thumbNail.getParent().getParent()).getWidth();
+        }
+
         RequestOptions requestOptions = new RequestOptions();
         requestOptions = requestOptions.transform(new CenterCrop(),
                 new RoundedCorners(mSelectionMode ? 8 : 1));
         if (mSelectionMode) {
             requestOptions = requestOptions.override(140);
         }
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout
+                .LayoutParams(mDisplayWidth / 3, LinearLayout.LayoutParams.WRAP_CONTENT);
+        holder.thumbNail.setLayoutParams(layoutParams);
+
         holder.thumbNail.startAnimation(
-                ANIMATIONS.getAlphaAnimation(0.1f, 1.0f, FADE_TIME, true)
+                ANIMATIONS.getAlphaAnimation(0.4f, 1.0f, FADE_TIME, true)
         );
         Glide.with(mContext)
                 .asBitmap()

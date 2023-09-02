@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RecyclerViewPagingCache {
 
-    public static int PAGE_SIZE = 3;
-    private static final int CAPACITY = 8 * PAGE_SIZE;
+    public static int PAGE_SIZE = 16;
+    private static final int CAPACITY = 16 * PAGE_SIZE;
 
     private static RecyclerViewPagingCache mInstance;
     private final AppDatabase mAppDatabase;

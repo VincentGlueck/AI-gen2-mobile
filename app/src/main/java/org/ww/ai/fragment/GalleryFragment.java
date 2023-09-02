@@ -169,8 +169,8 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         LinearLayoutManager linearLayoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         assert linearLayoutManager != null;
         int first = linearLayoutManager.findFirstVisibleItemPosition();
-        int last = linearLayoutManager.findLastVisibleItemPosition();
-        for (int n = first; n <= last; n++) {
+        int last = linearLayoutManager.findLastVisibleItemPosition() - first;
+        for (int n = 0; n <= last; n++) {
             LinearLayout childLayout = (LinearLayout) linearLayoutManager.getChildAt(n);
             if (childLayout == null) {
                 continue;
