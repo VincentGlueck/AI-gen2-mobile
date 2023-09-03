@@ -30,8 +30,6 @@ import java.util.stream.Collectors;
 public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHolder>
         implements GalleryThumbSelectionIF<RenderResultViewHolder>, GalleryAdapterCallbackIF {
 
-    private static final long FADE_TIME = 200L;
-
     public GalleryAdapter(Context context,
                           DisplayMetrics displayMetrics,
                           OnGalleryThumbSelectionIF onGalleryThumbSelection,
@@ -52,11 +50,13 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
     public void onViewRecycled(@NonNull RenderResultViewHolder holder) {
         super.onViewRecycled(holder);
         holder.checkBox.setVisibility(mSelectionMode ? View.VISIBLE : View.GONE);
+        holder.thumbNail.setScaleX(1.0f);
+        holder.thumbNail.setScaleY(1.0f);
         int position = holder.getAbsoluteAdapterPosition();
         if (position != RecyclerView.NO_POSITION) {
             holder.position = position;
         }
-        if(mSelectionMode) {
+        if (mSelectionMode) {
             holder.checkBox.setChecked(mSelectedThumbs.stream().map(s -> s.position)
                     .collect(Collectors.toList()).contains(holder.position));
         }
@@ -89,9 +89,8 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
         } else {
             boolean needsInc = needsIncrementCacheReload(position);
             boolean needsDec = needsDecrementCacheReload(position);
-            Log.e("FAILURE", "<<< currently no thumb for " + position + ", forward:" + needsInc + ", backwards:" + needsDec);
             if (needsInc || needsDec) {
-                mThumbRequests.add(new ThumbLoadRequest<RenderResultViewHolder>(new RecyclerViewPagingCache.PagingEntry(), holder));
+                mThumbRequests.add(new ThumbLoadRequest<>(new RecyclerViewPagingCache.PagingEntry(), holder));
                 mPagingCache.fillCache(mContext, holder.requestedPosition, needsDec && !needsInc
                         ? position - RecyclerViewPagingCache.PAGE_SIZE
                         : position, this, mUseTrash, needsDec && !needsInc);
@@ -104,7 +103,6 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
     protected void displayThumbnail(@NonNull RecyclerViewPagingCache.PagingEntry pagingEntry) {
         RenderResultViewHolder holder = getHolder(pagingEntry.requestPosition);
         if (holder == null) {
-            Log.e("SORRY", "but no holder for " + pagingEntry);
             return;
         }
         if (holder.requestedPosition != pagingEntry.idx) {
@@ -112,16 +110,18 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
             return;
         }
 
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transform(new CenterCrop(),
-                new RoundedCorners(mSelectionMode ? 8 : 1));
-        if (mSelectionMode) {
-            requestOptions = requestOptions.override(140);
+        if(mSelectionMode) {
+            holder.thumbNail.setScaleX(SCALE_SELECTED);
+            holder.thumbNail.setScaleY(SCALE_SELECTED);
         }
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout
                 .LayoutParams(mDisplayMetrics.widthPixels / 3, mDisplayMetrics.heightPixels / 5);
         holder.thumbNail.setLayoutParams(layoutParams);
+
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions = requestOptions.transform(new CenterCrop(),
+                new RoundedCorners(mSelectionMode ? 24 : 1));
 
         Glide.with(mContext)
                 .asBitmap()
@@ -148,5 +148,6 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
         int minIdxAvail = min.getAsInt();
         return idx < minIdxAvail;
     }
+
 
 }

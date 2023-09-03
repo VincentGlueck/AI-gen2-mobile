@@ -1,7 +1,11 @@
 package org.ww.ai.fragment;
 
-import static org.ww.ai.ui.Animations.ANIMATIONS;
+import static org.ww.ai.adapter.GenericThumbnailAdapter.SCALE_SELECTED;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -12,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 
@@ -34,12 +37,13 @@ import org.ww.ai.enumif.ReceiveEventIF;
 import org.ww.ai.prefs.Preferences;
 import org.ww.ai.rds.AppDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalleryThumbSelectionIF {
 
-    private static final float SCALE_SELECTED = 0.88f;
-    private static final long FADE_TIME = 300L;
+
+    private static final long FADE_TIME = 150L;
     private RecyclerView mRecyclerView;
     private GalleryAdapter mAdapter;
     protected boolean mIsTrashMode;
@@ -75,20 +79,6 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         mAdapter = new GalleryAdapter(requireContext(), displayMetrics, this, gallerySize, false);
         mRecyclerView.setAdapter(mAdapter);
-    }
-
-    private void animateOne(View view, boolean decreaseSize) {
-        float from = SCALE_SELECTED;
-        float to = 1.0f;
-        if (decreaseSize) {
-            float f = from;
-            from = to;
-            to = f;
-        }
-        final Animation animation = ANIMATIONS.getScaleAnimation(from, to, FADE_TIME, true);
-        if (view != null) {
-            view.startAnimation(animation);
-        }
     }
 
     protected int getMenuResourceId() {
@@ -173,6 +163,16 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         assert linearLayoutManager != null;
         int first = linearLayoutManager.findFirstVisibleItemPosition();
         int last = linearLayoutManager.findLastVisibleItemPosition() - first;
+        if(mAdapter.getFromX() == null) {
+            mAdapter.setFromX((float) (mAdapter.getThumbWidth()) * SCALE_SELECTED);
+            mAdapter.setFromY((float) (mAdapter.getThumbHeight()) * SCALE_SELECTED);
+        }
+        float fromX = mAdapter.isSelectionMode() ? 1.0f : mAdapter.getFromX() / (float) mAdapter.getThumbWidth();
+        float fromY = mAdapter.isSelectionMode() ? 1.0f : mAdapter.getFromY() / (float) mAdapter.getThumbHeight();
+        float toX = mAdapter.isSelectionMode() ? mAdapter.getFromX() / (float) mAdapter.getThumbWidth() : 1.0f;
+        float toY = mAdapter.isSelectionMode() ? mAdapter.getFromY() / (float) mAdapter.getThumbHeight() : 1.0f;
+        AnimatorSet animatorSet = new AnimatorSet();
+        List<ObjectAnimator> animators = new ArrayList<>();
         for (int n = 0; n <= last; n++) {
             LinearLayout childLayout = (LinearLayout) linearLayoutManager.getChildAt(n);
             if (childLayout == null) {
@@ -181,8 +181,19 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
             View galleryImage = childLayout.findViewById(R.id.single_gallery_image_view);
             CheckBox checkBox = childLayout.findViewById(R.id.check_single_entry);
             checkBox.setVisibility(mAdapter.isSelectionMode() ? View.VISIBLE : View.GONE);
-            animateOne(galleryImage, mAdapter.isSelectionMode());
+            animators.add(ObjectAnimator.ofFloat(galleryImage, "scaleX", fromX, toX));
+            animators.add(ObjectAnimator.ofFloat(galleryImage, "scaleY", fromY, toY));
         }
+        Animator[] animatorsArray = animators.toArray(new Animator[0]);
+        animatorSet.playTogether(animatorsArray);
+        animatorSet.start();
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                mAdapter.notifyItemRangeChanged(first, last);
+            }
+        });
         updateToolbar();
     }
 }

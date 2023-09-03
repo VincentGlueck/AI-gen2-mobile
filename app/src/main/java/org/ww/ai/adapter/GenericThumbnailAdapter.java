@@ -29,6 +29,9 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
         implements GalleryThumbSelectionIF<T>,
         GalleryAdapterCallbackIF {
 
+    public static final float SCALE_SELECTED = 0.94f;
+
+    public static final int PER_ROW = 3;
 
     final RecyclerViewPagingCache mPagingCache;
     final Context mContext;
@@ -44,6 +47,9 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
     Boolean mLastSelectionMode = null;
     int mSelectionSize = 0;
     DisplayMetrics mDisplayMetrics;
+
+    Float mFromX = null;
+    Float mFromY = null;
 
     public GenericThumbnailAdapter(Context context,
                                    DisplayMetrics displayMetrics,
@@ -170,6 +176,30 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
     public void onCachingDone(List<RecyclerViewPagingCache.PagingEntry> pagingEntries) {
         pagingEntries.forEach(this::displayThumbnail);
         mThumbRequests.clear();
+    }
+
+    public int getThumbWidth() {
+        return mDisplayMetrics.widthPixels / GenericThumbnailAdapter.PER_ROW;
+    }
+
+    public int getThumbHeight() {
+        return mDisplayMetrics.heightPixels / (GenericThumbnailAdapter.PER_ROW + 2);
+    }
+
+    public Float getFromX() {
+        return mFromX;
+    }
+
+    public void setFromX(float value) {
+        mFromX = value;
+    }
+
+    public Float getFromY() {
+        return mFromY;
+    }
+
+    public void setFromY(float value) {
+        mFromY = value;
     }
 
 
