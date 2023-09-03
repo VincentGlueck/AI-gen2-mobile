@@ -1,9 +1,9 @@
 package org.ww.ai.adapter;
 
-import static org.ww.ai.ui.Animations.ANIMATIONS;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,10 +33,11 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
     private static final long FADE_TIME = 200L;
 
     public GalleryAdapter(Context context,
+                          DisplayMetrics displayMetrics,
                           OnGalleryThumbSelectionIF onGalleryThumbSelection,
                           int count,
                           boolean useTrash) {
-        super(context, onGalleryThumbSelection, count, useTrash);
+        super(context, displayMetrics, onGalleryThumbSelection, count, useTrash);
     }
 
     @NonNull
@@ -50,16 +51,15 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
     @Override
     public void onViewRecycled(@NonNull RenderResultViewHolder holder) {
         super.onViewRecycled(holder);
-        holder.thumbNail.startAnimation(
-                ANIMATIONS.getAlphaAnimation(1.0f, 0.0f, FADE_TIME, true)
-        );
         holder.checkBox.setVisibility(mSelectionMode ? View.VISIBLE : View.GONE);
         int position = holder.getAbsoluteAdapterPosition();
         if (position != RecyclerView.NO_POSITION) {
             holder.position = position;
         }
-        holder.checkBox.setChecked(mSelectedThumbs.stream().map(s -> s.position)
-                .collect(Collectors.toList()).contains(holder.position));
+        if(mSelectionMode) {
+            holder.checkBox.setChecked(mSelectedThumbs.stream().map(s -> s.position)
+                    .collect(Collectors.toList()).contains(holder.position));
+        }
     }
 
     @Override
@@ -86,11 +86,10 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
         if (optional.isPresent()) {
             mHolderMap.put(holder.requestedPosition, holder);
             displayThumbnail(optional.get());
-            Log.d("SUCCESS", ">>> got " + position + ", uid=" + optional.get().renderResultLightWeight.uid);
         } else {
             boolean needsInc = needsIncrementCacheReload(position);
             boolean needsDec = needsDecrementCacheReload(position);
-            Log.w("FAILURE", "<<< currently no thumb for " + position + ", forward:" + needsInc + ", backwards:" + needsDec);
+            Log.e("FAILURE", "<<< currently no thumb for " + position + ", forward:" + needsInc + ", backwards:" + needsDec);
             if (needsInc || needsDec) {
                 mThumbRequests.add(new ThumbLoadRequest<RenderResultViewHolder>(new RecyclerViewPagingCache.PagingEntry(), holder));
                 mPagingCache.fillCache(mContext, holder.requestedPosition, needsDec && !needsInc
@@ -112,9 +111,6 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
             Log.w("SKIP", "it's " + pagingEntry.idx + ", but I need " + holder.requestedPosition);
             return;
         }
-        if (mDisplayWidth == -1 && holder.thumbNail != null) {
-            mDisplayWidth = ((View) holder.thumbNail.getParent().getParent()).getWidth();
-        }
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions = requestOptions.transform(new CenterCrop(),
@@ -123,15 +119,10 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
             requestOptions = requestOptions.override(140);
         }
 
-        if(mDisplayWidth > 0) {
-            LinearLayout.LayoutParams layoutParams = new LinearLayout
-                    .LayoutParams(mDisplayWidth / 3, mDisplayWidth / 3);
-            holder.thumbNail.setLayoutParams(layoutParams);
-        }
+        LinearLayout.LayoutParams layoutParams = new LinearLayout
+                .LayoutParams(mDisplayMetrics.widthPixels / 3, mDisplayMetrics.heightPixels / 5);
+        holder.thumbNail.setLayoutParams(layoutParams);
 
-        holder.thumbNail.startAnimation(
-                ANIMATIONS.getAlphaAnimation(0.4f, 1.0f, FADE_TIME, true)
-        );
         Glide.with(mContext)
                 .asBitmap()
                 .load(IMAGE_UTIL.convertBlobToImage(pagingEntry.renderResultLightWeight.thumbNail))
