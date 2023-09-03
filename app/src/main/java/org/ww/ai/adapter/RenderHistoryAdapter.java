@@ -3,6 +3,7 @@ package org.ww.ai.adapter;
 import static org.ww.ai.ui.Animations.ANIMATIONS;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +21,11 @@ public class RenderHistoryAdapter extends GenericThumbnailAdapter<RenderResultVi
     private static final long FADE_TIME = 200L;
 
     public RenderHistoryAdapter(Context context,
+                                DisplayMetrics displayMetrics,
                                 OnGalleryThumbSelectionIF onGalleryThumbSelection,
                                 int count,
                                 boolean useTrash) {
-        super(context, onGalleryThumbSelection, count, useTrash);
+        super(context, displayMetrics, onGalleryThumbSelection, count, useTrash);
     }
 
     @Override

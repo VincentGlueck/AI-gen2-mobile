@@ -4,6 +4,7 @@ import static org.ww.ai.ui.Animations.ANIMATIONS;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -70,7 +71,9 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 3);
         gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL); // set Horizontal Orientation
         mRecyclerView.setLayoutManager(gridLayoutManager);
-        mAdapter = new GalleryAdapter(requireContext(), this, gallerySize, false);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        mAdapter = new GalleryAdapter(requireContext(), displayMetrics, this, gallerySize, false);
         mRecyclerView.setAdapter(mAdapter);
     }
 

@@ -1,6 +1,7 @@
 package org.ww.ai.adapter;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -42,11 +43,15 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
     boolean mSelectionMode;
     Boolean mLastSelectionMode = null;
     int mSelectionSize = 0;
-    int mDisplayWidth = -1;
+    DisplayMetrics mDisplayMetrics;
 
-    public GenericThumbnailAdapter(Context context, OnGalleryThumbSelectionIF onGalleryThumbSelection,
-                                   int count, boolean useTrash) {
+    public GenericThumbnailAdapter(Context context,
+                                   DisplayMetrics displayMetrics,
+                                   OnGalleryThumbSelectionIF onGalleryThumbSelection,
+                                   int count,
+                                   boolean useTrash) {
         mContext = context;
+        mDisplayMetrics = displayMetrics;
         mPagingCache = RecyclerViewPagingCache.getInstance(context);
         mOnGalleryThumbSelection = onGalleryThumbSelection;
         mCount = count;
