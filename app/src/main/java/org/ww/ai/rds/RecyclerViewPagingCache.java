@@ -1,7 +1,6 @@
 package org.ww.ai.rds;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -88,7 +87,6 @@ public class RecyclerViewPagingCache {
                         realRequestPosition.getAndDecrement() :
                         realRequestPosition.getAndIncrement())
                 );
-                Log.e("LIGHTWEIGHT", "uid: " + lightweight.uid + ", realRequestPosition:" + realRequestPosition.get());
             });
             addAll(idx, pagingEntries);
             pagingCacheCallback.onCachingDone(pagingEntries);
