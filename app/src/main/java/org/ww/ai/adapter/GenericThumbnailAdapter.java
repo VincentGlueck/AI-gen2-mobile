@@ -30,13 +30,12 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
         GalleryAdapterCallbackIF {
 
     public static final float SCALE_SELECTED = 0.94f;
-
     public static final int PER_ROW = 3;
 
     final RecyclerViewPagingCache mPagingCache;
     final Context mContext;
     final boolean mUseTrash;
-    final OnGalleryThumbSelectionIF mOnGalleryThumbSelection;
+    final OnGallerySelectionIF mOnGalleryThumbSelection;
     final List<SelectionHolder> mSelectedThumbs = new ArrayList<>();
     final List<ThumbLoadRequest<T>> mThumbRequests
             = Collections.synchronizedList(new ArrayList<>());
@@ -53,7 +52,7 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
 
     public GenericThumbnailAdapter(Context context,
                                    DisplayMetrics displayMetrics,
-                                   OnGalleryThumbSelectionIF onGalleryThumbSelection,
+                                   OnGallerySelectionIF onGalleryThumbSelection,
                                    int count,
                                    boolean useTrash) {
         mContext = context;
@@ -134,8 +133,10 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
         }
         if (useTrash) {
             softDeletedSelected(flagUndeleted);
+        } else {
+            hardDeleteSelected();
         }
-        hardDeleteSelected();
+        mPagingCache.getPagingEntries().clear();
     }
 
     private void hardDeleteSelected() {
@@ -143,9 +144,8 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
     }
 
     private void softDeletedSelected(boolean flagUndelete) {
-        List<String> ids = mSelectedThumbs.stream().map(i -> mPosToUidMapping.get(i.position))
-                .map(String::valueOf).collect(Collectors.toList());
-        mSelectedThumbs.clear();
+        List<Integer> positions = mSelectedThumbs.stream().map(i -> i.position).collect(Collectors.toList());
+        List<String> ids = mSelectedThumbs.stream().map(s -> String.valueOf(s.uid)).collect(Collectors.toList());
         ListenableFuture<List<RenderResultLightWeight>> future =
                 getAppDatabase().renderResultDao().getLightWeightByIds(ids);
         AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
@@ -159,14 +159,20 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
             ListenableFuture<Integer> listenableFuture = getAppDatabase()
                     .renderResultDao().updateRenderResults(renderResults);
             AsyncDbFuture<Integer> updateFuture = new AsyncDbFuture<>();
-            updateFuture.processFuture(listenableFuture, i -> refreshAdapter(), mContext);
+            updateFuture.processFuture(listenableFuture, i -> {
+                afterAsyncDelete(positions, i);
+            }, mContext);
         }, mContext);
     }
 
-    private void refreshAdapter() {
-        Log.w("REFRESH", "Should now refresh the adapter view");
+    private void afterAsyncDelete(List<Integer> absolutePositions, Integer deleteCount) {
+        notifyItemRangeRemoved(0, mCount);
+        mSelectedThumbs.clear();
+        mSelectionMode = false;
+        mLastSelectionMode = null;
+        mCount = mCount - deleteCount;
+        mOnGalleryThumbSelection.onDeleteDone();
     }
-
 
     private AppDatabase getAppDatabase() {
         return AppDatabase.getInstance(mContext);

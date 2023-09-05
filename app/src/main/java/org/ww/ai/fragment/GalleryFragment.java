@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.ww.ai.R;
 import org.ww.ai.adapter.AbstractRenderResultViewHolder;
 import org.ww.ai.adapter.GalleryAdapter;
-import org.ww.ai.adapter.OnGalleryThumbSelectionIF;
+import org.ww.ai.adapter.OnGallerySelectionIF;
 import org.ww.ai.databinding.GalleryFragmentBinding;
 import org.ww.ai.enumif.ReceiveEventIF;
 import org.ww.ai.prefs.Preferences;
@@ -40,10 +40,8 @@ import org.ww.ai.rds.AppDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalleryThumbSelectionIF {
+public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGallerySelectionIF {
 
-
-    private static final long FADE_TIME = 150L;
     private RecyclerView mRecyclerView;
     private GalleryAdapter mAdapter;
     protected boolean mIsTrashMode;
@@ -159,6 +157,10 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
 
     @Override
     public void thumbSelected(boolean selected, AbstractRenderResultViewHolder holder, int position) {
+        updateThumbNailUI();
+    }
+
+    private void updateThumbNailUI() {
         LinearLayoutManager linearLayoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         assert linearLayoutManager != null;
         int first = linearLayoutManager.findFirstVisibleItemPosition();
@@ -194,6 +196,11 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
                 mAdapter.notifyItemRangeChanged(first, last);
             }
         });
+        updateToolbar();
+    }
+
+    @Override
+    public void onDeleteDone() {
         updateToolbar();
     }
 }

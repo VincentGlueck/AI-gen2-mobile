@@ -32,7 +32,7 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
 
     public GalleryAdapter(Context context,
                           DisplayMetrics displayMetrics,
-                          OnGalleryThumbSelectionIF onGalleryThumbSelection,
+                          OnGallerySelectionIF onGalleryThumbSelection,
                           int count,
                           boolean useTrash) {
         super(context, displayMetrics, onGalleryThumbSelection, count, useTrash);

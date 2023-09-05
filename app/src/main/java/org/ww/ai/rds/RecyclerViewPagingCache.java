@@ -25,7 +25,7 @@ public class RecyclerViewPagingCache {
 
     private RecyclerViewPagingCache(Context context) {
         mAppDatabase = AppDatabase.getInstance(context);
-        mPagingEntries = new ArrayList<>(CAPACITY);
+        mPagingEntries = Collections.synchronizedList(new ArrayList<>(CAPACITY));
     }
 
     public static RecyclerViewPagingCache getInstance(Context context) {
@@ -94,7 +94,6 @@ public class RecyclerViewPagingCache {
     }
 
     public void remove(int idx) {
-        int size = mPagingEntries.size();
         Optional<PagingEntry> optional = mPagingEntries.stream()
                 .filter(e -> e.idx == idx).findFirst();
         optional.ifPresent(mPagingEntries::remove);
@@ -108,7 +107,6 @@ public class RecyclerViewPagingCache {
         public RenderResultLightWeight renderResultLightWeight;
         public long timeAdded;
         public int idx;
-
         public int requestPosition;
 
         public PagingEntry(int idx, RenderResultLightWeight renderResultLightWeight,

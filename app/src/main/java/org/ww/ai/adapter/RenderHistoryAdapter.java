@@ -22,7 +22,7 @@ public class RenderHistoryAdapter extends GenericThumbnailAdapter<RenderResultVi
 
     public RenderHistoryAdapter(Context context,
                                 DisplayMetrics displayMetrics,
-                                OnGalleryThumbSelectionIF onGalleryThumbSelection,
+                                OnGallerySelectionIF onGalleryThumbSelection,
                                 int count,
                                 boolean useTrash) {
         super(context, displayMetrics, onGalleryThumbSelection, count, useTrash);
