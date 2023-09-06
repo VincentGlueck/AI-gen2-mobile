@@ -176,9 +176,13 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             return;
         }
         preference.setEnabled(true);
-        String str = initRestoreBackupPreference(backupFiles);
-        preference.setSummary(str);
-        mLatestBackupHolder = backupFiles.get(0);
+        try {
+            String str = initRestoreBackupPreference(backupFiles);
+            preference.setSummary(str);
+            mLatestBackupHolder = backupFiles.get(0);
+        } catch(IllegalStateException e) {
+            Log.e("PREFS", "Backup list done, but Fragment already closed!");
+        }
     }
 
     private BackupHolder writeBackup() throws JsonProcessingException {
@@ -193,7 +197,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         initPreferences();
     }
 
-    private String initRestoreBackupPreference(List<BackupHolder> backupHolderList) {
+    private String initRestoreBackupPreference(List<BackupHolder> backupHolderList) throws IllegalStateException {
         Preference preferenceRestoreBackup = mPreferenceScreen.findPreference(PREF_RESTORE_BACKUP);
         assert preferenceRestoreBackup != null;
         preferenceRestoreBackup.setOnPreferenceClickListener(preference -> {

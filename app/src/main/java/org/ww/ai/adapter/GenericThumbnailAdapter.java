@@ -65,6 +65,9 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
 
     protected abstract void displayThumbnail(@NonNull RecyclerViewPagingCache.PagingEntry pagingEntry);
 
+    public OnGallerySelectionIF getOnGalleryThumbSelection() {
+        return mOnGalleryThumbSelection;
+    }
 
     protected T getHolder(int requestedPosition) {
         T holder = mHolderMap.get(requestedPosition);
@@ -126,28 +129,20 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
         return mSelectedThumbs.stream().map(s -> s.position).collect(Collectors.toList());
     }
 
+    public List<String> getSelectedUids() {
+        return mSelectedThumbs.stream().map(s -> String.valueOf(s.uid)).collect(Collectors.toList());
+    }
+
     @Override
-    public void deleteSelected(boolean useTrash, boolean flagUndeleted) {
+    public void deleteSelected(boolean useTrash, boolean flagUndelete) {
         if (mSelectedThumbs.isEmpty()) {
             return;
         }
-        if (useTrash) {
-            softDeletedSelected(flagUndeleted);
-        } else {
-            hardDeleteSelected();
+        if(!useTrash && flagUndelete) {
+            throw new IllegalArgumentException("Can't undelete if hard delete is active!");
         }
-        mPagingCache.getPagingEntries().clear();
-    }
-
-    private void hardDeleteSelected() {
-        //return 0;
-    }
-
-    private void softDeletedSelected(boolean flagUndelete) {
-        List<Integer> positions = mSelectedThumbs.stream().map(i -> i.position).collect(Collectors.toList());
-        List<String> ids = mSelectedThumbs.stream().map(s -> String.valueOf(s.uid)).collect(Collectors.toList());
         ListenableFuture<List<RenderResultLightWeight>> future =
-                getAppDatabase().renderResultDao().getLightWeightByIds(ids);
+                getAppDatabase().renderResultDao().getLightWeightByIds(getSelectedUids());
         AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             List<RenderResult> renderResults = new ArrayList<>();
@@ -156,22 +151,36 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
                 renderResult.deleted = !flagUndelete;
                 renderResults.add(renderResult);
             });
-            ListenableFuture<Integer> listenableFuture = getAppDatabase()
-                    .renderResultDao().updateRenderResults(renderResults);
+            ListenableFuture<Integer> listenableFuture = useTrash ? getSoftDeleteFuture(renderResults)
+                    : getHardDeleteFuture(renderResults);
             AsyncDbFuture<Integer> updateFuture = new AsyncDbFuture<>();
-            updateFuture.processFuture(listenableFuture, i -> {
-                afterAsyncDelete(positions, i);
-            }, mContext);
+            updateFuture.processFuture(listenableFuture, this::afterAsyncDelete, mContext);
         }, mContext);
     }
 
-    private void afterAsyncDelete(List<Integer> absolutePositions, Integer deleteCount) {
+    private ListenableFuture<Integer> getSoftDeleteFuture(List<RenderResult> renderResults) {
+        return getAppDatabase()
+                .renderResultDao().updateRenderResults(renderResults);
+    }
+
+    private ListenableFuture<Integer> getHardDeleteFuture(List<RenderResult> renderResults) {
+        return getAppDatabase()
+                .renderResultDao().deleteRenderResults(renderResults);
+    }
+
+    public void afterAsyncDelete(Integer deleteCount) {
         notifyItemRangeRemoved(0, mCount);
         mSelectedThumbs.clear();
         mSelectionMode = false;
         mLastSelectionMode = null;
         mCount = mCount - deleteCount;
+        mPagingCache.getPagingEntries().clear();
         mOnGalleryThumbSelection.onDeleteDone();
+    }
+
+    public void refresh() {
+        mPagingCache.getPagingEntries().clear();
+        notifyItemRangeChanged(0, mCount);
     }
 
     private AppDatabase getAppDatabase() {
@@ -180,6 +189,10 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
 
     @Override
     public void onCachingDone(List<RecyclerViewPagingCache.PagingEntry> pagingEntries) {
+        pagingEntries.forEach(p -> {
+            Log.w("pagingEntry", "pagingEntry: " + p);
+        });
+
         pagingEntries.forEach(this::displayThumbnail);
         mThumbRequests.clear();
     }
@@ -209,44 +222,44 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
     }
 
 
-static class ThumbLoadRequest<T extends AbstractRenderResultViewHolder> {
-    public RecyclerViewPagingCache.PagingEntry pagingEntry;
-    public AbstractRenderResultViewHolder holder;
-    public int startIdx;
+    static class ThumbLoadRequest<T extends AbstractRenderResultViewHolder> {
+        public RecyclerViewPagingCache.PagingEntry pagingEntry;
+        public AbstractRenderResultViewHolder holder;
+        public int startIdx;
 
-    public ThumbLoadRequest(RecyclerViewPagingCache.PagingEntry pagingEntry,
-                            T holder) {
-        this.pagingEntry = pagingEntry;
-        this.holder = holder;
-        this.startIdx = holder.getAbsoluteAdapterPosition();
+        public ThumbLoadRequest(RecyclerViewPagingCache.PagingEntry pagingEntry,
+                                T holder) {
+            this.pagingEntry = pagingEntry;
+            this.holder = holder;
+            this.startIdx = holder.getAbsoluteAdapterPosition();
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "ThumbLoadRequest{" +
+                    "pagingEntry=" + pagingEntry +
+                    ", holder=" + holder +
+                    '}';
+        }
     }
 
-    @NonNull
-    @Override
-    public String toString() {
-        return "ThumbLoadRequest{" +
-                "pagingEntry=" + pagingEntry +
-                ", holder=" + holder +
-                '}';
-    }
-}
+    static class SelectionHolder {
+        public int position;
+        public int uid;
 
-static class SelectionHolder {
-    public int position;
-    public int uid;
+        public SelectionHolder(int position, int uid) {
+            this.position = position;
+            this.uid = uid;
+        }
 
-    public SelectionHolder(int position, int uid) {
-        this.position = position;
-        this.uid = uid;
+        @NonNull
+        @Override
+        public String toString() {
+            return "SelectionHolder{" +
+                    "position=" + position +
+                    ", uid=" + uid +
+                    '}';
+        }
     }
-
-    @NonNull
-    @Override
-    public String toString() {
-        return "SelectionHolder{" +
-                "position=" + position +
-                ", uid=" + uid +
-                '}';
-    }
-}
 }

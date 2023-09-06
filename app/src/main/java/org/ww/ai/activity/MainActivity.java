@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
                     } else if (R.id.action_gallery == id) {
                         mNavController.navigate(R.id.action_MainFragment_to_GalleryFragment);
                     } else if (R.id.action_trash_bin == id) {
-                        Log.w("SORRY", "Trash is gone to trash");
+                        mNavController.navigate(R.id.action_MainFragment_to_TrashBinFragment);
                     } else if (R.id.action_settings == id) {
                         mNavController.navigate(R.id.action_MainFragment_to_SettingsFragment);
                     } else if (R.id.action_license == id) {

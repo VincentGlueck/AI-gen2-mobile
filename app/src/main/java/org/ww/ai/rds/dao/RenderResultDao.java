@@ -56,6 +56,9 @@ public interface RenderResultDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Integer> updateRenderResults(List<RenderResult> renderResults);
 
+    @Query("UPDATE " + TABLE + " SET deleted = :flagDeleted WHERE uid in ( :uids)")
+    ListenableFuture<Integer> updateDeleteFlag(List<String> uids, boolean flagDeleted);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Long> insertRenderResult(RenderResult renderResult);
 

@@ -149,5 +149,4 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
         return idx < minIdxAvail;
     }
 
-
 }
