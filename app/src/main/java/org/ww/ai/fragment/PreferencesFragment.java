@@ -262,11 +262,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
 
     @Override
     public void backupDone(File zipFile) {
-        String str = getResources().getText(R.string.pref_backup_created_toast,
-                FILE_UTIL.readableFileSize(zipFile.length())).toString();
-        Log.w("STR", "str: " + str);
+        CharSequence charSequence = getResources().getString(R.string.pref_backup_created_toast,
+                FILE_UTIL.readableFileSize(zipFile.length()));
         Toast.makeText(getContext(),
-                str,
+                charSequence,
                 Toast.LENGTH_LONG
         ).show();
         removeObsoleteBackups();
