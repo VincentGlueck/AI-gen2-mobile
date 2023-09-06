@@ -80,6 +80,13 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
             thumbSelected(position, holder, holder.checked);
             return false;
         });
+        holder.thumbNail.setOnClickListener(l -> {
+            int uid = mPosToUidMapping
+                    .keySet().stream().filter(f -> f == holder.position)
+                    .findFirst().map(mPosToUidMapping::get).orElse(-1);
+            Log.w("UID", "sel on " + holder.position + " > uid = " + uid);
+            mOnGalleryThumbSelection.onImageClickListener(uid);
+        });
         holder.requestedPosition = holder.getAbsoluteAdapterPosition();
         Optional<PagingCache.PagingEntry> optional = mPagingCache.getPagingEntries()
                 .stream().parallel().filter(p -> p.idx == position).findAny();

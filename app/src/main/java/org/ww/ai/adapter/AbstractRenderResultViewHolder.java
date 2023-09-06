@@ -29,8 +29,9 @@ public class AbstractRenderResultViewHolder extends RecyclerView.ViewHolder {
     public String toString() {
         return "RenderResultViewHolder{" +
                 "checked: " + checked +
-                ", thumbNail=" + thumbNail +
-                ", checkBox=" + checkBox +
+                ", position: " + position +
+                ", thumbNail.getWidth(): " + thumbNail.getWidth() +
+                ", checkBox.isChecked():" + checkBox.isChecked() +
                 '}';
     }
 }
