@@ -114,9 +114,6 @@
         <action
             android:id="@+id/action_GalleryFullSizeFragment_to_ResultsGalleryFragment"
             app:destination="@id/GalleryFragment" />
-        <action
-            android:id="@+id/action_GalleryFullSizeFragment_to_TrashBinFragment"
-            app:destination="@id/TrashBinFragment" />
     </fragment>
     <fragment
         android:id="@+id/SettingsFragment"

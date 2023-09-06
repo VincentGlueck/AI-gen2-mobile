@@ -1,37 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/empty_trash"
+        android:id="@+id/btn_empty_trash"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.05"
-        android:padding="4dp"
-        android:textColor="@color/link"
+        android:layout_height="wrap_content"
         android:text="@string/empty_trash"
         android:textAlignment="center"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:visibility="gone" />
 
-    <ScrollView
-        android:id="@+id/results_gallery_fragment"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/gallery_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.95"
-        android:orientation="vertical"
-        tools:ignore="SpeakableTextPresentCheck">
+        android:layout_height="match_parent" />
 
-        <LinearLayout
-            android:id="@+id/results_gallery_linear_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="4dp" />
-
-    </ScrollView>
 </LinearLayout>
