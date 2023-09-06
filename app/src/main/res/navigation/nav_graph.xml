@@ -26,6 +26,9 @@
         <action
             android:id="@+id/action_MainFragment_to_LicenseFragment"
             app:destination="@id/LicenseFragment" />
+        <action
+            android:id="@+id/action_MainFragment_to_TrashBinFragment"
+            app:destination="@id/TrashBinFragment" />
     </fragment>
     <fragment
         android:id="@+id/ShowSentencesFragment"
@@ -89,6 +92,18 @@
             app:destination="@id/MainFragment" />
         <action
             android:id="@+id/action_GalleryFragment_to_GalleryFullSizeFragment"
+            app:destination="@id/GalleryFullSizeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/TrashBinFragment"
+        android:name="org.ww.ai.fragment.TrashBinFragment"
+        android:label="@string/lbl_trash_bin_title"
+        tools:layout="@layout/gallery_fragment">
+        <action
+            android:id="@+id/action_TrashBinFragment_to_MainFragment"
+            app:destination="@id/MainFragment" />
+        <action
+            android:id="@+id/action_TrashBinFragment_to_GalleryFullSizeFragment"
             app:destination="@id/GalleryFullSizeFragment" />
     </fragment>
     <fragment

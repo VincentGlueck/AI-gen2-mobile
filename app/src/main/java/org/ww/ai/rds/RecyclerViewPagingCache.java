@@ -2,6 +2,8 @@ package org.ww.ai.rds;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.rds.entity.RenderResultLightWeight;
@@ -127,6 +129,17 @@ public class RecyclerViewPagingCache {
                 return -1;
             }
             return Long.compare(timeAdded, o.timeAdded);
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "PagingEntry{" +
+                    "timeAdded=" + timeAdded +
+                    ", idx=" + idx +
+                    ", requestPosition=" + requestPosition +
+                    ", renderResultLightWeight=" + renderResultLightWeight +
+                    '}';
         }
     }
 

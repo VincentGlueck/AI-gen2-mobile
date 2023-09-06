@@ -42,11 +42,12 @@ import java.util.List;
 
 public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGallerySelectionIF {
 
-    private RecyclerView mRecyclerView;
-    private GalleryAdapter mAdapter;
+    protected RecyclerView mRecyclerView;
+    protected GalleryAdapter mAdapter;
     protected boolean mIsTrashMode;
     private MenuProvider mMenuProvider;
     private boolean mDeleteMode;
+    protected int mGallerySize;
 
 
     @Override
@@ -59,9 +60,13 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        org.ww.ai.databinding.GalleryFragmentBinding mBinding =
+        org.ww.ai.databinding.GalleryFragmentBinding binding =
                 GalleryFragmentBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        return binding.getRoot();
+    }
+
+    protected void additionalOnViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // trash bin does something here...
     }
 
     @Override
@@ -69,13 +74,15 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         super.onViewCreated(view, savedInstanceState);
         mRecyclerView = view.findViewById(R.id.gallery_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        int gallerySize = AppDatabase.getInstance(requireContext()).renderResultDao().getCount(mIsTrashMode);
+        mGallerySize = AppDatabase.getInstance(requireContext()).renderResultDao().getCount(mIsTrashMode);
+        additionalOnViewCreated(view, savedInstanceState);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 3);
-        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL); // set Horizontal Orientation
+        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        mAdapter = new GalleryAdapter(requireContext(), displayMetrics, this, gallerySize, false);
+        mAdapter = new GalleryAdapter(requireContext(), displayMetrics,
+                this, mGallerySize, mIsTrashMode);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -142,8 +149,6 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
 
     protected void handleMenuItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.action_delete) {
-            List<Integer> list = mAdapter.getSelectedThumbs();
-            list.forEach(l -> Log.w("SELECTED", "id: " + l));
             performDelete();
         }
     }
@@ -165,7 +170,7 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         assert linearLayoutManager != null;
         int first = linearLayoutManager.findFirstVisibleItemPosition();
         int last = linearLayoutManager.findLastVisibleItemPosition() - first;
-        if(mAdapter.getFromX() == null) {
+        if (mAdapter.getFromX() == null) {
             mAdapter.setFromX((float) (mAdapter.getThumbWidth()) * SCALE_SELECTED);
             mAdapter.setFromY((float) (mAdapter.getThumbHeight()) * SCALE_SELECTED);
         }
@@ -202,5 +207,11 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
     @Override
     public void onDeleteDone() {
         updateToolbar();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter.refresh();
     }
 }
