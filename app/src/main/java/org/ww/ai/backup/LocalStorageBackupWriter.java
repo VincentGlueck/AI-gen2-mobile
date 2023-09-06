@@ -9,8 +9,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
-import org.ww.ai.rds.entity.RenderResult;
-import org.ww.ai.rds.entity.RenderResultLightWeight;
+import org.ww.ai.rds.PagingCache;
+import org.ww.ai.rds.entity.RenderResultImageLW;
+import org.ww.ai.rds.ifenum.GalleryAdapterCallbackIF;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,65 +19,95 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 
-public class LocalStorageBackupWriter extends AbstractBackupWriter {
+public class LocalStorageBackupWriter extends AbstractBackupWriter implements GalleryAdapterCallbackIF {
 
     private final static String FILE_NAME_PREFIX = "AI-2-gen_";
     private final static String FILE_NAME_SUFFIX = ".zip";
 
+    private final PagingCache pagingCache;
+    private int mIdx;
+    private int mTotalCount;
+    private XmlMapper mXmlMapper;
     private File mZipFile;
-
     private ZipOutputStream mZipOutputStream;
+    private BackupDoneCallbackIF mBackupDoneCallback;
 
     public LocalStorageBackupWriter(Context context) {
         super(context);
+        pagingCache = PagingCache.getInstance(context);
+
     }
 
     @Override
-    public BackupHolder writeBackup(List<RenderResult> renderResults) {
+    public void writeBackup(BackupDoneCallbackIF backupDoneCallbackIF) {
+        mBackupDoneCallback = backupDoneCallbackIF;
         try {
             mZipOutputStream = prepareZipFile();
+            mXmlMapper = new XmlMapper();
             writeImages();
         } catch (IOException e) {
             Log.e("ERROR", "" + e.getMessage());
         }
-        return BackupHolder.create(mZipFile, 0);
+    }
+
+    @Override
+    public void onCachingDone(List<PagingCache.PagingEntry> pagingEntries) {
+        if (pagingEntries != null) {
+            List<String> uids = pagingEntries.stream()
+                    .map(p -> String.valueOf(p.renderResultLightWeight.uid)).collect(Collectors.toList());
+            ListenableFuture<List<RenderResultImageLW>> future = pagingCache.getAppDatabase()
+                    .renderResultDao().getImagesForUids(uids);
+            AsyncDbFuture<List<RenderResultImageLW>> asyncDbFuture = new AsyncDbFuture<>();
+            asyncDbFuture.processFuture(future, result -> {
+                for (PagingCache.PagingEntry pagingEntry : pagingEntries) {
+                    String xml;
+                    try {
+                        xml = mXmlMapper.writeValueAsString(pagingEntry.renderResultLightWeight);
+                        byte[] thumbNail = pagingEntry.renderResultLightWeight.thumbNail;
+                        byte[] image = result.stream().filter(r -> r.uid == pagingEntry.renderResultLightWeight.uid)
+                                .findFirst().map(m -> m.image).orElse(null);
+                        if (image == null) {
+                            continue; // may happen if elder fake/test data involved
+                        }
+                        try {
+                            addXmlToZip(pagingEntry.renderResultLightWeight.uid, xml);
+                            addImagesToZip(pagingEntry.renderResultLightWeight.uid, thumbNail, image);
+                        } catch (IOException e) {
+                            Log.e("CREATE_ZIP", "failed: " + e.getMessage());
+                        }
+                    } catch (IOException e) {
+                        Log.e("JSON", "said, no: " + e.getMessage());
+                    }
+                }
+                mIdx += pagingEntries.size();
+                if (mIdx < mTotalCount) {
+                    mBackupDoneCallback.notifyProgress(mIdx, mTotalCount);
+                    pagingCache.fillCache(mContext, mIdx, mIdx, this, false, true);
+                } else {
+                    try {
+                        mZipOutputStream.flush();
+                        mZipOutputStream.close();
+                        mBackupDoneCallback.backupDone(mZipFile);
+                    } catch (IOException ignore) {
+                    }
+                }
+            }, mContext);
+        }
     }
 
     private void writeImages() {
         final AppDatabase appDatabase = AppDatabase.getInstance(mContext);
-        final ListenableFuture<List<RenderResult>> listenableFuture =
-                appDatabase.renderResultDao().getAll();
-        final AsyncDbFuture<List<RenderResult>> asyncDbFuture = new AsyncDbFuture<>();
-        final XmlMapper xmlMapper = new XmlMapper();
-        final AtomicInteger count = new AtomicInteger();
-        asyncDbFuture.processFuture(listenableFuture,
-                result -> {
-                    count.set(result.size());
-                    result.forEach(r -> {
-                        String xml;
-                        try {
-                            xml = xmlMapper.writeValueAsString(RenderResultLightWeight.fromRenderResult(r));
-                            addXmlToZip(r.uid, xml);
-                        } catch (IOException e) {
-                            Log.e("JSON", "said, no: " + e.getMessage());
-                        }
-                        byte[] thumbNail = r.thumbNail;
-                        byte[] image = r.image;
-                        try {
-                            addImagesToZip(r.uid, thumbNail, image);
-                        } catch (IOException e) {
-                            Log.e("CREATE_ZIP", "failed: " + e.getMessage());
-                        }
-                    });
-                    mZipOutputStream.close();
-                }, mContext);
+        mTotalCount = appDatabase.renderResultDao().getCount(false);
+        mIdx = 0;
+        pagingCache.fillCache(mContext, mIdx, mIdx, this, false, true);
     }
 
     private void addXmlToZip(int uid, String xml) throws IOException {
@@ -127,11 +158,11 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
     }
 
     @Override
-    public int removeObsoleteBackups() {
+    public void removeObsoleteBackups() {
         File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File[] files = downloadsDir.listFiles();
         if (files == null || files.length == 0) {
-            return -1;
+            return;
         }
         List<BackupHolder> backups = new ArrayList<>();
         for (File file : files) {
@@ -147,27 +178,24 @@ public class LocalStorageBackupWriter extends AbstractBackupWriter {
                 }
             }
         }
-        return backups.size() - 1;
     }
 
     private int getBackupFilesCount(String name) {
-        File zipFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS
+        File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS
                 + File.separator + name);
-        ZipInputStream zipInputStream;
         int count = 0;
-        try {
-            zipInputStream = new ZipInputStream(Files.newInputStream(zipFile.toPath()));
-            ZipEntry entry;
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                if (entry.getName().endsWith(".xml")) {
+        try (ZipFile zipFile = new ZipFile(file)) {
+            final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                if (entries.nextElement().getName().endsWith(".xml")) {
                     count++;
                 }
             }
+            return count;
         } catch (IOException e) {
             Log.e("ZIP", "error: " + e.getMessage());
-            return -1;
         }
-        return count;
+        return -1;
     }
 
 }

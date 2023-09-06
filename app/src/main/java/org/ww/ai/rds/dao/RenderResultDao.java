@@ -10,6 +10,7 @@ import androidx.room.Update;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.rds.entity.RenderResultImageLW;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 
 import java.util.List;
@@ -32,12 +33,6 @@ public interface RenderResultDao {
     @Query("SELECT * FROM " + TABLE + " WHERE uid = :id")
     ListenableFuture<RenderResult> getById(int id);
 
-    @Query("SELECT * FROM " + TABLE + " WHERE deleted = 0")
-    ListenableFuture<List<RenderResult>> getAll();
-
-    @Query("SELECT * FROM " + TABLE + " WHERE deleted = 0")
-    List<RenderResult> getAllOnThread();
-
     @Query("SELECT * FROM " + TABLE + " WHERE uid = :id")
     RenderResult getByIdOnThread(int id);
 
@@ -58,6 +53,9 @@ public interface RenderResultDao {
 
     @Query("UPDATE " + TABLE + " SET deleted = :flagDeleted WHERE uid in ( :uids)")
     ListenableFuture<Integer> updateDeleteFlag(List<String> uids, boolean flagDeleted);
+
+    @Query("SELECT uid, image FROM " + TABLE + " WHERE uid IN ( :uids)")
+    ListenableFuture<List<RenderResultImageLW>> getImagesForUids(List<String> uids);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     ListenableFuture<Long> insertRenderResult(RenderResult renderResult);

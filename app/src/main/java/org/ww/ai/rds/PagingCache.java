@@ -16,23 +16,22 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RecyclerViewPagingCache {
+public class PagingCache {
 
     public static int PAGE_SIZE = 16;
     private static final int CAPACITY = 16 * PAGE_SIZE;
-
-    private static RecyclerViewPagingCache mInstance;
+    private static PagingCache mInstance;
     private final AppDatabase mAppDatabase;
     private final List<PagingEntry> mPagingEntries;
 
-    private RecyclerViewPagingCache(Context context) {
+    private PagingCache(Context context) {
         mAppDatabase = AppDatabase.getInstance(context);
         mPagingEntries = Collections.synchronizedList(new ArrayList<>(CAPACITY));
     }
 
-    public static RecyclerViewPagingCache getInstance(Context context) {
+    public static PagingCache getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new RecyclerViewPagingCache(context);
+            mInstance = new PagingCache(context);
         }
         return mInstance;
     }
@@ -75,21 +74,19 @@ public class RecyclerViewPagingCache {
                           final boolean showTrash,
                           final boolean backwards) {
         ListenableFuture<List<RenderResultLightWeight>> future = mAppDatabase.renderResultDao()
-                .getPagedRenderResultsLw(idx, RecyclerViewPagingCache.PAGE_SIZE, showTrash);
+                .getPagedRenderResultsLw(idx, PagingCache.PAGE_SIZE, showTrash);
         AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             AtomicInteger counter = new AtomicInteger(idx);
             AtomicInteger realRequestPosition = new AtomicInteger(requestedPosition);
             List<PagingEntry> pagingEntries = new ArrayList<>();
-            result.forEach(lightweight -> {
-                pagingEntries.add(new PagingEntry(backwards ?
-                        counter.getAndDecrement() :
-                        counter.getAndIncrement(),
-                        lightweight, backwards ?
-                        realRequestPosition.getAndDecrement() :
-                        realRequestPosition.getAndIncrement())
-                );
-            });
+            result.forEach(lightweight -> pagingEntries.add(new PagingEntry(backwards ?
+                    counter.getAndDecrement() :
+                    counter.getAndIncrement(),
+                    lightweight, backwards ?
+                    realRequestPosition.getAndDecrement() :
+                    realRequestPosition.getAndIncrement())
+            ));
             addAll(idx, pagingEntries);
             pagingCacheCallback.onCachingDone(pagingEntries);
         }, context);
@@ -103,6 +100,10 @@ public class RecyclerViewPagingCache {
 
     public List<PagingEntry> getPagingEntries() {
         return mPagingEntries;
+    }
+
+    public AppDatabase getAppDatabase() {
+        return mAppDatabase;
     }
 
     public static class PagingEntry implements Comparable<PagingEntry> {

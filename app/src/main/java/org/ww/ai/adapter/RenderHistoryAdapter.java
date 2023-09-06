@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.ww.ai.R;
-import org.ww.ai.rds.RecyclerViewPagingCache;
+import org.ww.ai.rds.PagingCache;
 
 import java.util.stream.Collectors;
 
@@ -29,7 +29,7 @@ public class RenderHistoryAdapter extends GenericThumbnailAdapter<RenderResultVi
     }
 
     @Override
-    protected void displayThumbnail(@NonNull RecyclerViewPagingCache.PagingEntry pagingEntry) {
+    protected void displayThumbnail(@NonNull PagingCache.PagingEntry pagingEntry) {
         // TODO similar to GalleryAdapter's implementation
     }
 

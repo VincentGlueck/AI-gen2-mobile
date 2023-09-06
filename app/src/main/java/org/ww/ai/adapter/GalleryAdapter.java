@@ -20,7 +20,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
 import org.ww.ai.R;
-import org.ww.ai.rds.RecyclerViewPagingCache;
+import org.ww.ai.rds.PagingCache;
 import org.ww.ai.rds.ifenum.GalleryAdapterCallbackIF;
 
 import java.util.Optional;
@@ -81,7 +81,7 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
             return false;
         });
         holder.requestedPosition = holder.getAbsoluteAdapterPosition();
-        Optional<RecyclerViewPagingCache.PagingEntry> optional = mPagingCache.getPagingEntries()
+        Optional<PagingCache.PagingEntry> optional = mPagingCache.getPagingEntries()
                 .stream().parallel().filter(p -> p.idx == position).findAny();
         if (optional.isPresent()) {
             mHolderMap.put(holder.requestedPosition, holder);
@@ -90,9 +90,9 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
             boolean needsInc = needsIncrementCacheReload(position);
             boolean needsDec = needsDecrementCacheReload(position);
             if (needsInc || needsDec) {
-                mThumbRequests.add(new ThumbLoadRequest<>(new RecyclerViewPagingCache.PagingEntry(), holder));
+                mThumbRequests.add(new ThumbLoadRequest<>(new PagingCache.PagingEntry(), holder));
                 mPagingCache.fillCache(mContext, holder.requestedPosition, needsDec && !needsInc
-                        ? position - RecyclerViewPagingCache.PAGE_SIZE
+                        ? position - PagingCache.PAGE_SIZE
                         : position, this, mUseTrash, needsDec && !needsInc);
             }
             mHolderMap.put(holder.requestedPosition, holder);
@@ -100,7 +100,7 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
     }
 
     @Override
-    protected void displayThumbnail(@NonNull RecyclerViewPagingCache.PagingEntry pagingEntry) {
+    protected void displayThumbnail(@NonNull PagingCache.PagingEntry pagingEntry) {
         RenderResultViewHolder holder = getHolder(pagingEntry.requestPosition);
         if (holder == null) {
             return;
@@ -136,7 +136,7 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
             return true;
         }
         OptionalInt max = mThumbRequests.stream().mapToInt(t -> t.startIdx).max();
-        int maxIdxAvail = max.getAsInt() + RecyclerViewPagingCache.PAGE_SIZE - 1;
+        int maxIdxAvail = max.getAsInt() + PagingCache.PAGE_SIZE - 1;
         return idx > maxIdxAvail;
     }
 
