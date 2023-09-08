@@ -2,60 +2,44 @@ package org.ww.ai.fragment;
 
 import static org.ww.ai.fragment.RenderDetailsFragment.ARG_UID;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.google.common.util.concurrent.ListenableFuture;
-
 import org.ww.ai.R;
-import org.ww.ai.databinding.RenderResultsFragmentBinding;
-import org.ww.ai.rds.AppDatabase;
-import org.ww.ai.rds.AsyncDbFuture;
-import org.ww.ai.rds.entity.RenderResult;
-import org.ww.ai.rds.entity.RenderResultLightWeight;
+import org.ww.ai.adapter.AbstractRenderResultViewHolder;
+import org.ww.ai.adapter.OnGallerySelectionIF;
 import org.ww.ai.adapter.RenderResultAdapter;
-import org.ww.ai.ui.SwipeToDeleteCallback;
+import org.ww.ai.databinding.RenderResultsFragmentBinding;
+import org.ww.ai.enumif.ReceiveEventIF;
+import org.ww.ai.rds.AppDatabase;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
-public class RenderHistoryFragment extends Fragment implements RenderResultAdapter.OnItemClickListener {
+public class RenderHistoryFragment extends Fragment implements ReceiveEventIF, OnGallerySelectionIF {
 
     private RenderResultsFragmentBinding binding;
-    private Context containerContext;
-    private RenderResultAdapter adapter;
-    private RelativeLayout linearLayout;
-    private RecyclerView renderResultView;
 
-    private TextView nothingToRenderTextView;
-    private final Map<Integer, LightWeightDeleteHolder> renderResultLightWeights = new HashMap<>();
-
-    private int uid;
+    protected RenderResultAdapter mAdapter;
+    protected RecyclerView mRecyclerView;
+    protected boolean mIsTrashMode;
+    protected int mGallerySize;
+    private int mUid;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            uid = getArguments().getInt(ARG_UID);
+            mUid = getArguments().getInt(ARG_UID);
         }
     }
 
@@ -63,10 +47,6 @@ public class RenderHistoryFragment extends Fragment implements RenderResultAdapt
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-
-        assert container != null;
-        this.containerContext = container.getContext();
-
         binding = RenderResultsFragmentBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -74,95 +54,21 @@ public class RenderHistoryFragment extends Fragment implements RenderResultAdapt
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        binding.renderResultList.setOnClickListener(view1 -> NavHostFragment.findNavController(
-                RenderHistoryFragment.this).navigate(R.id.action_RenderResultsFragment_to_MainFragment));
-
-        renderResultView = view.findViewById(R.id.render_result_List);
-        nothingToRenderTextView = view.findViewById(R.id.empty_results);
-        adapter = new RenderResultAdapter(containerContext, this);
-
-        renderResultView.setAdapter(adapter);
-        renderResultView.setLayoutManager(new LinearLayoutManager(containerContext));
-        renderResultView.addItemDecoration(new DividerItemDecoration(renderResultView.getContext(), DividerItemDecoration.VERTICAL));
-        getRenderResultsFromDatabase();
-
-        linearLayout = view.findViewById(R.id.render_result_linear_layout);
-        enableSwipeToDeleteAndUndo();
-
-    }
-
-    private void enableSwipeToDeleteAndUndo() {
-        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(containerContext) {
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-
-                final int position = viewHolder.getAdapterPosition();
-                renderResultLightWeights.put(adapter.itemAt(position).uid,
-                        new LightWeightDeleteHolder(position, adapter.itemAt(position)));
-                adapter.removeResult(position);
-
-                Snackbar snackbar = Snackbar.make(linearLayout, getText(R.string.history_entry_deleted_snackbar), Snackbar.LENGTH_LONG);
-                snackbar.setAction(getText(R.string.undo_snackbar), view -> {
-                    AtomicInteger lastPosition = new AtomicInteger();
-                    renderResultLightWeights.values().forEach(r -> {
-                        adapter.restoreResult(r.renderResultLightWeight, r.position);
-                        lastPosition.set(r.position);
-                    });
-                    renderResultView.scrollToPosition(lastPosition.get());
-                });
-
-                snackbar.setActionTextColor(Color.YELLOW);
-                snackbar.show();
-
-                snackbar.addCallback(new Snackbar.Callback() {
-                    @Override
-                    public void onDismissed(Snackbar transientBottomBar, int event) {
-                        super.onDismissed(transientBottomBar, event);
-                        if (event == 2) { // auto dismiss, nothing clicked
-                            permanentDelete();
-                        }
-                    }
-                });
-
-            }
-        };
-        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
-        itemTouchhelper.attachToRecyclerView(renderResultView);
-    }
-
-    private void permanentDelete() {
-        AppDatabase db = AppDatabase.getInstance(containerContext);
-        renderResultLightWeights.values().forEach(r -> {
-            ListenableFuture<RenderResult> future = db.renderResultDao().getById(r.renderResultLightWeight.uid);
-            AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
-            asyncDbFuture.processFuture(future, result -> {
-                ListenableFuture<Integer> delFuture = db.renderResultDao().deleteRenderResults(List.of(result));
-                AsyncDbFuture<Integer> asyncDbFutureDel = new AsyncDbFuture<>();
-                asyncDbFutureDel.processFuture(delFuture, i -> {
-                }, containerContext);
-            }, containerContext);
-        });
-        renderResultLightWeights.clear();
-    }
-
-    private void getRenderResultsFromDatabase() {
-        AppDatabase appDatabase = AppDatabase.getInstance(containerContext);
-        ListenableFuture<List<RenderResultLightWeight>> listenableFuture =
-                appDatabase.renderResultDao().getAllLightWeights(false);
-        AsyncDbFuture<List<RenderResultLightWeight>> asyncDbFuture = new AsyncDbFuture<>();
-        asyncDbFuture.processFuture(listenableFuture, renderResults -> {
-            adapter.addRenderResults(renderResults);
-            if(uid >= 0) {
-                int position = adapter.getPositionOfUid(uid);
-                if(position >= 0) {
-                    renderResultView.scrollToPosition(position);
-                    adapter.highLightNewRow(position);
-                    adapter.notifyItemChanged(position);
-                }
-            }
-            nothingToRenderTextView.setVisibility(renderResults.isEmpty() ? View.VISIBLE : View.GONE);
-        }, containerContext);
+        mRecyclerView = view.findViewById(R.id.gallery_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        mGallerySize = AppDatabase.getInstance(requireContext()).renderResultDao().getCount(mIsTrashMode);
+        // TODO: check if needed or not: additionalOnViewCreated(view, savedInstanceState);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 3);
+        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        mAdapter = new RenderResultAdapter(requireContext(), displayMetrics,
+                this, mGallerySize, mIsTrashMode);
+        mRecyclerView.setAdapter(mAdapter);
+        if (mGallerySize == 0) {
+            showNothingToDisplayImage();
+        }
     }
 
     @Override
@@ -171,21 +77,33 @@ public class RenderHistoryFragment extends Fragment implements RenderResultAdapt
         super.onDestroy();
     }
 
+    protected void showNothingToDisplayImage() {
+        LinearLayout linearLayout = (LinearLayout) mRecyclerView.getParent();
+        linearLayout.removeAllViews();
+        View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_result,
+                linearLayout, false);
+        linearLayout.addView(emptyView);
+        linearLayout.setBackgroundColor(Color.BLACK);
+    }
+
     @Override
-    public void onItemClick(RenderResultLightWeight item) {
-        NavController navController = NavHostFragment.findNavController(RenderHistoryFragment.this);
-        Bundle bundle = new Bundle();
-        bundle.putInt(ARG_UID, item.uid);
-        navController.navigate(R.id.action_RenderResultsFragment_to_ShowRenderDetailsFragment, bundle);
+    public void thumbSelected(boolean selected, AbstractRenderResultViewHolder holder, int position) {
+
     }
 
-    private static class LightWeightDeleteHolder {
-        public int position;
-        public RenderResultLightWeight renderResultLightWeight;
+    @Override
+    public void onDeleteDone() {
 
-        public LightWeightDeleteHolder(int position, RenderResultLightWeight renderResultLightWeight) {
-            this.position = position;
-            this.renderResultLightWeight = renderResultLightWeight;
-        }
     }
+
+    @Override
+    public void onImageClickListener(int uid) {
+
+    }
+
+    @Override
+    public void receiveEvent(Object... eventObject) {
+
+    }
+
 }
