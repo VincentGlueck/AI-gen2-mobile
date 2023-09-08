@@ -75,8 +75,8 @@ public class GalleryFullSizeFragment extends Fragment {
                 CheckBox checkIncludeText = view.findViewById(R.id.gallery_full_size_share_with_text);
                 if(result.image == null) {
                     Glide.with(containerContext)
-                            .asDrawable()
                             .load(R.drawable.no_image)
+                            .override(400)
                             .into(imageView);
                     imageViewShare.setVisibility(View.GONE);
                     imageViewDelete.setVisibility(View.GONE);

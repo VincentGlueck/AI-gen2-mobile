@@ -4,15 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/colorGray"
+    android:background="@color/black"
     android:padding="2dp">
 
         <ImageView
             android:id="@+id/gallery_full_size_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:importantForAccessibility="no"
-            android:src="@drawable/no_image" />
+            android:importantForAccessibility="no" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,7 +23,6 @@
             android:layout_marginBottom="16dp"
             android:layout_marginEnd="4dp"
             android:background="@color/lightGrayTransparent">
-
 
                 <ImageView
                     android:id="@+id/gallery_full_size_share"

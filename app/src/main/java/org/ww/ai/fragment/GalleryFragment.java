@@ -86,6 +86,9 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         mAdapter = new GalleryAdapter(requireContext(), displayMetrics,
                 this, mGallerySize, mIsTrashMode);
         mRecyclerView.setAdapter(mAdapter);
+        if(mGallerySize == 0) {
+            showNothingToDisplayImage();
+        }
     }
 
     protected int getMenuResourceId() {
@@ -126,6 +129,7 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
 
     protected void showNothingToDisplayImage() {
         LinearLayout linearLayout = (LinearLayout) mRecyclerView.getParent();
+        linearLayout.removeAllViews();
         View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_result,
                 linearLayout, false);
         linearLayout.addView(emptyView);

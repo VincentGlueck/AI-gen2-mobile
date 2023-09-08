@@ -15,6 +15,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -79,6 +82,10 @@ public class MainActivity extends AppCompatActivity implements MenuEnableIF {
         mCoordinatorLayout = findViewById(R.id.main_activity_coordinator_layout);
         requestPermissions();
         checkIntentPurpose();
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setNavigationBarColor(getResources().getColor(R.color.purple, getTheme()));
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
     }
 
     private void requestPermissions() {
