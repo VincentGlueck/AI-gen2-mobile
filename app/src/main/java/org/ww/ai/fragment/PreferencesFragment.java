@@ -47,11 +47,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
     private final AtomicReference<String> mAiRenderUrl = new AtomicReference<>();
     private final AtomicBoolean mUseTranslation = new AtomicBoolean();
     private final AtomicBoolean mUseTrash = new AtomicBoolean();
-    private final AtomicBoolean mOpenImmediate = new AtomicBoolean();
+    private final AtomicBoolean mStartImmediately = new AtomicBoolean();
     private PreferenceScreen mPreferenceScreen;
     private AbstractBackupWriter mBackupWriter;
     private BackupHolder mLatestBackupHolder;
-
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
@@ -66,9 +65,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
         mAiRenderUrl.set(preferences.getString(Preferences.PREF_RENDER_ENGINE_URL));
         mUseTranslation.set(preferences.getBoolean(Preferences.PREF_USE_TRANSLATION));
         mUseTrash.set(preferences.getBoolean(Preferences.PREF_USE_TRASH));
-        mOpenImmediate.set(preferences.getBoolean(Preferences.PREF_OPEN_IMMEDIATE));
+        mStartImmediately.set(preferences.getBoolean(Preferences.PREF_START_IMMEDIATELY));
         addBooleanListener(mUseTranslation, PREF_USE_TRANSLATION);
         addBooleanListener(mUseTrash, PREF_USE_TRASH);
+        addBooleanListener(mStartImmediately, Preferences.PREF_START_IMMEDIATELY);
         initRenderingUrlSection();
         initBackupSection();
     }
@@ -99,7 +99,6 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
         editRenderUrl.setOnPreferenceChangeListener((p, newVal) -> {
             mAiRenderUrl.set((String) newVal);
             editRenderUrl.setSummary(mAiRenderUrl.get());
-            writeSharedPreferences();
             return false;
         });
     }
@@ -108,6 +107,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
         Preferences preferences = Preferences.getInstance(requireContext());
         SharedPreferences.Editor editor = preferences.getPreferences().edit();
         editor.putString(Preferences.PREF_RENDER_ENGINE_URL, mAiRenderUrl.get());
+        editor.putBoolean(Preferences.PREF_START_IMMEDIATELY, mStartImmediately.get());
+        editor.putBoolean(Preferences.PREF_USE_TRASH, mUseTrash.get());
+        editor.putBoolean(Preferences.PREF_USE_TRANSLATION, mUseTranslation.get());
         editor.apply();
     }
 
@@ -130,7 +132,8 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
                 }
 
                 @Override
-                public void onExecutionFinished() { }
+                public void onExecutionFinished() {
+                }
             });
             return false;
         });
@@ -173,7 +176,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
             String str = initRestoreBackupPreference(backupFiles);
             preference.setSummary(str);
             mLatestBackupHolder = backupFiles.get(0);
-        } catch(IllegalStateException e) {
+        } catch (IllegalStateException e) {
             Log.e("PREFS", "Backup list done, but Fragment already closed!");
         }
     }
@@ -182,6 +185,12 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
     public void onResume() {
         super.onResume();
         initPreferences();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        writeSharedPreferences();
     }
 
     private String initRestoreBackupPreference(List<BackupHolder> backupHolderList) throws IllegalStateException {
@@ -203,6 +212,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
         EXECUTOR_UTIL.execute(new ExecutorUtil.ExecutionIF() {
 
             BackupReaderResultHolder holder;
+
             @Override
             public void runInBackground() {
                 LocalStorageBackupReader localStorageBackupReader = new LocalStorageBackupReader(getContext());
@@ -211,11 +221,11 @@ public class PreferencesFragment extends PreferenceFragmentCompat implements Bac
 
             @Override
             public void onExecutionFinished() {
-                if(holder == null) {
+                if (holder == null) {
                     Toast.makeText(getContext(), "Fatal: no holder returned", Toast.LENGTH_LONG).show();
                     return;
                 }
-                if(holder.messages.isEmpty()) {
+                if (holder.messages.isEmpty()) {
                     String str = getResources().getString(R.string.pref_backup_restored, holder.restored);
                     DialogUtil.DIALOG_UTIL.showMessage(getContext(), R.string.pref_section_backup, str, R.drawable.info);
                 } else {

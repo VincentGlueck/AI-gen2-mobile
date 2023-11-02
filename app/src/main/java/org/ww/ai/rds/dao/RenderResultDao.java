@@ -41,7 +41,7 @@ public interface RenderResultDao {
 
     @Query("SELECT uid, createdTime, thumbnail, query_string, query_used, width," +
             " height, engines_used, deleted FROM " + TABLE +
-            " WHERE deleted = :flagDeleted ORDER BY createdTime LIMIT :limit OFFSET :offset")
+            " WHERE deleted = :flagDeleted ORDER BY createdTime DESC LIMIT :limit OFFSET :offset")
     ListenableFuture<List<RenderResultLightWeight>> getPagedRenderResultsLw(int offset, int limit,
                                                                             boolean flagDeleted);
 

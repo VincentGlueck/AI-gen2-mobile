@@ -1,7 +1,7 @@
 package org.ww.ai.fragment;
 
-import static org.ww.ai.prefs.Preferences.PREF_OPEN_IMMEDIATE;
 import static org.ww.ai.prefs.Preferences.PREF_RENDER_ENGINE_URL;
+import static org.ww.ai.prefs.Preferences.PREF_START_IMMEDIATELY;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -86,7 +86,7 @@ public class ShowSentencesFragment extends Fragment implements PhraseGeneratorEr
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        if(whatToRender == null) {
+        if (whatToRender == null) {
             whatToRender = new WhatToRender();
         }
         ImageView refreshImageView = view.findViewById(R.id.refresh_results);
@@ -133,8 +133,10 @@ public class ShowSentencesFragment extends Fragment implements PhraseGeneratorEr
             editText.setOnFocusChangeListener((v, hasFocus) -> {
                 if (hasFocus && whatToRender.isInstantCopyToClipBoard()) {
                     copyToClipBoard(editText.getText());
-                    if(Preferences.getInstance(requireContext()).getBoolean(PREF_OPEN_IMMEDIATE)) {
-                        openRenderUrl(Preferences.getInstance(requireContext()).getString(PREF_RENDER_ENGINE_URL));
+                    String renderUrl = Preferences.getInstance(requireContext()).getString(PREF_RENDER_ENGINE_URL);
+                    if (Preferences.getInstance(requireContext()).getBoolean(PREF_START_IMMEDIATELY)
+                            && renderUrl != null && !renderUrl.isEmpty()) {
+                        openRenderUrl(renderUrl);
                     }
                 }
             });
@@ -146,7 +148,7 @@ public class ShowSentencesFragment extends Fragment implements PhraseGeneratorEr
     }
 
     private void openRenderUrl(@NonNull String urlStr) {
-        if(!urlStr.startsWith("https://") && !urlStr.startsWith("http://")) {
+        if (!urlStr.startsWith("https://") && !urlStr.startsWith("http://")) {
             urlStr = "https://" + urlStr;
         }
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(urlStr)));
@@ -159,12 +161,12 @@ public class ShowSentencesFragment extends Fragment implements PhraseGeneratorEr
     }
 
     private void copyToClipBoard(Editable text) {
-        if(getContext() != null && getContext().getSystemService(Context.CLIPBOARD_SERVICE) != null) {
+        if (getContext() != null && getContext().getSystemService(Context.CLIPBOARD_SERVICE) != null) {
             ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("ai gen-2 text", text.toString());
             clipboard.setPrimaryClip(clip);
-            if(whatToRender != null) {
-                if(getActivity() != null) {
+            if (whatToRender != null) {
+                if (getActivity() != null) {
                     whatToRender.setQueryUsed(text.toString());
                     ((MainActivity) getActivity()).setLastQuery(whatToRender);
                 }

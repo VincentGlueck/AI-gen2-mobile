@@ -379,8 +379,11 @@ public class MainFragment extends Fragment implements TranslationAvailableNotifi
 
     private void addCheckBoxListeners(@NonNull View view) {
         CheckBox checkBoxNoLayout = view.findViewById(R.id.chk_no_layout);
-        Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
-        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) -> whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem()));
+        final Spinner layoutSpinner = view.findViewById(R.id.spin_layout);
+        checkBoxNoLayout.setOnCheckedChangeListener((v, checked) -> {
+            whatToRender.setPreset(checked ? "" : (String) layoutSpinner.getSelectedItem());
+            layoutSpinner.setEnabled(!checked);
+        });
         CheckBox checkBoxNoArtist = view.findViewById(R.id.chk_no_artists);
         Spinner numOfArtist = view.findViewById(R.id.spin_num_artists);
         checkBoxNoArtist.setOnCheckedChangeListener((v, checked) -> {
