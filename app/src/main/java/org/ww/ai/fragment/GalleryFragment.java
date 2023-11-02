@@ -24,6 +24,8 @@ import androidx.annotation.Nullable;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -84,6 +86,9 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         mAdapter = new GalleryAdapter(requireContext(), displayMetrics,
                 this, mGallerySize, mIsTrashMode);
         mRecyclerView.setAdapter(mAdapter);
+        if(mGallerySize == 0) {
+            showNothingToDisplayImage();
+        }
     }
 
     protected int getMenuResourceId() {
@@ -124,6 +129,7 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
 
     protected void showNothingToDisplayImage() {
         LinearLayout linearLayout = (LinearLayout) mRecyclerView.getParent();
+        linearLayout.removeAllViews();
         View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_result,
                 linearLayout, false);
         linearLayout.addView(emptyView);
@@ -202,6 +208,16 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
             }
         });
         updateToolbar();
+    }
+
+    @Override
+    public void onImageClickListener(int uid) {
+        if(uid >= 0) {
+            NavController navController = NavHostFragment.findNavController(GalleryFragment.this);
+            Bundle bundle = new Bundle();
+            bundle.putInt(RenderDetailsFragment.ARG_UID, uid);
+            navController.navigate(R.id.action_GalleryFragment_to_GalleryFullSizeFragment, bundle);
+        }
     }
 
     @Override

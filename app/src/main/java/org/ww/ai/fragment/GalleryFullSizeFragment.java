@@ -70,18 +70,27 @@ public class GalleryFullSizeFragment extends Fragment {
         AsyncDbFuture<RenderResult> asyncDbFuture = new AsyncDbFuture<>();
         asyncDbFuture.processFuture(future, result -> {
             if (result != null) {
-                assert getActivity() != null;
-                Glide.with(containerContext)
-                        .asBitmap()
-                        .load(IMAGE_UTIL.convertBlobToImage(result.image))
-                        .into(imageView);
-                final CheckBox checkIncludeText = view.findViewById(R.id.gallery_full_size_share_with_text);
                 ImageView imageViewShare = view.findViewById(R.id.gallery_full_size_share);
-                imageViewShare.setVisibility(View.VISIBLE);
-                imageViewShare.setOnClickListener(v -> new ShareImageUtil(getActivity())
-                        .startShare(result.uid, checkIncludeText.isChecked()));
                 ImageView imageViewDelete = view.findViewById(R.id.gallery_full_size_delete);
-                imageViewDelete.setOnClickListener(l -> deleteImage(uid));
+                CheckBox checkIncludeText = view.findViewById(R.id.gallery_full_size_share_with_text);
+                if(result.image == null) {
+                    Glide.with(containerContext)
+                            .load(R.drawable.no_image)
+                            .override(400)
+                            .into(imageView);
+                    imageViewShare.setVisibility(View.GONE);
+                    imageViewDelete.setVisibility(View.GONE);
+                    checkIncludeText.setVisibility(View.GONE);
+                } else {
+                    Glide.with(containerContext)
+                            .asBitmap()
+                            .load(IMAGE_UTIL.convertBlobToImage(result.image))
+                            .into(imageView);
+                    imageViewShare.setVisibility(View.VISIBLE);
+                    imageViewShare.setOnClickListener(v -> new ShareImageUtil(getActivity())
+                            .startShare(result.uid, checkIncludeText.isChecked()));
+                    imageViewDelete.setOnClickListener(l -> deleteImage(uid));
+                }
             }
         }, containerContext);
     }

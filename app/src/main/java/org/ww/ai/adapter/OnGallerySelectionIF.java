@@ -6,4 +6,6 @@ public interface OnGallerySelectionIF {
 
     void onDeleteDone();
 
+    void onImageClickListener(int uid);
+
 }

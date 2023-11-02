@@ -1,21 +1,15 @@
 package org.ww.ai.adapter;
 
-import static org.ww.ai.ui.Animations.ANIMATIONS;
 import static org.ww.ai.ui.ImageUtil.IMAGE_UTIL;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Typeface;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationSet;
-import android.widget.ImageView;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,180 +20,142 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
 import org.ww.ai.R;
-import org.ww.ai.rds.dao.EngineUsedNonDao;
-import org.ww.ai.rds.entity.RenderResultLightWeight;
-import org.ww.ai.ui.inclues.ShowRenderModelsLinearLayout;
+import org.ww.ai.rds.PagingCache;
+import org.ww.ai.rds.ifenum.GalleryAdapterCallbackIF;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
-public class RenderResultAdapter extends RecyclerView.Adapter<RenderResultAdapter.ViewHolder> {
-
-    private static final int PREVIEW_SIZE = 272;
-    private final List<RenderResultLightWeight> mLocalDataSet;
-    private final OnItemClickListener mOnItemClickListener;
-    private final DateFormat mDateFormat;
-    private final Context mContext;
+public class RenderResultAdapter extends GenericThumbnailAdapter<RenderResultViewHolder>
+        implements GalleryThumbSelectionIF<RenderResultViewHolder>, GalleryAdapterCallbackIF {
 
 
-    public RenderResultAdapter(Context context, OnItemClickListener onItemClickListener) {
-        mContext = context;
-        mOnItemClickListener = onItemClickListener;
-        mLocalDataSet = new ArrayList<>();
-        mDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    }
-
-    public void addRenderResults(List<RenderResultLightWeight> renderResults) {
-        if (renderResults == null || renderResults.isEmpty()) {
-            Log.d("ADD_RENDER_RESULTS", "Attempt to add null or empty list of RenderResults");
-            return;
-        }
-        int oldLength = mLocalDataSet.size();
-        mLocalDataSet.addAll(renderResults);
-        notifyItemRangeInserted(oldLength, mLocalDataSet.size());
-    }
-
-    public void removeResult(int position) {
-        if (position >= 0 && position < mLocalDataSet.size()) {
-            mLocalDataSet.remove(position);
-            notifyItemRemoved(position);
-        } else {
-            Log.e("REMOVE_RESULT", "with position " + position + ", but localDataSet.size() is " + mLocalDataSet.size());
-        }
-    }
-
-    public void restoreResult(RenderResultLightWeight renderResult, int position) {
-        mLocalDataSet.add(position, renderResult);
-        notifyItemInserted(position);
-    }
-
-    public RenderResultLightWeight itemAt(int position) {
-        return mLocalDataSet.get(position);
+    public RenderResultAdapter(Context context,
+                               DisplayMetrics displayMetrics,
+                               OnGallerySelectionIF onGalleryThumbSelection,
+                               int count,
+                               boolean useTrash) {
+        super(context, displayMetrics, onGalleryThumbSelection, count, useTrash);
     }
 
     @NonNull
     @Override
-    public RenderResultAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.single_render_result_row, parent, false);
-        return new ViewHolder(view);
+    public RenderResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View singleGalleryView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.single_gallery_image, parent, false);
+        return new RenderResultViewHolder(singleGalleryView);
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull RenderResultAdapter.ViewHolder viewHolder, int position) {
-        RenderResultLightWeight item = mLocalDataSet.get(position);
-        viewHolder.getQueryStringTextView().setText(item.queryString);
+    public void onViewRecycled(@NonNull RenderResultViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.checkBox.setVisibility(mSelectionMode ? View.VISIBLE : View.GONE);
+        holder.thumbNail.setScaleX(1.0f);
+        holder.thumbNail.setScaleY(1.0f);
+        int position = holder.getAbsoluteAdapterPosition();
+        if (position != RecyclerView.NO_POSITION) {
+            holder.position = position;
+        }
+        if (mSelectionMode) {
+            holder.checkBox.setChecked(mSelectedThumbs.stream().map(s -> s.position)
+                    .collect(Collectors.toList()).contains(holder.position));
+        }
+    }
+
+
+    @Override
+    public void onBindViewHolder(@NonNull RenderResultViewHolder holder,
+                                 int position) {
+        holder.checkBox.setVisibility(mSelectionMode ? View.VISIBLE : View.GONE);
+        holder.position = holder.getAbsoluteAdapterPosition();
+        holder.checkBox.setChecked(mSelectedThumbs.stream().map(s -> s.position)
+                .collect(Collectors.toList()).contains(holder.getAbsoluteAdapterPosition()));
+        holder.checkBox.setOnClickListener(v -> {
+            CheckBox checkBox = (CheckBox) v;
+            holder.checked = checkBox.isChecked();
+            thumbSelected(position, holder, holder.checked);
+        });
+        holder.thumbNail.setOnLongClickListener(v -> {
+            holder.checkBox.setChecked(!holder.checkBox.isChecked());
+            holder.checked = holder.checkBox.isChecked();
+            thumbSelected(position, holder, holder.checked);
+            return false;
+        });
+        holder.thumbNail.setOnClickListener(l -> {
+            int uid = mPosToUidMapping
+                    .keySet().stream().filter(f -> f == holder.position)
+                    .findFirst().map(mPosToUidMapping::get).orElse(-1);
+            Log.w("UID", "sel on " + holder.position + " > uid = " + uid);
+            mOnGalleryThumbSelection.onImageClickListener(uid);
+        });
+        holder.requestedPosition = holder.getAbsoluteAdapterPosition();
+        Optional<PagingCache.PagingEntry> optional = mPagingCache.getPagingEntries()
+                .stream().parallel().filter(p -> p.idx == position).findAny();
+        if (optional.isPresent()) {
+            mHolderMap.put(holder.requestedPosition, holder);
+            displayThumbnail(optional.get());
+        } else {
+            boolean needsInc = needsIncrementCacheReload(position);
+            boolean needsDec = needsDecrementCacheReload(position);
+            if (needsInc || needsDec) {
+                mThumbRequests.add(new ThumbLoadRequest<>(new PagingCache.PagingEntry(), holder));
+                mPagingCache.fillCache(mContext, holder.requestedPosition, needsDec && !needsInc
+                        ? position - PagingCache.PAGE_SIZE
+                        : position, this, mUseTrash, needsDec && !needsInc);
+            }
+            mHolderMap.put(holder.requestedPosition, holder);
+        }
+    }
+
+    @Override
+    protected void displayThumbnail(@NonNull PagingCache.PagingEntry pagingEntry) {
+        RenderResultViewHolder holder = getHolder(pagingEntry.requestPosition);
+        if (holder == null) {
+            return;
+        }
+        if (holder.requestedPosition != pagingEntry.idx) {
+            Log.w("SKIP", "it's " + pagingEntry.idx + ", but I need " + holder.requestedPosition);
+            return;
+        }
+
+        if(mSelectionMode) {
+            holder.thumbNail.setScaleX(SCALE_SELECTED);
+            holder.thumbNail.setScaleY(SCALE_SELECTED);
+        }
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout
+                .LayoutParams(mDisplayMetrics.widthPixels / 3, mDisplayMetrics.heightPixels / 5);
+        holder.thumbNail.setLayoutParams(layoutParams);
+
         RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(16));
+        requestOptions = requestOptions.transform(new CenterCrop(),
+                new RoundedCorners(mSelectionMode ? 24 : 1));
+
         Glide.with(mContext)
                 .asBitmap()
-                .load(IMAGE_UTIL.convertBlobToImage(item.thumbNail))
-                .override(PREVIEW_SIZE)
+                .load(IMAGE_UTIL.convertBlobToImage(pagingEntry.renderResultLightWeight.thumbNail))
                 .apply(requestOptions)
-                .into(viewHolder.getThumb());
-        viewHolder.getTextViewSizeLabel().setText(item.width + "x" + item.height);
-        List<EngineUsedNonDao> enginesUsed = item.enginesUsed;
-        if (enginesUsed != null && !enginesUsed.isEmpty()) {
-            ShowRenderModelsLinearLayout enginesUsedView = new ShowRenderModelsLinearLayout(mContext);
-            enginesUsedView.init(mContext, viewHolder.getRootView(), enginesUsed);
-            viewHolder.getLinearLayout().addView(enginesUsedView);
-        }
-        SpannableString spanString = new SpannableString(mDateFormat.format(
-                // this is a workaround for forgotten date in fake data
-                new Date(item.createdTime == null ? (System.currentTimeMillis()
-                        - (long)(Math.random()*10000000000L)) : item.createdTime)));
-        spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
-        viewHolder.getTextViewDate().setText(spanString);
-        viewHolder.getQueryUsedTextView().setText(item.queryUsed);
-        if (item.flagHighLight) {
-            final AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(ANIMATIONS.getAlphaAnimation(0.4F, 1.0F, 1000L, true));
-            animationSet.addAnimation(ANIMATIONS.getScaleAnimation(0.3F, 1.0F, 700L, true));
-            viewHolder.getRootView().setAnimation(animationSet);
-            animationSet.start();
-            item.flagHighLight = false;
-        }
-        viewHolder.bind(item, mOnItemClickListener);
-    }
-
-    public int getPositionOfUid(int uid) {
-        for (int n = 0; n < mLocalDataSet.size(); n++) {
-            if (mLocalDataSet.get(n).uid == uid) {
-                return n;
-            }
-        }
-        return -1;
+                .into(holder.thumbNail);
+        mPosToUidMapping.put(holder.getAbsoluteAdapterPosition(), pagingEntry.renderResultLightWeight.uid);
     }
 
 
-    @Override
-    public int getItemCount() {
-        return mLocalDataSet.size();
+    private boolean needsIncrementCacheReload(int idx) {
+        if (mThumbRequests.isEmpty()) {
+            return true;
+        }
+        OptionalInt max = mThumbRequests.stream().mapToInt(t -> t.startIdx).max();
+        int maxIdxAvail = max.getAsInt() + PagingCache.PAGE_SIZE - 1;
+        return idx > maxIdxAvail;
     }
 
-    public void highLightNewRow(int position) {
-        mLocalDataSet.get(position).flagHighLight = true;
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final TextView renderTitleTextView;
-        private final ImageView thumb;
-        protected final TextView queryUsedTextView;
-        private final TextView textViewDate;
-        private final TextView textViewSizeLabel;
-        private final LinearLayout linearLayout;
-        private final View rootView;
-
-
-        public ViewHolder(View view) {
-            super(view);
-            rootView = view;
-            renderTitleTextView = view.findViewById(R.id.render_result_title);
-            thumb = view.findViewById(R.id.history_render_result_thumb);
-            textViewDate = view.findViewById(R.id.render_result_date);
-            queryUsedTextView = view.findViewById(R.id.render_result_query_used);
-            textViewSizeLabel = view.findViewById(R.id.image_view_size_lbl);
-            linearLayout = view.findViewById(R.id.render_result_linear_layout);
+    private boolean needsDecrementCacheReload(int idx) {
+        if (mThumbRequests.isEmpty()) {
+            return false;
         }
-
-        public void bind(final RenderResultLightWeight item, final OnItemClickListener listener) {
-            itemView.setOnClickListener(l -> listener.onItemClick(item));
-        }
-
-        public TextView getQueryStringTextView() {
-            return renderTitleTextView;
-        }
-
-        public TextView getQueryUsedTextView() {
-            return queryUsedTextView;
-        }
-
-        public ImageView getThumb() {
-            return thumb;
-        }
-
-        public TextView getTextViewDate() {
-            return textViewDate;
-        }
-
-        public TextView getTextViewSizeLabel() {
-            return textViewSizeLabel;
-        }
-
-        public LinearLayout getLinearLayout() {
-            return linearLayout;
-        }
-
-        public View getRootView() {
-            return rootView;
-        }
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(RenderResultLightWeight item);
+        OptionalInt min = mThumbRequests.stream().mapToInt(t -> t.startIdx).min();
+        int minIdxAvail = min.getAsInt();
+        return idx < minIdxAvail;
     }
 }

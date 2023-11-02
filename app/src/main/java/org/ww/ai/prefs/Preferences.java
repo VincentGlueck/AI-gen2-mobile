@@ -8,7 +8,7 @@ public class Preferences {
     public static final String PREF_USE_TRANSLATION = "pref_translate";
     public static final String PREF_USE_TRASH = "pref_use_trash";
     public static final String PREF_RENDER_ENGINE_URL = "pref_render_engine_url";
-    public static final String PREF_OPEN_IMMEDIATE = "pref_open_immediate";
+    public static final String PREF_START_IMMEDIATELY = "pref_start_immediately";
 
     private static Preferences instance;
     private static final String TAG = Preferences.class.getSimpleName();

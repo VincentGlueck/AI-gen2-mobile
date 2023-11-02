@@ -2,16 +2,15 @@ package org.ww.ai.backup;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import org.ww.ai.rds.entity.RenderResult;
-
 import java.util.List;
 
-public interface BackupWriterIF<T> {
+public interface BackupWriterIF {
 
-    BackupHolder writeBackup(List<RenderResult> renderResults) throws  JsonProcessingException;
+    void writeBackup(BackupDoneCallbackIF backupDoneCallback) throws JsonProcessingException;
 
     List<BackupHolder> getBackupFiles();
 
-    int removeObsoleteBackups();
+    void removeObsoleteBackups();
+
 
 }

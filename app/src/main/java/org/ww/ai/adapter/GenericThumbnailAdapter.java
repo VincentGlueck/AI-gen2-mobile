@@ -11,7 +11,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.ww.ai.rds.AppDatabase;
 import org.ww.ai.rds.AsyncDbFuture;
-import org.ww.ai.rds.RecyclerViewPagingCache;
+import org.ww.ai.rds.PagingCache;
 import org.ww.ai.rds.entity.RenderResult;
 import org.ww.ai.rds.entity.RenderResultLightWeight;
 import org.ww.ai.rds.ifenum.GalleryAdapterCallbackIF;
@@ -32,7 +32,7 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
     public static final float SCALE_SELECTED = 0.94f;
     public static final int PER_ROW = 3;
 
-    final RecyclerViewPagingCache mPagingCache;
+    final PagingCache mPagingCache;
     final Context mContext;
     final boolean mUseTrash;
     final OnGallerySelectionIF mOnGalleryThumbSelection;
@@ -57,13 +57,13 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
                                    boolean useTrash) {
         mContext = context;
         mDisplayMetrics = displayMetrics;
-        mPagingCache = RecyclerViewPagingCache.getInstance(context);
+        mPagingCache = PagingCache.getInstance(context);
         mOnGalleryThumbSelection = onGalleryThumbSelection;
         mCount = count;
         mUseTrash = useTrash;
     }
 
-    protected abstract void displayThumbnail(@NonNull RecyclerViewPagingCache.PagingEntry pagingEntry);
+    protected abstract void displayThumbnail(@NonNull PagingCache.PagingEntry pagingEntry);
 
     public OnGallerySelectionIF getOnGalleryThumbSelection() {
         return mOnGalleryThumbSelection;
@@ -188,11 +188,7 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
     }
 
     @Override
-    public void onCachingDone(List<RecyclerViewPagingCache.PagingEntry> pagingEntries) {
-        pagingEntries.forEach(p -> {
-            Log.w("pagingEntry", "pagingEntry: " + p);
-        });
-
+    public void onCachingDone(List<PagingCache.PagingEntry> pagingEntries) {
         pagingEntries.forEach(this::displayThumbnail);
         mThumbRequests.clear();
     }
@@ -223,11 +219,11 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
 
 
     static class ThumbLoadRequest<T extends AbstractRenderResultViewHolder> {
-        public RecyclerViewPagingCache.PagingEntry pagingEntry;
+        public PagingCache.PagingEntry pagingEntry;
         public AbstractRenderResultViewHolder holder;
         public int startIdx;
 
-        public ThumbLoadRequest(RecyclerViewPagingCache.PagingEntry pagingEntry,
+        public ThumbLoadRequest(PagingCache.PagingEntry pagingEntry,
                                 T holder) {
             this.pagingEntry = pagingEntry;
             this.holder = holder;

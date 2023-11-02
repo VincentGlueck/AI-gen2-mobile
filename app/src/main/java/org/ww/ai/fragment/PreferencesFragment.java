@@ -1,6 +1,7 @@
 package org.ww.ai.fragment;
 
 import static org.ww.ai.tools.ExecutorUtil.EXECUTOR_UTIL;
+import static org.ww.ai.tools.FileUtil.FILE_UTIL;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.EditTextPreference;
@@ -19,35 +21,36 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.ww.ai.R;
 import org.ww.ai.backup.AbstractBackupWriter;
+import org.ww.ai.backup.BackupDoneCallbackIF;
 import org.ww.ai.backup.BackupHolder;
 import org.ww.ai.backup.BackupReaderResultHolder;
 import org.ww.ai.backup.LocalStorageBackupReader;
 import org.ww.ai.backup.LocalStorageBackupWriter;
 import org.ww.ai.prefs.Preferences;
-import org.ww.ai.rds.AppDatabase;
-import org.ww.ai.rds.entity.RenderResult;
+import org.ww.ai.prefs.ProgressPreference;
 import org.ww.ai.tools.ExecutorUtil;
 import org.ww.ai.ui.DialogUtil;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class PreferencesFragment extends PreferenceFragmentCompat {
+public class PreferencesFragment extends PreferenceFragmentCompat implements BackupDoneCallbackIF {
 
     private static final String PREF_USE_TRANSLATION = "pref_translate";
     private static final String PREF_USE_TRASH = "pref_use_trash";
     private static final String PREF_CREATE_BACKUP = "pref_create_backup";
     private static final String PREF_RESTORE_BACKUP = "pref_restore_backup";
     private static final String PREF_REMOVE_OBSOLETE_BACKUPS = "pref_remove_obsolete_backups";
+    private static final String PREF_SHOW_PROGRESS = "pref_show_progress";
     private final AtomicReference<String> mAiRenderUrl = new AtomicReference<>();
     private final AtomicBoolean mUseTranslation = new AtomicBoolean();
     private final AtomicBoolean mUseTrash = new AtomicBoolean();
-    private final AtomicBoolean mOpenImmediate = new AtomicBoolean();
+    private final AtomicBoolean mStartImmediately = new AtomicBoolean();
     private PreferenceScreen mPreferenceScreen;
     private AbstractBackupWriter mBackupWriter;
     private BackupHolder mLatestBackupHolder;
-
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
@@ -62,9 +65,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         mAiRenderUrl.set(preferences.getString(Preferences.PREF_RENDER_ENGINE_URL));
         mUseTranslation.set(preferences.getBoolean(Preferences.PREF_USE_TRANSLATION));
         mUseTrash.set(preferences.getBoolean(Preferences.PREF_USE_TRASH));
-        mOpenImmediate.set(preferences.getBoolean(Preferences.PREF_OPEN_IMMEDIATE));
+        mStartImmediately.set(preferences.getBoolean(Preferences.PREF_START_IMMEDIATELY));
         addBooleanListener(mUseTranslation, PREF_USE_TRANSLATION);
         addBooleanListener(mUseTrash, PREF_USE_TRASH);
+        addBooleanListener(mStartImmediately, Preferences.PREF_START_IMMEDIATELY);
         initRenderingUrlSection();
         initBackupSection();
     }
@@ -95,7 +99,6 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         editRenderUrl.setOnPreferenceChangeListener((p, newVal) -> {
             mAiRenderUrl.set((String) newVal);
             editRenderUrl.setSummary(mAiRenderUrl.get());
-            writeSharedPreferences();
             return false;
         });
     }
@@ -103,8 +106,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     private void writeSharedPreferences() {
         Preferences preferences = Preferences.getInstance(requireContext());
         SharedPreferences.Editor editor = preferences.getPreferences().edit();
-        Log.d("PREF", "write '" + mAiRenderUrl.get() + "' to key '" + Preferences.PREF_RENDER_ENGINE_URL + "'");
         editor.putString(Preferences.PREF_RENDER_ENGINE_URL, mAiRenderUrl.get());
+        editor.putBoolean(Preferences.PREF_START_IMMEDIATELY, mStartImmediately.get());
+        editor.putBoolean(Preferences.PREF_USE_TRASH, mUseTrash.get());
+        editor.putBoolean(Preferences.PREF_USE_TRANSLATION, mUseTranslation.get());
         editor.apply();
     }
 
@@ -114,13 +119,13 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         assert preferenceCreateBackup != null;
         preferenceCreateBackup.setOnPreferenceClickListener(preference -> {
             EXECUTOR_UTIL.execute(new ExecutorUtil.ExecutionIF() {
-                BackupHolder backupHolder = null;
                 Exception exception = null;
 
                 @Override
                 public void runInBackground() {
+                    getProgressPreference().setVisible(true);
                     try {
-                        backupHolder = writeBackup();
+                        mBackupWriter.writeBackup(PreferencesFragment.this);
                     } catch (JsonProcessingException e) {
                         exception = e;
                     }
@@ -128,15 +133,6 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
                 @Override
                 public void onExecutionFinished() {
-                    if (backupHolder != null) {
-                        getBackupFilesAsync();
-                        Toast.makeText(getContext(), R.string.pref_backup_created_toast,
-                                Toast.LENGTH_LONG).show();
-                        removeObsoleteBackups();
-                    } else if (exception != null) {
-                        Toast.makeText(getContext(), "Error: "
-                                + exception.getMessage(), Toast.LENGTH_LONG).show();
-                    }
                 }
             });
             return false;
@@ -180,21 +176,21 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             String str = initRestoreBackupPreference(backupFiles);
             preference.setSummary(str);
             mLatestBackupHolder = backupFiles.get(0);
-        } catch(IllegalStateException e) {
+        } catch (IllegalStateException e) {
             Log.e("PREFS", "Backup list done, but Fragment already closed!");
         }
-    }
-
-    private BackupHolder writeBackup() throws JsonProcessingException {
-        AppDatabase appDatabase = AppDatabase.getInstance(requireContext());
-        List<RenderResult> renderResultList = appDatabase.renderResultDao().getAllOnThread();
-        return mBackupWriter.writeBackup(renderResultList);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         initPreferences();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        writeSharedPreferences();
     }
 
     private String initRestoreBackupPreference(List<BackupHolder> backupHolderList) throws IllegalStateException {
@@ -216,6 +212,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         EXECUTOR_UTIL.execute(new ExecutorUtil.ExecutionIF() {
 
             BackupReaderResultHolder holder;
+
             @Override
             public void runInBackground() {
                 LocalStorageBackupReader localStorageBackupReader = new LocalStorageBackupReader(getContext());
@@ -224,11 +221,11 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
             @Override
             public void onExecutionFinished() {
-                if(holder == null) {
+                if (holder == null) {
                     Toast.makeText(getContext(), "Fatal: no holder returned", Toast.LENGTH_LONG).show();
                     return;
                 }
-                if(holder.messages.isEmpty()) {
+                if (holder.messages.isEmpty()) {
                     String str = getResources().getString(R.string.pref_backup_restored, holder.restored);
                     DialogUtil.DIALOG_UTIL.showMessage(getContext(), R.string.pref_section_backup, str, R.drawable.info);
                 } else {
@@ -273,5 +270,30 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         }
     }
 
+    @Override
+    public void backupDone(File zipFile) {
+        CharSequence charSequence = getResources().getString(R.string.pref_backup_created_toast,
+                FILE_UTIL.readableFileSize(zipFile.length()));
+        Toast.makeText(getContext(),
+                charSequence,
+                Toast.LENGTH_LONG
+        ).show();
+        removeObsoleteBackups();
+        getBackupFilesAsync();
+        getProgressPreference().setVisible(false);
+    }
+
+    @Override
+    public void notifyProgress(int done, int total) {
+        ProgressPreference progressPreference = getProgressPreference();
+        progressPreference.updateValue(done, total);
+    }
+
+    @NonNull
+    private ProgressPreference getProgressPreference() {
+        Preference preference = mPreferenceScreen.findPreference(PREF_SHOW_PROGRESS);
+        assert preference != null;
+        return (ProgressPreference) preference;
+    }
 }
 

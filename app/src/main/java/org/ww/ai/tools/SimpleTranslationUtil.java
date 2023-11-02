@@ -32,8 +32,6 @@ public class SimpleTranslationUtil implements TranslationAvailableNotifierIF {
     private SimpleTranslationUtil(Context context, String language) {
         if(TranslateLanguage.ENGLISH.equals(language)) {
             useTranslator = false;
-            Toast.makeText(context, "Translation not required as you already use " +
-                    language, Toast.LENGTH_LONG).show();
         }
         if (translator == null) {
             TranslatorOptions options = new TranslatorOptions.Builder()
