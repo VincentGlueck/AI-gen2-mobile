@@ -7,9 +7,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.ww.ai.R;
-
-public class AbstractRenderResultViewHolder extends RecyclerView.ViewHolder {
+public abstract  class AbstractRenderResultViewHolder extends RecyclerView.ViewHolder {
 
     public ImageView thumbNail;
     public CheckBox checkBox;
@@ -17,12 +15,15 @@ public class AbstractRenderResultViewHolder extends RecyclerView.ViewHolder {
     public int position = -1;
     public int requestedPosition;
 
+    public View rootView;
+
     public AbstractRenderResultViewHolder(@NonNull View itemView) {
         super(itemView);
-        thumbNail = itemView.findViewById(R.id.single_gallery_image_view);
-        checkBox = itemView.findViewById(R.id.check_single_entry);
-        checked = false;
+        rootView = itemView;
+        init();
     }
+
+    protected abstract void init();
 
     @NonNull
     @Override
@@ -30,7 +31,6 @@ public class AbstractRenderResultViewHolder extends RecyclerView.ViewHolder {
         return "RenderResultViewHolder{" +
                 ", position: " + position +
                 ", thumbNail.getWidth(): " + thumbNail.getWidth() +
-                ", checkBox.isChecked():" + checkBox.isChecked() +
                 '}';
     }
 }

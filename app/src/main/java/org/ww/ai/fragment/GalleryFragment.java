@@ -78,14 +78,14 @@ public class GalleryFragment extends Fragment implements ReceiveEventIF, OnGalle
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         mGallerySize = AppDatabase.getInstance(requireContext()).renderResultDao().getCount(mIsTrashMode);
         additionalOnViewCreated(view, savedInstanceState);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 3);
-        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(gridLayoutManager);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         mAdapter = new GalleryAdapter(requireContext(), displayMetrics,
                 this, mGallerySize, mIsTrashMode);
         mRecyclerView.setAdapter(mAdapter);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), mAdapter.getPerRow());
+        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
         if(mGallerySize == 0) {
             showNothingToDisplayImage();
         }

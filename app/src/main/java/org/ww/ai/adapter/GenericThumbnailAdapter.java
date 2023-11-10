@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultViewHolder>
@@ -30,16 +31,15 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
         GalleryAdapterCallbackIF {
 
     public static final float SCALE_SELECTED = 0.94f;
-    public static final int PER_ROW = 3;
 
     final PagingCache mPagingCache;
     final Context mContext;
     final boolean mUseTrash;
     final OnGallerySelectionIF mOnGalleryThumbSelection;
     final List<SelectionHolder> mSelectedThumbs = new ArrayList<>();
-    final List<ThumbLoadRequest<T>> mThumbRequests
+    final List<ThumbLoadRequest<?>> mThumbRequests
             = Collections.synchronizedList(new ArrayList<>());
-    final Map<Integer, T> mHolderMap = new HashMap<>();
+    final Map<Integer, AbstractRenderResultViewHolder> mHolderMap = new HashMap<>();
     final Map<Integer, Integer> mPosToUidMapping = new HashMap<>();
     int mCount;
     boolean mSelectionMode;
@@ -65,12 +65,15 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
 
     protected abstract void displayThumbnail(@NonNull PagingCache.PagingEntry pagingEntry);
 
+    public abstract int getPerRow();
+
     public OnGallerySelectionIF getOnGalleryThumbSelection() {
         return mOnGalleryThumbSelection;
     }
 
+    /** @noinspection unchecked*/
     protected T getHolder(int requestedPosition) {
-        T holder = mHolderMap.get(requestedPosition);
+        T holder = (T) mHolderMap.get(requestedPosition);
         mHolderMap.remove(requestedPosition);
         return holder;
     }
@@ -193,12 +196,49 @@ public abstract class GenericThumbnailAdapter<T extends AbstractRenderResultView
         mThumbRequests.clear();
     }
 
+    protected void doCacheManagement(AbstractRenderResultViewHolder holder, int position) {
+        Optional<PagingCache.PagingEntry> optional = mPagingCache.getPagingEntries()
+                .stream().parallel().filter(p -> p.idx == position).findAny();
+        if (optional.isPresent()) {
+            mHolderMap.put(holder.requestedPosition, holder);
+            displayThumbnail(optional.get());
+        } else {
+            boolean needsInc = needsIncrementCacheReload(position);
+            boolean needsDec = needsDecrementCacheReload(position);
+            if (needsInc || needsDec) {
+                mThumbRequests.add(new ThumbLoadRequest<>(new PagingCache.PagingEntry(), holder));
+                mPagingCache.fillCache(mContext, holder.requestedPosition, needsDec && !needsInc
+                        ? position - PagingCache.PAGE_SIZE
+                        : position, this, mUseTrash, needsDec && !needsInc);
+            }
+            mHolderMap.put(holder.requestedPosition, holder);
+        }
+    }
+
+    protected boolean needsIncrementCacheReload(int idx) {
+        if (mThumbRequests.isEmpty()) {
+            return true;
+        }
+        OptionalInt max = mThumbRequests.stream().mapToInt(t -> t.startIdx).max();
+        int maxIdxAvail = max.getAsInt() + PagingCache.PAGE_SIZE - 1;
+        return idx > maxIdxAvail;
+    }
+
+    protected boolean needsDecrementCacheReload(int idx) {
+        if (mThumbRequests.isEmpty()) {
+            return false;
+        }
+        OptionalInt min = mThumbRequests.stream().mapToInt(t -> t.startIdx).min();
+        int minIdxAvail = min.getAsInt();
+        return idx < minIdxAvail;
+    }
+
     public int getThumbWidth() {
-        return mDisplayMetrics.widthPixels / GenericThumbnailAdapter.PER_ROW;
+        return mDisplayMetrics.widthPixels / getPerRow();
     }
 
     public int getThumbHeight() {
-        return mDisplayMetrics.heightPixels / (GenericThumbnailAdapter.PER_ROW + 2);
+        return mDisplayMetrics.heightPixels / (getPerRow() + 2);
     }
 
     public Float getFromX() {

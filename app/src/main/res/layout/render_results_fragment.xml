@@ -25,6 +25,4 @@
         android:visibility="gone"
         android:textColor="@color/black" />
 
-
-
 </RelativeLayout>

@@ -23,8 +23,6 @@ import org.ww.ai.R;
 import org.ww.ai.rds.PagingCache;
 import org.ww.ai.rds.ifenum.GalleryAdapterCallbackIF;
 
-import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHolder>
@@ -88,22 +86,8 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
             mOnGalleryThumbSelection.onImageClickListener(uid);
         });
         holder.requestedPosition = holder.getAbsoluteAdapterPosition();
-        Optional<PagingCache.PagingEntry> optional = mPagingCache.getPagingEntries()
-                .stream().parallel().filter(p -> p.idx == position).findAny();
-        if (optional.isPresent()) {
-            mHolderMap.put(holder.requestedPosition, holder);
-            displayThumbnail(optional.get());
-        } else {
-            boolean needsInc = needsIncrementCacheReload(position);
-            boolean needsDec = needsDecrementCacheReload(position);
-            if (needsInc || needsDec) {
-                mThumbRequests.add(new ThumbLoadRequest<>(new PagingCache.PagingEntry(), holder));
-                mPagingCache.fillCache(mContext, holder.requestedPosition, needsDec && !needsInc
-                        ? position - PagingCache.PAGE_SIZE
-                        : position, this, mUseTrash, needsDec && !needsInc);
-            }
-            mHolderMap.put(holder.requestedPosition, holder);
-        }
+
+        doCacheManagement(holder, position);
     }
 
     @Override
@@ -138,22 +122,9 @@ public class GalleryAdapter extends GenericThumbnailAdapter<RenderResultViewHold
         mPosToUidMapping.put(holder.getAbsoluteAdapterPosition(), pagingEntry.renderResultLightWeight.uid);
     }
 
-    private boolean needsIncrementCacheReload(int idx) {
-        if (mThumbRequests.isEmpty()) {
-            return true;
-        }
-        OptionalInt max = mThumbRequests.stream().mapToInt(t -> t.startIdx).max();
-        int maxIdxAvail = max.getAsInt() + PagingCache.PAGE_SIZE - 1;
-        return idx > maxIdxAvail;
-    }
-
-    private boolean needsDecrementCacheReload(int idx) {
-        if (mThumbRequests.isEmpty()) {
-            return false;
-        }
-        OptionalInt min = mThumbRequests.stream().mapToInt(t -> t.startIdx).min();
-        int minIdxAvail = min.getAsInt();
-        return idx < minIdxAvail;
+    @Override
+    public int getPerRow() {
+        return 3;
     }
 
 }
