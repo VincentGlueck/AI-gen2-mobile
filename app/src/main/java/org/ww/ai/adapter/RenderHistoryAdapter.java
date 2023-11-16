@@ -89,6 +89,8 @@ public class RenderHistoryAdapter extends GenericThumbnailAdapter<RenderHistoryV
         List<EngineUsedNonDao> enginesUsed = pagingEntry.renderResultLightWeight.enginesUsed;
         if (enginesUsed != null && !enginesUsed.isEmpty()) {
             ShowRenderModelsLinearLayout enginesUsedView = new ShowRenderModelsLinearLayout(mContext);
+            holder.flexboxLayout.removeAllViews();
+            holder.flexboxLayout.invalidate();
             enginesUsedView.init(mContext, holder.rootView, enginesUsed);
             holder.flexboxLayout.addView(enginesUsedView);
         }

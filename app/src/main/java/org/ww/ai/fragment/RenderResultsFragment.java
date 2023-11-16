@@ -16,6 +16,8 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -137,7 +139,10 @@ public class RenderResultsFragment extends Fragment implements ReceiveEventIF, O
 
     @Override
     public void onImageClickListener(int uid) {
-
+        NavController navController = NavHostFragment.findNavController(RenderResultsFragment.this);
+        Bundle bundle = new Bundle();
+        bundle.putInt(RenderDetailsFragment.ARG_UID, uid);
+        navController.navigate(R.id.action_RenderResultsFragment_to_GalleryFullSizeFragment, bundle);
     }
 
     @Override

@@ -49,20 +49,8 @@
             android:id="@+id/action_RenderResultsFragment_to_MainFragment"
             app:destination="@id/MainFragment" />
         <action
-            android:id="@+id/action_RenderResultsFragment_to_ShowRenderDetailsFragment"
-            app:destination="@id/RenderDetailsFragment" />
-        <action
             android:id="@+id/action_RenderResultsFragment_to_GalleryFullSizeFragment"
             app:destination="@id/GalleryFullSizeFragment" />
-        <action
-            android:id="@+id/action_RenderResultsFragment_to_GalleryFullSizeFragment2"
-            app:destination="@id/GalleryFullSizeFragment" />
-        <action
-            android:id="@+id/action_RenderResultsFragment_to_GalleryFullSizeFragment3"
-            app:destination="@id/GalleryFullSizeFragment" />
-        <action
-            android:id="@+id/action_RenderResultsFragment_to_RenderDetailsFragment"
-            app:destination="@id/RenderDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/RenderDetailsFragment"
